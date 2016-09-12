@@ -187,6 +187,11 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
             // animation to make the push transition work right
             let actions : () -> Void = {
                 self.navigationItem.title = item.block.displayName
+                if item.block.displayName == "Yammer" {
+                    let alert = UIAlertView(title: kAppName, message: "Yammer feature is under progress. Sorry for the inconvenience.", delegate: nil, cancelButtonTitle: "OK")
+                    alert.show()
+                    
+                }
                 self.webController.info = self.openOnWebInfoForBlock(item.block)
             }
             if let navigationBar = navigationController?.navigationBar where navigationItem.title != nil {

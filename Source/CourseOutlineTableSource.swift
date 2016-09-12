@@ -164,7 +164,52 @@ class CourseOutlineTableController : UITableViewController, CourseVideoTableView
     override func tableView(tableView: UITableView, didSelectRowAtIndexPath indexPath: NSIndexPath) {
         let group = groups[indexPath.section]
         let chosenBlock = group.children[indexPath.row]
+        //self.delegate?.outlineTableController(self, choseBlock: chosenBlock, withParentID: group.block.blockID)
+        //kAMAT_CHANGES
+        /*
+        if chosenBlock.displayName == "Yammer"
+        {
+        let yammerAlert = UIAlertController(title: kAppName, message: "Yammer article will open in Safari", preferredStyle: .Alert)
+        yammerAlert.addAction(UIAlertAction(title: "Cancel", style: .Default, handler: { (UIAlertAction) in
+        if let path = self.tableView.indexPathForSelectedRow {
+        self.tableView.deselectRowAtIndexPath(path, animated: false)
+        }
+        //self.dismissViewControllerAnimated(true, completion: nil)
+        }))
+        yammerAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (UIAlertAction) in
+        self.openYammerInSafari(chosenBlock.blockURL!)
+        }))
+        
+        self.presentViewController(yammerAlert, animated: true, completion: nil)
+        
+        } else {
         self.delegate?.outlineTableController(self, choseBlock: chosenBlock, withParentID: group.block.blockID)
+        }*/
+        
+        if chosenBlock.displayName == "Yammer"
+        {
+            let yammerAlert = UIAlertController(title: kAppName, message: "Yammer feature is under progress. Sorry for the inconvenience.", preferredStyle: .Alert)
+            yammerAlert.addAction(UIAlertAction(title: "OK", style: .Default, handler: { (UIAlertAction) in
+                if let path = self.tableView.indexPathForSelectedRow {
+                    self.tableView.deselectRowAtIndexPath(path, animated: false)
+                }
+                //self.dismissViewControllerAnimated(true, completion: nil)
+            }))
+            self.presentViewController(yammerAlert, animated: true, completion: nil)
+            
+        } else {
+            self.delegate?.outlineTableController(self, choseBlock: chosenBlock, withParentID: group.block.blockID)
+        }
+    }
+    
+    func openYammerInSafari(yammerUrl :NSURL)
+    {
+        if let path = self.tableView.indexPathForSelectedRow {
+            self.tableView.deselectRowAtIndexPath(path, animated: false)
+        }
+        if UIApplication .sharedApplication().canOpenURL(yammerUrl) {
+            [UIApplication .sharedApplication().openURL(yammerUrl)];
+        }
     }
     
     func videoCellChoseDownload(cell: CourseVideoTableViewCell, block : CourseBlock) {
