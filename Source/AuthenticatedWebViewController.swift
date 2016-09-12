@@ -81,7 +81,7 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
         case LoadingContent
         case NeedingSession
     }
-
+    
     public typealias Environment = protocol<OEXAnalyticsProvider, OEXConfigProvider, OEXSessionProvider>
     
     internal let environment : Environment
@@ -93,7 +93,7 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
         let controller = WKWebViewContentController()
         controller.webView.navigationDelegate = self
         return controller
-    
+        
     }()
     
     private var state = State.CreatingSession
@@ -226,7 +226,7 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
     }
     
     // MARK: WKWebView delegate
-
+    
     public func webView(webView: WKWebView, decidePolicyForNavigationAction navigationAction: WKNavigationAction, decisionHandler: (WKNavigationActionPolicy) -> Void) {
         switch navigationAction.navigationType {
         case .LinkActivated, .FormSubmitted, .FormResubmitted:
@@ -242,9 +242,9 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
     public func webView(webView: WKWebView, decidePolicyForNavigationResponse navigationResponse: WKNavigationResponse, decisionHandler: (WKNavigationResponsePolicy) -> Void) {
         
         if let
-        httpResponse = navigationResponse.response as? NSHTTPURLResponse,
-        statusCode = OEXHTTPStatusCode(rawValue: httpResponse.statusCode),
-        errorGroup = statusCode.errorGroup
+            httpResponse = navigationResponse.response as? NSHTTPURLResponse,
+            statusCode = OEXHTTPStatusCode(rawValue: httpResponse.statusCode),
+            errorGroup = statusCode.errorGroup
             where state == .LoadingContent
         {
             switch errorGroup {
@@ -285,19 +285,38 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
         showError(error)
     }
     
+    //kAMAT Changes
+    /*
+    public func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+    // Don't use basic auth on exchange endpoint. That is explicitly non protected
+    // and it screws up the authorization headers
+    if let URL = webView.URL where URL.absoluteString.hasSuffix(OAuthExchangePath) {
+    completionHandler(.PerformDefaultHandling, nil)
+    }
+    else if let credential = environment.config.URLCredentialForHost(challenge.protectionSpace.host)  {
+    completionHandler(.UseCredential, credential)
+    }
+    else {
+    completionHandler(.PerformDefaultHandling, nil)
+    }
+    }
+    */
+    
     public func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
         // Don't use basic auth on exchange endpoint. That is explicitly non protected
         // and it screws up the authorization headers
         if let URL = webView.URL where URL.absoluteString.hasSuffix(OAuthExchangePath) {
-            completionHandler(.PerformDefaultHandling, nil)
+            let credential = NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!)
+            completionHandler(.UseCredential, credential)
         }
-        else if let credential = environment.config.URLCredentialForHost(challenge.protectionSpace.host)  {
+        else if var credential = environment.config.URLCredentialForHost(challenge.protectionSpace.host)  {
+            credential = NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!)
             completionHandler(.UseCredential, credential)
         }
         else {
-            completionHandler(.PerformDefaultHandling, nil)
+            let credential = NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!)
+            completionHandler(.UseCredential, credential)
         }
     }
-
 }
 
