@@ -13,7 +13,7 @@ public struct CourseCatalogAPI {
     static func coursesDeserializer(response : NSHTTPURLResponse, json : JSON) -> Result<[OEXCourse]> {
         return (json.array?.flatMap {item in
             item.dictionaryObject.map { OEXCourse(dictionary: $0) }
-        }).toResult()
+            }).toResult()
     }
     
     static func courseDeserializer(response : NSHTTPURLResponse, json : JSON) -> Result<OEXCourse> {
@@ -32,17 +32,32 @@ public struct CourseCatalogAPI {
         case Mobile = "mobile"
     }
     
+    //kAMAT_Changes
+    /*
+    public static func getCourseCatalog(userID: String, page : Int) -> NetworkRequest<Paginated<[OEXCourse]>> {
+    return NetworkRequest(
+    method: .GET,
+    path : "api/courses/v1/courses/",
+    query : [
+    Params.Mobile.rawValue: JSON(true),
+    Params.User.rawValue: JSON(userID),
+    ],
+    requiresAuth : true,
+    deserializer: .JSONResponse(coursesDeserializer)
+    ).paginated(page: page)
+    }
+    */
+    //REMOVED THE USER ID AS NOT NEEDED FOR FIND COURSES
     public static func getCourseCatalog(userID: String, page : Int) -> NetworkRequest<Paginated<[OEXCourse]>> {
         return NetworkRequest(
             method: .GET,
             path : "api/courses/v1/courses/",
             query : [
                 Params.Mobile.rawValue: JSON(true),
-                Params.User.rawValue: JSON(userID),
             ],
             requiresAuth : true,
             deserializer: .JSONResponse(coursesDeserializer)
-        ).paginated(page: page)
+            ).paginated(page: page)
     }
     
     public static func getCourse(courseID: String) -> NetworkRequest<OEXCourse> {
@@ -57,13 +72,13 @@ public struct CourseCatalogAPI {
             method: .POST,
             path: "api/enrollment/v1/enrollment",
             requiresAuth: true,
-
+            
             body: .JSONBody(JSON([
                 "course_details" : [
                     "course_id": courseID,
                     "email_opt_in": emailOptIn
                 ]
-            ])),
+                ])),
             deserializer: .JSONResponse(enrollmentDeserializer)
         )
     }
