@@ -74,7 +74,8 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
     }
     
     func coursesTableChoseCourse(course: OEXCourse) {
-        guard let courseID = course.course_id else {
+        //kAMAT Changes
+        guard let courseID = course.course_id_amat else {
             return
         }
         self.environment.router?.showCourseCatalogDetail(courseID, fromController:self)

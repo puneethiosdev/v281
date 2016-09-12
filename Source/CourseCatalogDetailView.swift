@@ -11,7 +11,7 @@ private let margin : CGFloat = 20
 import edXCore
 
 class CourseCatalogDetailView : UIView, UIWebViewDelegate {
-
+    
     private struct Field {
         let name : String
         let value : String
@@ -99,7 +99,7 @@ class CourseCatalogDetailView : UIView, UIWebViewDelegate {
         playButton.layer.shadowRadius = 3
         playButton.layer.shadowOffset = CGSizeZero
         courseCard.addCenteredOverlay(playButton)
-
+        
         descriptionView.scrollView.oex_addObserver(self, forKeyPath: "bounds") { (observer, scrollView, _) -> Void in
             let offset = scrollView.contentOffset.y + scrollView.contentInset.top
             // Even though it's in the webview's scrollview,
@@ -134,7 +134,9 @@ class CourseCatalogDetailView : UIView, UIWebViewDelegate {
         didSet {
             if let blurb = blurbText where !blurb.isEmpty {
                 self.blurbLabel.attributedText = blurbStyle.attributedStringWithText(blurb)
-                self.blurbLabel.hidden = false
+                //kAMAT_CHANGES 2.0
+                //Hiding this as per AMAT design
+                self.blurbLabel.hidden = true
             }
             else {
                 self.blurbLabel.hidden = true
