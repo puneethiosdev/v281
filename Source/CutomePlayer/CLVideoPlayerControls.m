@@ -26,6 +26,10 @@
 #import "OEXAuthentication.h"
 #import "OEXUserDetails.h"
 #import "OEXVideoSummary.h"
+    //kAMAT_CHANGES 2.0
+#import "OEXClosedCaptionTableViewCell.h"
+#import "OEXConstants.h"
+
 
 static NSString* const kIndex = @"kIndex";
 static NSString* const kStart = @"kStart";
@@ -511,7 +515,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     }
     else if(self.style == CLVideoPlayerControlsStyleEmbedded || (self.style == CLVideoPlayerControlsStyleDefault && !self.moviePlayer.isFullscreen)) {
         fontSize = 12.0;
-        self.topBar.hidden = YES;
+            //kAMAT_Changes 3.0
+        self.topBar.hidden = NO;
+            //        self.topBar.hidden = YES;
     }
 
     self.subtitleLabel.font = [UIFont fontWithName:@"OpenSans" size:fontSize];
@@ -761,7 +767,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [_bottomBar addSubview:_btnSettings];
 
     self.btnLMS = [[CLButton alloc] init];
-    [self.btnLMS setImage:[UIImage OpenURL] forState:UIControlStateNormal];
+    [self.btnLMS setImage:[UIImage imageNamed:@"ic_captions.png"] forState:UIControlStateNormal];
+        //    [self.btnLMS setImage:[UIImage OpenURL] forState:UIControlStateNormal];
     [self.btnLMS addTarget:self action:@selector(LMSBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     self.btnLMS.delegate = self;
     [_topBar addSubview:self.btnLMS];
@@ -894,6 +901,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         switch(state) {
             case CLVideoPlayerControlsStateLoading :
                 [self showLoadingIndicators];
+                NSString *captionURL = self.video.summary.transcripts[[OEXInterface getCCSelectedLanguage]];
+                [self activateSubTitles:captionURL];
                 break;
             case CLVideoPlayerControlsStateReady:
                 //Commented hide login indicators
@@ -988,7 +997,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 
     // Hide unhide the option tableview
     self.view_OptionsOverlay.hidden = NO;
-    self.tableSettings.hidden = NO;
+        //kAMAT_CHANGES 2.0
+    self.tableSettings.hidden = YES;
     self.view_OptionsInner.hidden = YES;
 
     [self bringSubviewToFront:self.tableSettings];
@@ -1004,7 +1014,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 #pragma CC methods
 
 - (void)LMSBtnClicked:(id)sender {
-    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.video.summary.unitURL]];
+//    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.video.summary.unitURL]];
+    [self.settings showCloasedCaptions];
 }
 
 # pragma mark - UIControl/Touch Events
@@ -1620,11 +1631,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     CGFloat rewindHeightWidth = 25.f;
     CGFloat settingsbtnSize = 24.f;
     CGFloat tableOptionWidth = 120.f;
-    CGFloat tableOptionHeight = 88.f;
+        //kAMAT_CHANGES changed from 88 to 44 as removed ClosedCaptions from the table
+    CGFloat tableOptionHeight = 44.f;
     CGFloat viewInnerWidth = 200.f;
     CGFloat viewInnerHeight = 240.f;
     CGFloat PrevNextButtonSize = 30.f;
-    CGFloat LMSButtonSize = 15.f;
+        //kAMAT_CHANGES 2.0 //Changed from 15.0f to 30.0f
+    CGFloat LMSButtonSize = 30.0f;
 
     CGFloat fullscreenBtnSize = 20.f;
 
@@ -1652,8 +1665,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.btnPrevious.frame = CGRectMake(paddingFromBezel, (self.frame.size.height / 2) - (PrevNextButtonSize / 2), PrevNextButtonSize, PrevNextButtonSize);
 
         self.btnNext.frame = CGRectMake(self.frame.size.width - paddingFromBezel - PrevNextButtonSize, (self.frame.size.height / 2) - (PrevNextButtonSize / 2), PrevNextButtonSize, PrevNextButtonSize);
-
-        self.btnLMS.frame = CGRectMake(self.frame.size.width - paddingFromBezel - LMSButtonSize, 18, LMSButtonSize, LMSButtonSize);
+            //kAMAT_Change 13 from 18
+        self.btnLMS.frame = CGRectMake(self.frame.size.width - paddingFromBezel - LMSButtonSize, 13 /*18*/, LMSButtonSize, LMSButtonSize);
 
         self.timeRemainingLabel.frame = CGRectMake(self.btnSettings.frame.origin.x - labelWidth, 0, labelWidth, self.barHeight);
 
