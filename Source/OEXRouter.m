@@ -1,10 +1,10 @@
-//
-//  OEXRouter.m
-//  edXVideoLocker
-//
-//  Created by Akiva Leffert on 1/29/15.
-//  Copyright (c) 2015 edX. All rights reserved.
-//
+    //
+    //  OEXRouter.m
+    //  edXVideoLocker
+    //
+    //  Created by Akiva Leffert on 1/29/15.
+    //  Copyright (c) 2015 edX. All rights reserved.
+    //
 
 #import <Masonry/Masonry.h>
 
@@ -26,6 +26,10 @@
 #import "OEXMyVideosViewController.h"
 #import "OEXCourse.h"
 #import "SWRevealViewController.h"
+
+    //kAMAT_CHANGES
+    //#import "UIWindow+TopController.h"
+#import "OEXAppDelegate.h"
 
 static OEXRouter* sSharedRouter;
 
@@ -92,6 +96,10 @@ OEXRegistrationViewControllerDelegate
     self.currentContentController = nil;
 }
 
+-(UIViewController*) getCurrentViewController{
+    return self.currentContentController;
+}
+
 - (void)makeContentControllerCurrent:(UIViewController*)controller {
     [self.containerViewController addChildViewController:controller];
     [self.containerViewController.view addSubview:controller.view];
@@ -103,7 +111,24 @@ OEXRegistrationViewControllerDelegate
     self.currentContentController = controller;
 }
 
+- (void)showSplash {
+    self.revealController = nil;
+    [self removeCurrentContentController];
+    
+    OEXLoginSplashViewControllerEnvironment* splashEnvironment = [[OEXLoginSplashViewControllerEnvironment alloc] initWithRouter:self];
+    OEXLoginSplashViewController* splashController = [[OEXLoginSplashViewController alloc] initWithEnvironment:splashEnvironment];
+    [self makeContentControllerCurrent:splashController];
+}
+
+
 - (void)showLoggedInContent {
+        //kAMAT_CHANGES
+        //    if ([[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers] count] &&[NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"edX.RevealViewController"]) {
+        //
+        //        NSLog(@" Tracked Controller %@",[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers]);
+        //        //NSLog(@"In RevealViewController");
+        //    }else{
+    
     [self removeCurrentContentController];
     
     OEXUserDetails* currentUser = self.environment.session.currentUser;
@@ -111,11 +136,19 @@ OEXRegistrationViewControllerDelegate
     
     self.revealController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"SideNavigationContainer"];
     self.revealController.delegate = self.revealController;
-    [self showMyCoursesAnimated:NO pushingCourseWithID:nil];
+    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"isDeepLink"] != nil) {
+        NSString *courseID = [[NSUserDefaults standardUserDefaults] objectForKey:@"isDeepLink"];
+        [self showCourseCatalogDetail:courseID];
+        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"isDeepLink"];
+        [[NSUserDefaults standardUserDefaults] synchronize];
+    } else {
+        [self showMyCoursesAnimated:NO pushingCourseWithID:nil];
+    }
     
     UIViewController* rearController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"RearViewController"];
     [self.revealController setDrawerViewController:rearController animated:NO];
     [self makeContentControllerCurrent:self.revealController];
+        //}
 }
 
 - (void)showLoginScreenFromController:(UIViewController*)controller completion:(void(^)(void))completion {
@@ -138,15 +171,21 @@ OEXRegistrationViewControllerDelegate
     if (fromController == nil) {
         fromController = self.containerViewController;
     }
-
+    
     [fromController presentViewController:controller animated:YES completion:completion];
 }
 
 - (void)showLoggedOutScreen {
-    [self showLoginScreenFromController:nil completion:^{
-        [self showSplash];
-    }];
     
+        //kAMAT_CHANGES
+    /*
+     [self showLoginScreenFromController:nil completion:^{
+     [self showSplash];
+     }];
+     */
+    
+        //FIX: Working
+    [self showSplash];
 }
 
 - (void)showAnnouncementsForCourseWithID:(NSString *)courseID {
@@ -154,7 +193,7 @@ OEXRegistrationViewControllerDelegate
     CourseAnnouncementsViewController* currentController = OEXSafeCastAsClass(navigation.topViewController, CourseAnnouncementsViewController);
     BOOL showingChosenCourse = [currentController.courseID isEqual:courseID];
     
-    if(!showingChosenCourse) { 
+    if(!showingChosenCourse) {
         CourseAnnouncementsViewController* announcementController = [[CourseAnnouncementsViewController alloc] initWithEnvironment:self.environment courseID:courseID];
         [navigation pushViewController:announcementController animated:YES];
     }

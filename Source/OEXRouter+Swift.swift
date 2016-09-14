@@ -259,6 +259,16 @@ extension OEXRouter {
         presentViewController(navController, fromController:nil, completion: nil)
     }
 
+    //kAMAT_Changes
+    func showCourseCatalogDetail(courseID: String) {
+        NSUserDefaults.standardUserDefaults().setObject(nil, forKey: "isDeepLink")
+        NSUserDefaults.standardUserDefaults().synchronize()
+        let controller = CourseCatalogViewController(environment: self.environment)
+        self.showContentStackWithRootController(controller, animated: true)
+        self.showCourseCatalogDetail(courseID,fromController: controller)
+    }
+
+    
     func showCourseCatalogDetail(courseID: String, fromController: UIViewController) {
         let detailController = CourseCatalogDetailViewController(environment: environment, courseID: courseID)
         fromController.navigationController?.pushViewController(detailController, animated: true)
