@@ -1,10 +1,10 @@
-//
-//  OEXVideoPlayerInterface.m
-//  edX_videoStreaming
-//
-//  Created by Nirbhay Agarwal on 13/05/14.
-//  Copyright (c) 2014 edX, Inc. All rights reserved.
-//
+    //
+    //  OEXVideoPlayerInterface.m
+    //  edX_videoStreaming
+    //
+    //  Created by Nirbhay Agarwal on 13/05/14.
+    //  Copyright (c) 2014 edX, Inc. All rights reserved.
+    //
 
 #import <AVFoundation/AVFoundation.h>
 
@@ -23,6 +23,9 @@
 @interface OEXVideoPlayerInterface ()
 {
     UILabel* labelTitle;
+        //kAMAT_CHANGES 2.0
+    NSMutableData      *responseData;
+    OEXHelperVideoDownload *globalVideo;
 }
 
 @property(nonatomic, assign) CGRect defaultFrame;
@@ -52,8 +55,8 @@
     self.fadeInOnLoad = YES;
     
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    //Add observer
-
+        //Add observer
+    
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(exitFullScreenMode:) name:MPMoviePlayerDidExitFullscreenNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(enterFullScreenMode:) name:MPMoviePlayerDidEnterFullscreenNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self
@@ -65,16 +68,16 @@
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
     
-    //create a player
+        //create a player
     self.moviePlayerController = [[CLVideoPlayer alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
     self.moviePlayerController.view.alpha = 0.f;
     self.moviePlayerController.delegate = self; //IMPORTANT!
     
-    //create the controls
+        //create the controls
     CLVideoPlayerControls* movieControls = [[CLVideoPlayerControls alloc] initWithMoviePlayer:self.moviePlayerController style:CLVideoPlayerControlsStyleDefault];
     [movieControls setBarColor:[UIColor colorWithRed:0.2 green:0.2 blue:0.2 alpha:0.9]];
     [movieControls setTimeRemainingDecrements:YES];
-    //assign controls
+        //assign controls
     [self.moviePlayerController setControls:movieControls];
     _shouldRotate = YES;
     NSError* error = nil;
@@ -88,40 +91,74 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(orientationChanged:) name:UIDeviceOrientationDidChangeNotification object:nil];
 }
 
+    //kAMAT_CHANGES 2.0
 - (void)playVideoFor:(OEXHelperVideoDownload*)video {
     _moviePlayerController.videoTitle = video.summary.name;
     _moviePlayerController.controls.video = video;
     NSURL* url = [NSURL URLWithString:video.summary.videoURL];
-
+    
     NSFileManager* filemgr = [NSFileManager defaultManager];
     NSString* path = [video.filePath stringByAppendingPathExtension:@"mp4"];
-
+    
     if([filemgr fileExistsAtPath:path]) {
         url = [NSURL fileURLWithPath:path];
     }
-
+    
     if(video.downloadState == OEXDownloadStateComplete && ![filemgr fileExistsAtPath:path]) {
         return;
     }
-
+    
     float timeinterval = [[OEXInterface sharedInterface] lastPlayedIntervalForVideo:video];
     [self updateLastPlayedVideoWith:video];
-    [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval];
+    
+        //kAMAT_CHANGES 2.0
+    [self checkCloudFrontURL:video withTimeInterval:timeinterval];
+    
+        //kAMAT_CHANGES 2.0
+        //    [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval];
+}
+
+    //kAMAT_CHANGES 2.0
+- (void)checkCloudFrontURL:(OEXHelperVideoDownload*)video withTimeInterval:(float)timeinterval{
+        //kAMAT_CHANGES 2.0
+    globalVideo = video;
+    NSURL* url = [NSURL URLWithString:video.summary.videoURL];
+    
+        //Validate empty URL
+    if (video.summary.videoURL.length == 0) {
+        [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval];
+    }else{
+        
+            //        OEXSession* session = [OEXSession sharedSession];
+            //        NSString *bearerToken =  [NSString stringWithFormat:@"Bearer %@", session.token.accessToken];
+        
+            //Validate cloudfront URL
+        if ([video.summary.videoURL containsString:CLOUD_FRONT_HOST_NAME]) {
+            NSMutableURLRequest *signingRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@", SERVER_URL, VIDEO_SIGNED_URL, [video.summary.videoURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
+            NSLog(@"%s -- Unsigned URL -%@",__FUNCTION__,signingRequest);
+            [signingRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
+                //            [signingRequest addValue:bearerToken forHTTPHeaderField:@"Autherization"];
+            [NSURLConnection connectionWithRequest:signingRequest delegate:self];
+        } else {
+            [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval];
+        }
+    }
+    
 }
 
 - (void)setViewFromVideoPlayerView:(UIView*)videoPlayerView {
     BOOL wasLoaded = self.isViewLoaded;
     self.view = videoPlayerView;
     if(!wasLoaded) {
-        // Call this manually since if we set self.view ourselves it doesn't ever get called.
-        // This whole thing should get factored so that we just always use our own view
-        // And owners can add it where they choose and the whole thing goes through the natural
-        // view controller APIs
+            // Call this manually since if we set self.view ourselves it doesn't ever get called.
+            // This whole thing should get factored so that we just always use our own view
+            // And owners can add it where they choose and the whole thing goes through the natural
+            // view controller APIs
         [self viewDidLoad];
         [self beginAppearanceTransition:true animated:true];
         [self endAppearanceTransition];
     }
-
+    
 }
 
 - (void)setVideoPlayerVideoView:(UIView*)videoPlayerVideoView {
@@ -155,15 +192,15 @@
         [_moviePlayerController.view setFrame:_videoPlayerVideoView.bounds];
         [self.view addSubview:_moviePlayerController.view];
     }
-
+    
     if(self.fadeInOnLoad) {
         self.moviePlayerController.view.alpha = 0.0f;
         double delayInSeconds = 0.3;
         dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
         dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
             [UIView animateWithDuration:1.0 animations:^{
-                    self.moviePlayerController.view.alpha = 1.f;
-                }];
+                self.moviePlayerController.view.alpha = 1.f;
+            }];
         });
     }
     else {
@@ -197,36 +234,36 @@
     switch([_moviePlayerController playbackState])
     {
         case MPMoviePlaybackStateStopped:
-            OEXLogInfo(@"VIDEO", @"Stopped");
-            break;
+        OEXLogInfo(@"VIDEO", @"Stopped");
+        break;
         case MPMoviePlaybackStatePlaying:
-            OEXLogInfo(@"VIDEO", @"Playing");
-            break;
+        OEXLogInfo(@"VIDEO", @"Playing");
+        break;
         case MPMoviePlaybackStatePaused:
-            OEXLogInfo(@"VIDEO", @"Playing");
-            break;
+        OEXLogInfo(@"VIDEO", @"Playing");
+        break;
         case MPMoviePlaybackStateInterrupted:
-            OEXLogInfo(@"VIDEO", @"Interrupted");
-            break;
+        OEXLogInfo(@"VIDEO", @"Interrupted");
+        break;
         case MPMoviePlaybackStateSeekingForward:
-            OEXLogInfo(@"VIDEO", @"Seeking Forward");
-            break;
+        OEXLogInfo(@"VIDEO", @"Seeking Forward");
+        break;
         case MPMoviePlaybackStateSeekingBackward:
-            OEXLogInfo(@"VIDEO", @"Seeking Backward");
-            break;
+        OEXLogInfo(@"VIDEO", @"Seeking Backward");
+        break;
     }
 }
 
 - (void)playbackEnded:(NSNotification*)notification {
     int reason = [[[notification userInfo] valueForKey:MPMoviePlayerPlaybackDidFinishReasonUserInfoKey] intValue];
     if(reason == MPMovieFinishReasonPlaybackEnded) {
-        //NSLog(@"Reason: movie finished playing");
+            //NSLog(@"Reason: movie finished playing");
     }
     else if(reason == MPMovieFinishReasonUserExited) {
-        //NSLog(@"Reason: user hit done button");
+            //NSLog(@"Reason: user hit done button");
     }
     else if(reason == MPMovieFinishReasonPlaybackError) {
-        //NSLog(@"Reason: error --> VideoPlayerInterface.m");
+            //NSLog(@"Reason: error --> VideoPlayerInterface.m");
         [self.moviePlayerController.view removeFromSuperview];
     }
 }
@@ -240,10 +277,10 @@
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [_moviePlayerController setShouldAutoplay:NO];
     
-    // There appears to be an OS bug on iOS 8
-    // where if you don't call "stop" before a movie player view disappears
-    // it can cause a crash
-    // See http://stackoverflow.com/questions/31188035/overreleased-mpmovieplayercontroller-under-arc-in-ios-sdk-8-4-on-ipad
+        // There appears to be an OS bug on iOS 8
+        // where if you don't call "stop" before a movie player view disappears
+        // it can cause a crash
+        // See http://stackoverflow.com/questions/31188035/overreleased-mpmovieplayercontroller-under-arc-in-ios-sdk-8-4-on-ipad
     if([UIDevice isOSVersionAtLeast9]) {
         [_moviePlayerController pause];
     }
@@ -267,7 +304,7 @@
 - (void)orientationChanged:(NSNotification*)notification {
     if(_shouldRotate) {
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(manageOrientation) object:nil];
-
+        
         if(![self isVerticallyCompact]) {
             [self manageOrientation];
         }
@@ -281,9 +318,9 @@
     if(!((self.moviePlayerController.playbackState == MPMoviePlaybackStatePlaying) || self.moviePlayerController.playbackState == MPMoviePlaybackStatePaused ) && !_moviePlayerController.isFullscreen) {
         return;
     }
-
+    
     UIInterfaceOrientation deviceOrientation = [self currentOrientation];
-
+    
     if(deviceOrientation == UIInterfaceOrientationPortrait) {      // PORTRAIT MODE
         if(self.moviePlayerController.fullscreen) {
             [_moviePlayerController setFullscreen:NO withOrientation:UIInterfaceOrientationPortrait];
@@ -328,36 +365,36 @@
         }
         
     }
-    //calulate the frame on every rotation, so when we're returning from fullscreen mode we'll know where to position the movie player
+        //calulate the frame on every rotation, so when we're returning from fullscreen mode we'll know where to position the movie player
     self.defaultFrame = CGRectMake(self.view.frame.size.width / 2 - _width / 2, 0, _width, _height);
-
-    //only manage the movie player frame when it's not in fullscreen. when in fullscreen, the frame is automatically managed
-
+    
+        //only manage the movie player frame when it's not in fullscreen. when in fullscreen, the frame is automatically managed
+    
     if(self.moviePlayerController.isFullscreen) {
         return;
     }
-
-    //you MUST use [CLMoviePlayerController setFrame:] to adjust frame, NOT [CLMoviePlayerController.view setFrame:]
+    
+        //you MUST use [CLMoviePlayerController setFrame:] to adjust frame, NOT [CLMoviePlayerController.view setFrame:]
     [self.moviePlayerController setFrame:self.defaultFrame];
-    //    self.moviePlayerController.view.layer.borderColor = [UIColor redColor].CGColor;
-    //    self.moviePlayerController.view.layer.borderWidth = 2;
+        //    self.moviePlayerController.view.layer.borderColor = [UIColor redColor].CGColor;
+        //    self.moviePlayerController.view.layer.borderWidth = 2;
 }
 
 - (void)moviePlayerWillMoveFromWindow {
-    //movie player must be readded to this view upon exiting fullscreen mode.
-
+        //movie player must be readded to this view upon exiting fullscreen mode.
+    
     if(![self.view.subviews containsObject:self.moviePlayerController.view]) {
         [self.view addSubview:self.moviePlayerController.view];
     }
-
-    //you MUST use [CLMoviePlayerController setFrame:] to adjust frame, NOT [CLMoviePlayerController.view setFrame:]
-    //NSLog(@"set frame from  player delegate ");
+    
+        //you MUST use [CLMoviePlayerController setFrame:] to adjust frame, NOT [CLMoviePlayerController.view setFrame:]
+        //NSLog(@"set frame from  player delegate ");
     [self.moviePlayerController setFrame:self.defaultFrame];
 }
 
 - (void)playerDidStopPlaying:(NSURL*)videoUrl atPlayBackTime:(float)currentTime {
     NSString* url = [videoUrl absoluteString];
-
+    
     if([_lastPlayedVideo.summary.videoURL isEqualToString:url] || [_lastPlayedVideo.filePath isEqualToString:url]) {
         if(currentTime > 0) {
             NSTimeInterval totalTime = self.moviePlayerController.duration;
@@ -398,8 +435,64 @@
 
 - (void)dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
-
+    
     _moviePlayerController.delegate = nil;
 }
+
+#pragma mark - NSURLConnection Delegate methods
+
+- (BOOL)connection:(NSURLConnection *)connection canAuthenticateAgainstProtectionSpace:(NSURLProtectionSpace *)protectionSpace {
+    NSLog(@"Is Authentication Required ? YES");
+    return YES;
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
+    
+        //    NSURLCredential *credential = [NSURLCredential credentialWithUser:@"staff" password:@"edx123" persistence:NSURLCredentialPersistenceForSession];
+        //
+    NSURLCredential *credential = [NSURLCredential credentialWithUser:@"" password:@"" persistence:NSURLCredentialPersistenceForSession];
+    
+    [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
+}
+
+- (void)connection:(NSURLConnection *)connection didReceiveResponse:(NSURLResponse *)response
+{
+    NSLog(@"%s", __func__);
+    responseData = [NSMutableData new];
+    
+}
+- (void)connection:(NSURLConnection *)connection didReceiveData:(NSData *)data
+{
+    NSLog(@"%s", __func__);
+    [responseData appendData:data];
+    
+    
+}
+- (void)connection:(NSURLConnection *)connection
+  didFailWithError:(NSError *)error
+{
+    NSLog(@"Connection failed! Error - %@ ",[error localizedDescription]) ;
+}
+- (void)connectionDidFinishLoading:(NSURLConnection *)connection
+{
+    NSLog(@"%s", __func__);
+    if (responseData != nil) {
+        NSString *response = [[NSString alloc] initWithData:responseData encoding:NSASCIIStringEncoding];
+        NSLog(@"%s -- Signed URL -%@",__FUNCTION__,response);
+        NSLog(@"%s -- Signed URL After replacing spaces -%@",__FUNCTION__,[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
+        if (response) {
+                //[self playSignedVideo:[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] inTable:self.table_Videos atIndex:selectedVideoIndexPath];
+                //            [self playSignedVideo:response inTable:self.table_Videos atIndex:selectedVideoIndexPath];
+            float timeinterval = [[OEXInterface sharedInterface] lastPlayedIntervalForVideo:globalVideo];
+            [self playVideoFromURL:[NSURL URLWithString:response] withTitle:globalVideo.summary.name
+                      timeInterval:timeinterval];
+            
+        }
+    }else{
+        UIAlertView *nilDataAlert = [[UIAlertView alloc] initWithTitle:kAppName message:@"Unable to Play video. Please try again" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [nilDataAlert show];
+    }
+}
+
 
 @end
