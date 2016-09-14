@@ -58,6 +58,60 @@ private func setupTable(table: UITableView) {
                 self?.delegate?.setPlaybackSpeed(speed)
         }
         
+        //kAMAT_CHANGES 2.0
+        //Removing the Closed Captions from here and replacing with Share option.
+        /*
+        if let transcripts: [String: String] = self.delegate?.videoInfo().transcripts as? [String: String] {
+        var rows = [RowType]()
+        for lang: String in transcripts.keys {
+        let locale = NSLocale(localeIdentifier: lang)
+        let displayLang: String = locale.displayNameForKey(NSLocaleLanguageCode, value: lang)!
+        let item: RowType = (title: displayLang, value: lang)
+        rows.append(item)
+        }
+        
+        
+        let cc = OEXVideoPlayerSetting(title: "Closed Captions", rows: rows, isSelected: { (row) -> Bool in
+        var selected = false
+        if let selectedLanguage:String = OEXInterface.getCCSelectedLanguage() {
+        let lang = rows[row].value as! String
+        selected = selectedLanguage == lang
+        }
+        return selected
+        }) {[weak self] value in
+        self?.delegate?.setCaption(value as! String)
+        }
+        return [cc, speeds]
+        } else
+        {  */
+        return [speeds]
+        //        }
+    }()
+    
+    //kAMAT_CHANGES
+    //Creating one more settings object for Closed Captions
+    private lazy var cCsettings: [OEXVideoPlayerSetting] = {
+        self.updateMargins() //needs to be done here because the table loads the data too soon otherwise and it's nil
+        //kAMAT_CHANGES 2.0
+        //Removing the Speed option here as taking teh Captions separately.
+        /*
+        let rows:[RowType] = [("0.5x",  OEXVideoSpeed.Slow), ("1.0x", OEXVideoSpeed.Default), ("1.5x", OEXVideoSpeed.Fast), ("2.0x", OEXVideoSpeed.XFast)]
+        let speeds = OEXVideoPlayerSetting(title: "Video Speed", rows:rows , isSelected: { (row) -> Bool in
+        var selected = false
+        let savedSpeed = OEXInterface.getCCSelectedPlaybackSpeed()
+        
+        let speed = rows[row].value as! OEXVideoSpeed
+        
+        selected = savedSpeed == speed
+        
+        return selected
+        }) {[weak self] value in
+        let speed = value as! OEXVideoSpeed
+        self?.delegate?.setPlaybackSpeed(speed)
+        }
+        */
+        
+        
         if let transcripts: [String: String] = self.delegate?.videoInfo().transcripts as? [String: String] {
             var rows = [RowType]()
             for lang: String in transcripts.keys {
@@ -76,22 +130,70 @@ private func setupTable(table: UITableView) {
                 }
                 return selected
                 }) {[weak self] value in
-                self?.delegate?.setCaption(value as! String)
+                    self?.delegate?.setCaption(value as! String)
             }
-            return [cc, speeds]
-        } else {
-            return [speeds]
+            return [cc]
         }
+        return []
+        //               }
     }()
+    
+    
+    
     weak var delegate: OEXVideoPlayerSettingsDelegate?
-
+    
     func updateMargins() {
         optionsTable.layoutMargins = UIEdgeInsetsZero
     }
     
+    //kAMAT CHANGES 2.0
+    func showCloasedCaptions() {
+        let selectedSetting = cCsettings[0]
+        
+        let alert = UIAlertController(title: selectedSetting.title, message: nil, preferredStyle: .ActionSheet)
+        
+        for (i, row) in selectedSetting.rows.enumerate() {
+            var title = row.title
+            if selectedSetting.isSelected(row: i) {
+                //Can't use font awesome here
+                title = NSString(format: Strings.videoSettingSelected, row.title) as String
+                
+            }
+            
+            alert.addAction(UIAlertAction(title: title, style:.Default, handler: { _ in
+                selectedSetting.callback(value: row.value)
+            }))
+        }
+        alert.addCancelAction()
+        delegate?.showSubSettings(alert)
+    }
+    
+    //kAMAT CHANGES 2.0
+    func showVideoSpeed() {
+        let selectedSetting = settings[0]
+        
+        let alert = UIAlertController(title: selectedSetting.title, message: nil, preferredStyle: .ActionSheet)
+        
+        for (i, row) in selectedSetting.rows.enumerate() {
+            var title = row.title
+            if selectedSetting.isSelected(row: i) {
+                //Can't use font awesome here
+                title = NSString(format: Strings.videoSettingSelected, row.title) as String
+                
+            }
+            
+            alert.addAction(UIAlertAction(title: title, style:.Default, handler: { _ in
+                selectedSetting.callback(value: row.value)
+            }))
+        }
+        alert.addCancelAction()
+        delegate?.showSubSettings(alert)
+    }
+    
+    
     init(delegate: OEXVideoPlayerSettingsDelegate, videoInfo: OEXVideoSummary) {
         self.delegate = delegate
-
+        
         super.init()
         
         optionsTable.dataSource = self
@@ -117,7 +219,7 @@ extension OEXVideoPlayerSettings: UITableViewDataSource, UITableViewDelegate {
         cell.viewDisable?.backgroundColor = UIColor.whiteColor()
         cell.layoutMargins = UIEdgeInsetsZero
         cell.backgroundColor = UIColor.whiteColor()
-     
+        
         let setting = settings[indexPath.row]
         cell.lbl_Title?.text = setting.title
         
@@ -134,9 +236,9 @@ extension OEXVideoPlayerSettings: UITableViewDataSource, UITableViewDelegate {
             if selectedSetting.isSelected(row: i) {
                 //Can't use font awesome here
                 title = NSString(format: Strings.videoSettingSelected, row.title) as String
-
+                
             }
-
+            
             alert.addAction(UIAlertAction(title: title, style:.Default, handler: { _ in
                 selectedSetting.callback(value: row.value)
             }))
@@ -145,4 +247,7 @@ extension OEXVideoPlayerSettings: UITableViewDataSource, UITableViewDelegate {
         delegate?.showSubSettings(alert)
     }
 }
+
+
+
 
