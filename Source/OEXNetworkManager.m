@@ -1,10 +1,10 @@
-//
-//  NetworkManager.m
-//  edX_videoStreaming
-//
-//  Created by Nirbhay Agarwal on 05/05/14.
-//  Copyright (c) 2014 edX, Inc. All rights reserved.
-//
+    //
+    //  NetworkManager.m
+    //  edX_videoStreaming
+    //
+    //  Created by Nirbhay Agarwal on 05/05/14.
+    //  Copyright (c) 2014 edX, Inc. All rights reserved.
+    //
 
 #import "OEXNetworkManager.h"
 
@@ -41,14 +41,14 @@ static OEXNetworkManager* _sharedManager = nil;
 
 - (void)initBackgroundSession {
     if(!_backgroundSession) {
-        //Configuration
+            //Configuration
         NSURLSessionConfiguration* backgroundConfiguration = [NSURLSessionConfiguration defaultSessionConfiguration];
-
+        
         if([OEXAuthentication authHeaderForApiAccess]) {
             NSDictionary* headers = [NSDictionary dictionaryWithObjectsAndKeys:[OEXAuthentication authHeaderForApiAccess], @"Authorization", nil ];
             [backgroundConfiguration setHTTPAdditionalHeaders:headers];
         }
-        //Session
+            //Session
         self.backgroundSession = [NSURLSession sessionWithConfiguration:backgroundConfiguration
                                                                delegate:self
                                                           delegateQueue:nil];
@@ -57,15 +57,15 @@ static OEXNetworkManager* _sharedManager = nil;
 
 - (void)initForegroundSession {
     if(!_foregroundSession) {
-        //Configurarion
+            //Configurarion
         NSURLSessionConfiguration* foregroundConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
-
-        //Session
+        
+            //Session
         if([OEXAuthentication authHeaderForApiAccess]) {
             NSDictionary* headers = [NSDictionary dictionaryWithObjectsAndKeys:[OEXAuthentication authHeaderForApiAccess], @"Authorization", nil ];
             [foregroundConfig setHTTPAdditionalHeaders:headers];
         }
-
+        
         self.foregroundSession = [NSURLSession sessionWithConfiguration:foregroundConfig
                                                                delegate:self
                                                           delegateQueue:nil];
@@ -86,37 +86,37 @@ static OEXNetworkManager* _sharedManager = nil;
 
 - (void)startBackgroundDownloadForSession:(NSURLSession*)session withURL:(NSURL*)url {
     if(!session) {
-        //ELog(@"session missing!!!");
+            //ELog(@"session missing!!!");
     }
-    //Request
+        //Request
     NSURLRequest* request = [NSURLRequest requestWithURL:url];
-    //Task
+        //Task
     NSURLSessionDownloadTask* downloadTask = nil;
     downloadTask = [session downloadTaskWithRequest:request];
-
+    
     [downloadTask resume];
 }
 
 - (void)processURLInBackground:(NSURL*)url {
     [self startBackgroundDownloadForSession:[self sessionForRequest:url] withURL:url];
-
-    //Notify delegate
+    
+        //Notify delegate
     [_delegate downloadAddedForURL:url];
 }
 
 - (void)checkIfURLUnderProcess:(NSURL*)url {
-    //Check if null
+        //Check if null
     if(!url || [url.absoluteString isEqualToString:@""]) {
         return;
     }
-
+    
     [[self sessionForRequest:url] getTasksWithCompletionHandler:^(NSArray* dataTasks, NSArray* uploadTasks, NSArray* downloadTasks) {
-        //Check if already downloading
+            //Check if already downloading
         BOOL alreadyInProgress = NO;
         for(int ii = 0; ii < [downloadTasks count]; ii++) {
             NSURLSessionDownloadTask* downloadTask = [downloadTasks objectAtIndex:ii];
             NSURL* existingURL = downloadTask.originalRequest.URL;
-
+            
             if([[url absoluteString] isEqualToString:[existingURL absoluteString]]) {
                 alreadyInProgress = YES;
                 break;
@@ -158,7 +158,7 @@ static OEXNetworkManager* _sharedManager = nil;
         [_sharedManager initBackgroundSession];
         [_sharedManager initForegroundSession];
     }
-
+    
     return _sharedManager;
 }
 
@@ -188,13 +188,13 @@ static OEXNetworkManager* _sharedManager = nil;
 }
 
 - (void)URLSession:(NSURLSession*)session didBecomeInvalidWithError:(NSError*)error {
-    //ELog(@"URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)error \n '%@'", [error description]);
+        //ELog(@"URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)error \n '%@'", [error description]);
 }
 
 - (void)URLSessionDidFinishEventsForBackgroundURLSession:(NSURLSession*)session {
     if([self isValidSession:session]) {
-        //ELog(@"URLSessionDidFinishEventsForBackgroundURLSession");
-        //invoke background session completion handler
+            //ELog(@"URLSessionDidFinishEventsForBackgroundURLSession");
+            //invoke background session completion handler
         [self invokeBackgroundSessionCompletionHandlerForSession:session];
     }
 }
@@ -207,15 +207,15 @@ static OEXNetworkManager* _sharedManager = nil;
     if(![self isValidSession:session]) {
         return;
     }
-
+    
     NSData* data = [NSData dataWithContentsOfURL:location];
     NSString* fileUrl = [OEXFileUtility filePathForRequestKey:[downloadTask.originalRequest.URL absoluteString]];
-
-    //Write data in main thread
+    
+        //Write data in main thread
     dispatch_async(dispatch_get_main_queue(), ^{
         if(fileUrl) {
             if([data writeToURL:[NSURL fileURLWithPath:fileUrl] options:NSDataWritingAtomic error:nil]) {
-                //notify
+                    //notify
                 [[NSNotificationCenter defaultCenter] postNotificationName:DL_COMPLETE
                                                                     object:self
                                                                   userInfo:@{DL_COMPLETE_N_TASK: downloadTask}];
@@ -229,8 +229,8 @@ static OEXNetworkManager* _sharedManager = nil;
             OEXLogInfo(@"NETWORK", @"Data meta data not found, not saved.");
         }
     });
-
-    //invoke background session completion handler
+    
+        //invoke background session completion handler
     [self invokeBackgroundSessionCompletionHandlerForSession:session];
 }
 
@@ -261,12 +261,24 @@ static OEXNetworkManager* _sharedManager = nil;
 #pragma mark NSURLDataTask Delegate
 
 - (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition, NSURLCredential * _Nullable))completionHandler {
-    NSURLCredential* credential = [[OEXConfig sharedConfig] URLCredentialForHost:challenge.protectionSpace.host];
-    if(credential != nil) {
-        completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
-    }
-    else {
-        completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+    
+        //kAMAT_CHANGES;
+    /*
+     NSURLCredential* credential = [[OEXConfig sharedConfig] URLCredentialForHost:challenge.protectionSpace.host];
+     if(credential != nil) {
+     completionHandler(NSURLSessionAuthChallengeUseCredential, credential);
+     }
+     else {
+     completionHandler(NSURLSessionAuthChallengePerformDefaultHandling, nil);
+     }
+     */
+    
+        //This delegate method will invoke when Authentication is required
+    if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]){
+        if([challenge.protectionSpace.host isEqualToString:[[[OEXConfig sharedConfig].apiHostURL.absoluteString stringByReplacingOccurrencesOfString:@"https://" withString:@""] stringByReplacingOccurrencesOfString:@"http://" withString:@""]]){
+            NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+            completionHandler(NSURLSessionAuthChallengeUseCredential,credential);
+        }
     }
 }
 
@@ -276,16 +288,16 @@ static OEXNetworkManager* _sharedManager = nil;
     if(![self isValidSession:session]) {
         return;
     }
-
-    //Status
+    
+        //Status
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     int responseStatusCode = (int)[httpResponse statusCode];
     if(responseStatusCode != 200) {
-        //ELog(@"Data Task failed for request [%@], Error [%d]", dataTask.taskDescription, responseStatusCode);
+            //ELog(@"Data Task failed for request [%@], Error [%d]", dataTask.taskDescription, responseStatusCode);
         [_delegate receivedFailureforTask:dataTask];
         return;
     }
-
+    
     completionHandler(NSURLSessionResponseAllow);
 }
 
@@ -294,20 +306,20 @@ static OEXNetworkManager* _sharedManager = nil;
     if(![self isValidSession:session]) {
         return;
     }
-
-    //ELog(@"NSURLDataTask didReceiveData");
+    
+        //ELog(@"NSURLDataTask didReceiveData");
     [_delegate receivedData:data forTask:dataTask];
 }
 
 - (void)       URLSession:(NSURLSession*)session dataTask:(NSURLSessionDataTask*)dataTask
     didBecomeDownloadTask:(NSURLSessionDownloadTask*)downloadTask {
-    //ELog(@"URLSession : didBecomeDownloadTask");
+        //ELog(@"URLSession : didBecomeDownloadTask");
 }
 
 - (void)   URLSession:(NSURLSession*)session dataTask:(NSURLSessionDataTask*)dataTask
     willCacheResponse:(NSCachedURLResponse*)proposedResponse
     completionHandler:(void (^)(NSCachedURLResponse* cachedResponse))completionHandler {
-    //ELog(@"URLSession : willCacheResponse");
+        //ELog(@"URLSession : willCacheResponse");
 }
 
 - (void)            URLSession:(NSURLSession*)session
@@ -318,11 +330,11 @@ static OEXNetworkManager* _sharedManager = nil;
     if(![self isValidSession:session]) {
         return;
     }
-
+    
     NSMutableURLRequest* mutablerequest = [request mutableCopy];
     NSString* authValue = [NSString stringWithFormat:@"%@", [OEXAuthentication authHeaderForApiAccess]];
     [mutablerequest setValue:authValue forHTTPHeaderField:@"Authorization"];
-
+    
     completionHandler([mutablerequest copy]);
 }
 
@@ -330,17 +342,27 @@ static OEXNetworkManager* _sharedManager = nil;
 }
 
 - (void)callAuthorizedWebServiceWithURLPath:(NSString*)urlPath method:(NSString*)method body:(NSData*)body completionHandler:(void (^)(NSData* data, NSURLResponse* response, NSError* error))completionHandle {
-    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", [OEXConfig sharedConfig].apiHostURL, urlPath]];
+    NSURL* url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@", [OEXConfig sharedConfig].apiHostURL.absoluteString, urlPath]];
     NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:url];
-
+    
     [request setHTTPMethod:method];
-
+    
     [request setValue:@"application/json; charset=utf-8" forHTTPHeaderField:@"Content-Type"];
-
+    
     [request setHTTPBody:body];
-
+    
     NSURLSession* session = [self sessionForRequest:url];
     [[session dataTaskWithRequest:request completionHandler:completionHandle] resume];
 }
 
+
+#pragma mark - NSURLSessionTaskDelegate Methods
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+    [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+    
+}
 @end
