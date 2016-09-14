@@ -1,10 +1,10 @@
-//
-//  OEXCourse.m
-//  edXVideoLocker
-//
-//  Created by Rahul Varma on 05/06/14.
-//  Copyright (c) 2014 edX. All rights reserved.
-//
+    //
+    //  OEXCourse.m
+    //  edXVideoLocker
+    //
+    //  Created by Rahul Varma on 05/06/14.
+    //  Copyright (c) 2014 edX. All rights reserved.
+    //
 
 #import "OEXCourse.h"
 
@@ -29,9 +29,9 @@ OEXStartType OEXStartTypeForString(NSString* type) {
 
 NSString* NSStringForOEXStartType(OEXStartType type) {
     switch(type) {
-    case OEXStartTypeString: return @"string";
-    case OEXStartTypeTimestamp: return @"timestamp";
-    case OEXStartTypeNone: return @"empty";
+        case OEXStartTypeString: return @"string";
+        case OEXStartTypeTimestamp: return @"timestamp";
+        case OEXStartTypeNone: return @"empty";
     }
 }
 
@@ -75,6 +75,9 @@ NSString* NSStringForOEXStartType(OEXStartType type) {
 @property (nonatomic, copy) NSString* org;
 @property (nonatomic, copy) NSString* video_outline;
 @property (nonatomic, copy) NSString* course_id;
+    //kAMAT_CHANGES
+@property (nonatomic, copy) NSString* course_id_amat;
+
 @property (nonatomic, copy) NSString* root_block_usage_key;
 @property (nonatomic, copy) NSString* subscription_id;
 @property (nonatomic, copy) NSString* number;
@@ -108,6 +111,9 @@ NSString* NSStringForOEXStartType(OEXStartType type) {
         self.org = [info objectForKey:@"org"];
         self.video_outline = [info objectForKey:@"video_outline"];
         self.course_id = [info objectForKey:@"id"];
+            //kAMAT_CHANGES
+        self.course_id_amat = [info objectForKey:@"course_id"];
+        
         self.root_block_usage_key = [info objectForKey:@"root_block_usage_key"];
         self.number = [info objectForKey:@"number"];
         self.effort = [info objectForKey:@"effort"];
@@ -132,7 +138,7 @@ NSString* NSStringForOEXStartType(OEXStartType type) {
             [parsedMediaInfo setObjectOrNil:info forKey:type];
         }];
         self.mediaInfo = parsedMediaInfo;
-
+        
     }
     return self;
 }

@@ -1,10 +1,10 @@
-//
-//  OEXCourse.h
-//  edXVideoLocker
-//
-//  Created by Rahul Varma on 05/06/14.
-//  Copyright (c) 2014-2015 edX. All rights reserved.
-//
+    //
+    //  OEXCourse.h
+    //  edXVideoLocker
+    //
+    //  Created by Rahul Varma on 05/06/14.
+    //  Copyright (c) 2014-2015 edX. All rights reserved.
+    //
 
 #import <Foundation/Foundation.h>
 
@@ -39,7 +39,7 @@ OEXStartType OEXStartTypeForString(NSString* type);
 @interface OEXCourse : NSObject
 
 - (id)initWithDictionary:(NSDictionary*)info;
-// TODO: Rename these to CamelCase (MK - eh just make this swift)
+    // TODO: Rename these to CamelCase (MK - eh just make this swift)
 @property (readonly, nonatomic, strong, nullable) OEXLatestUpdates* latest_updates;
 @property (readonly, nonatomic, strong, nullable) NSDate* end;
 @property (readonly, nonatomic, strong) OEXCourseStartDisplayInfo* start_display_info;
@@ -48,6 +48,8 @@ OEXStartType OEXStartTypeForString(NSString* type);
 @property (readonly, nonatomic, copy, nullable) NSString* video_outline;
 @property (readonly, nonatomic, copy, nullable) NSString* effort;
 @property (readonly, nonatomic, copy, nullable) NSString* course_id;
+    //kAMAT_CHANGES
+@property (readonly, nonatomic, copy, nullable) NSString* course_id_amat;
 @property (readonly, nonatomic, copy, nullable) NSString* root_block_usage_key;
 @property (readonly, nonatomic, copy, nullable) NSString* subscription_id;
 @property (readonly, nonatomic, copy, nullable) NSString* number;
