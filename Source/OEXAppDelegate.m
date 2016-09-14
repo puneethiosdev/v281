@@ -43,6 +43,9 @@
 #import "OEXRegistrationViewController.h"
 #import "OEXLoginSplashViewController.h"
 
+    //SFSafari
+#import <SafariServices/SafariServices.h>
+
 #import "OEXRouter.h"
 
 #define USER_EMAIL @"USERNAME"
@@ -50,7 +53,8 @@
 @interface OEXAppDelegate () <UIApplicationDelegate>{
     
     NSMutableDictionary *schemaDictionary;
-    bool isFromSourceApplicationAnnotation;
+        //SFSafari
+        //bool isFromSourceApplicationAnnotation;
     
         //kAMAT_CHANGES
     NSURLConnection *vpnConnection;
@@ -98,25 +102,15 @@
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
     
-        //    kAMAT_CHANGES 2.0
-    defaults = [NSUserDefaults standardUserDefaults];
-    
-    
-    [self setupGlobalEnvironment];
-    [self.environment.session performMigrations];
-    
-        //kAMAT_CHANGES 2.0
-        //[self.environment.router openInWindow:self.window];
-    OEXLoginViewController *dummyController = [[OEXLoginViewController alloc] init];
-    [self.window setRootViewController:dummyController];
-        //To remove the gap of displaying the sign in screen after successful SSO
-    isFromSourceApplicationAnnotation = NO;
-    
     if ([self.reachability isReachableViaWWAN])
         {
         UIAlertView *cellularInternetAlert = [[UIAlertView alloc] initWithTitle:nil message:OEXLocalizedString(@"CONNECT_TO_WIFI_MESSAGE", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [cellularInternetAlert show];
         }
+    
+    [self setupGlobalEnvironment];
+    [self.environment.session performMigrations];
+    [self.environment.router openInWindow:self.window];
     [self activateActivityIndictaor];
     
     [[FBSDKApplicationDelegate sharedInstance] application:application didFinishLaunchingWithOptions:launchOptions];
@@ -146,9 +140,8 @@
         [[OEXGoogleSocial sharedInstance] setHandledOpenUrl:YES];
     }
     
-    
-    NSLog(@"%s ",__FUNCTION__);
-    NSLog(@"query string: %@", [url query]);
+        //SFSafari
+    [self.window.rootViewController.presentedViewController dismissViewControllerAnimated:true completion:nil];
     
     if ([url.absoluteString containsString:UNDEFINED_USER]) {
         
@@ -201,7 +194,8 @@
             //Because two times openInWindow method is calling after successful SSO check
             //Here and applicationDidBecomeActive method.
             //So we are checking here
-        isFromSourceApplicationAnnotation = YES;
+            //SFSafari
+            //isFromSourceApplicationAnnotation = YES;
         [self.environment.router openInWindow:self.window];
     }
     
@@ -209,65 +203,31 @@
 }
 
     //kAMAT_CHANGES;
-#pragma Auto Connect VPN
+#pragma - Auto Connect VPN
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    NSLog(@"applicationDidBecomeActive");
-    
     if(!self.reachability) {
         
         UIAlertView *noInternetAlert = [[UIAlertView alloc] initWithTitle:OEXLocalizedString(@"NETWORK_NOT_AVAILABLE_TITLE", nil) message:OEXLocalizedString(@"NETWORK_NOT_AVAILABLE_MESSAGE", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [noInternetAlert show];
         
         [self stopRotatingActivityIndicator];
-        NSLog(@"%s - NO INTERNET ",__FUNCTION__);
     }
-    else {
-        NSLog(@"%s - YES INTERNET ",__FUNCTION__);
-        if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count] &&  [NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"OEXLoginSplashViewController"]) {
-            
-                //NSLog(@"%@",[[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]);
-                //NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
-            
-            if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count]) {
-                [(OEXLoginSplashViewController*)[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] rotateActivityIndicator];
-                [self performVPNAvailability];
-                NSLog(@"No Need of SSO because we are in signup,signin, eula");
-            }
-            
-        }else{
-                //NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
-            [self performVPNAvailability];
-        }    }
+    else{
+        [self performVPNAvailability];
+    }
 }
 
     //kAMAT_CHANGES
-#pragma VPN Check
+#pragma - VPN Check
 - (void) performVPNAvailability
 {
     [self rotateActivityIndicator];
     
-    NSURL *ceoURL = [NSURL URLWithString:[@"https://myid.amat.com:4431/IdentityWebService.svc/Person/?filter=DisplayName contains Gary Dickerson&sortBy=DisplayName&sortOrder=ASC&attributes=DisplayName&pageNumber=1&pageSize=1" stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    NSURL *ceoURL = [NSURL URLWithString:[VPN_CHECK_URL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     
     vpnConnection = [[NSURLConnection alloc ]initWithRequest:[NSURLRequest requestWithURL:ceoURL] delegate:self startImmediately:YES];
     [vpnConnection start];
-    /*
-     SEGReachability *netReach = [SEGReachability reachabilityWithHostname:@"appliedx.amat.com"];
-     NSString *reachStatus = [netReach currentReachabilityString];
-     if ([reachStatus isEqualToString:@"No Connection"]) {
-     reachStatus = @"Not Reachable (WiFi)!";
-     UIAlertView *vpnAlert = [[UIAlertView alloc] initWithTitle:@"VPN Connection" message:@"Please turn on VPN to use this app, Go to Settings->VPN->Switch ON" delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-     //        vpnAlert.tag = VPN_ALERT_TAG;
-     [vpnAlert show];
-     
-     } else if ([reachStatus isEqualToString:@"WiFi"]) {
-     reachStatus = @"Reachable (WiFi)!";
-     //        [self performSelector:@selector(checkDoWeNeedToCallSSO) withObject:nil afterDelay:1.0f];
-     } else if([reachStatus isEqualToString:@"Cellular"]) {
-     reachStatus = @"Reachable (Cellular)!";
-     //        [self performSelector:@selector(checkDoWeNeedToCallSSO) withObject:nil afterDelay:1.0f];
-     }
-     */
 }
 
 #pragma mark SSO
@@ -278,31 +238,24 @@
         //Check session
     OEXUserDetails* currentUser = self.environment.session.currentUser;
     if(currentUser == nil) {
-            //22Mar2016
         [self OpenSsoUrlInSafari];
-        NSLog(@"User not is available");
     }else{
-        if(currentUser == nil) {
-            [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@", PING_SSO_URL]]];
-        }else{
-            
-            if (isFromSourceApplicationAnnotation == NO) {
-                [self.environment.router openInWindow:self.window];
-            }
-            isFromSourceApplicationAnnotation = NO;
-        }
+        [self.environment.router openInWindow:self.window];
     }
 }
 - (void)OpenSsoUrlInSafari{
     
-    OEXUserDetails* currentUser = self.environment.session.currentUser;
-    
-    if(currentUser == nil) {
-        [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@", PING_SSO_URL]]];
-    }else{
-        [self.environment.router openInWindow:self.window];
-        
-    }
+    /*
+     OEXUserDetails* currentUser = self.environment.session.currentUser;
+     
+     if(currentUser == nil) {
+     [[UIApplication sharedApplication] openURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@", PING_SSO_URL]]];
+     }else{
+     [self.environment.router openInWindow:self.window];
+     }
+     */
+    SFSafariViewController *sfSafariVC = [[SFSafariViewController alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@", PING_SSO_URL]]];
+    [self.window.rootViewController presentViewController:sfSafariVC animated:true completion:nil];
 }
 
 #pragma mark Push Notifications
@@ -404,12 +357,7 @@
             {
             [self.environment.router openInWindow:self.window];
             }
-        /*else if (VERSION_ALERT_TAG == alertView.tag)
-         {
-         if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:kDownloadURLForProduction]]) {
-         [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kDownloadURLForProduction]];
-         }
-         }*/
+        
     } else if ((1 == buttonIndex) && (VERSION_ALERT_TAG == alertView.tag)) {
         if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:kDownloadURLForProduction]]) {
             [[UIApplication sharedApplication] openURL:[NSURL URLWithString:kDownloadURLForProduction]];
@@ -472,7 +420,6 @@
     return YES;
 }
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
-    NSLog(@"~~~~~ Authenticating....");
     NSURLCredential *credential = [NSURLCredential credentialWithUser:GENRIC_USERNAME password:GENRIC_PASSWORD persistence:NSURLCredentialPersistenceForSession];
     
     [[challenge sender] useCredential:credential forAuthenticationChallenge:challenge];
@@ -489,11 +436,9 @@
 {
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     int responseStatusCode = (int)[httpResponse statusCode];
-    NSLog(@"responseStatusCode for CEO check is  :%d", responseStatusCode);
     if (200 == responseStatusCode) {
             //kAMAT_CHANGES 2.0
             //[self.environment.router openInWindow:self.window];
-            //UNCOMMENT THE BELOW LINE WHILE IMPLEMENTING SSO
         if (vpnConnection == connection) {
             NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
             versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
@@ -535,9 +480,6 @@
             nextVersion = versionJson[@"app_version"];
         }
         
-        NSLog(@"versionJson is :%@", versionJson);
-        NSLog(@"the version key is  :%@", versionJson[@"app_version"]);
-        
             //Getting the Bundle version
         NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
         if (infoDict && infoDict.count) {
@@ -559,12 +501,6 @@
 continueUserActivity: (NSUserActivity *)userActivity
  restorationHandler: (void(^)(NSArray *restorableObjects))restorationHandler
 {
-    NSLog(@"the userActivity is : %@ /n and url is %@", userActivity, [userActivity.webpageURL absoluteString]);
-        //
-        //    [userActivity getContinuationStreamsWithCompletionHandler:^(
-        //                                                                NSInputStream *inputStream,
-        //                                                                NSOutputStream *outputStream, NSError *error) {
-        //
     NSString *subStr1 = [NSString stringWithFormat:@"%@", [userActivity.webpageURL absoluteString]];
     NSString *courseID;
     
@@ -604,11 +540,6 @@ continueUserActivity: (NSUserActivity *)userActivity
     } else {
         return NO;
     }
-    
-        //    }];
-    
-    
-        //    return YES;
 }
 
 
