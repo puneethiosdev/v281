@@ -1,3 +1,8 @@
-API_HOST_URL: 'http://localhost:8000'
-ENVIRONMENT_DISPLAY_NAME: 'Localhost'
-FEEDBACK_EMAIL_ADDRESS: 'support@example.com'
+API_HOST_URL: 'https://appliedx.amat.com'
+COURSE_ENROLLMENT:
+    ENABLED: true
+    EXTERNAL_COURSE_SEARCH_URL: 'https://appliedx.amat.com/courses'
+    COURSE_SEARCH_URL: 'https://appliedx.amat.com/courses'
+COURSE_SEARCH_URL: 'https://appliedx.amat.com/courses'
+ENVIRONMENT_DISPLAY_NAME: 'AMAT'
+FEEDBACK_EMAIL_ADDRESS: 'appliedx_ops@amat.com'
