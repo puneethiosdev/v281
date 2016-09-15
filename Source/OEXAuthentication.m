@@ -222,4 +222,77 @@ OEXNSDataTaskRequestHandler OEXWrapURLCompletion(OEXURLRequestHandler completion
     [[session dataTaskWithRequest:request completionHandler:OEXWrapURLCompletion(handler)]resume];
 }
 
+//AMAT Changes
+#pragma mark - NSURLSessionDelegate Methods
+
+- (void)URLSession:(NSURLSession *)session didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler{
+    
+    //This delegate method will invoke when Authentication is required
+    if([challenge.protectionSpace.authenticationMethod isEqualToString:NSURLAuthenticationMethodServerTrust]){
+        if([challenge.protectionSpace.host isEqualToString:[[[OEXConfig sharedConfig].apiHostURL.absoluteString stringByReplacingOccurrencesOfString:@"https://" withString:@""] stringByReplacingOccurrencesOfString:@"http://" withString:@""]]){
+            NSURLCredential *credential = [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust];
+            completionHandler(NSURLSessionAuthChallengeUseCredential,credential);
+        }
+    }
+    
+}
+
+#pragma mark - NSURLSessionTaskDelegate Methods
+
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
+didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge
+ completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+    [challenge.sender useCredential:[NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust] forAuthenticationChallenge:challenge];
+    
+}
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task
+didCompleteWithError:(NSError *)error{
+    
+}
+
+//AMAT Changes
+// This retuns header for password authentication method
+- (NSString*)plainTextAuthorizationHeaderForUserNameAndPassword:(NSString*)userName password:(NSString*)password {
+    NSString* clientID = [[OEXConfig sharedConfig] oauthClientID];
+    
+    NSMutableDictionary* arguments = [[NSMutableDictionary alloc] init];
+    [arguments safeSetObject:clientID forKey:@"client_id"];
+    [arguments safeSetObject:@"password" forKey:@"grant_type"];
+    [arguments safeSetObject:userName forKey:@"username"];
+    [arguments safeSetObject:password forKey:@"password"];
+    
+    return [arguments oex_stringByUsingFormEncoding];
+}
+
+//AMAT Changes
+//This method gets called when user try to login with username password
+- (void)requestTokenWithUser:(NSString* )username password:(NSString* )password completionHandler:(OEXURLRequestHandler)completionBlock {
+    NSString* body = [self plainTextAuthorizationHeaderForUserNameAndPassword:username password:password];
+    NSURLSessionConfiguration* sessionConfig = [NSURLSessionConfiguration defaultSessionConfiguration];
+    NSMutableURLRequest* request = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@", [OEXConfig sharedConfig].apiHostURL, AUTHORIZATION_URL]]];
+    [request setHTTPMethod:@"POST"];
+    [request setHTTPBody:[body dataUsingEncoding:NSUTF8StringEncoding]];
+    kAMAT_CHANGES;
+    //NSURLSession* session = [NSURLSession sessionWithConfiguration:sessionConfig];
+    NSURLSession* session = [NSURLSession sessionWithConfiguration:sessionConfig delegate:self delegateQueue:nil];
+    NSLog(@"%@ - Request - Login - %@",kAMAT_DEBUG,request.URL.absoluteString);
+    
+    [[session dataTaskWithRequest:request completionHandler:^(NSData* data, NSURLResponse* response, NSError* error) {
+        NSHTTPURLResponse* httpResp = (NSHTTPURLResponse*) response;
+        if(httpResp.statusCode == OEXHTTPStatusCode200OK) {
+            
+            NSError* error;
+            NSDictionary* dictionary = [NSJSONSerialization JSONObjectWithData:data options:kNilOptions error:&error];
+            OEXAccessToken* token = [[OEXAccessToken alloc] initWithTokenDetails:dictionary];
+            [OEXAuthentication handleSuccessfulLoginWithToken:token completionHandler:completionBlock];
+        }
+        else {
+            completionBlock(data, httpResp, error);
+        }
+    }]resume];
+}
+
+
 @end

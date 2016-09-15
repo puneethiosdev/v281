@@ -33,6 +33,8 @@ typedef void (^ OEXURLRequestHandler)(NSData* _Nullable data, NSHTTPURLResponse*
 + (void)resetPasswordWithEmailId:(NSString*)email completionHandler:(OEXURLRequestHandler)completionBlock;
 
 + (void)registerUserWithParameters:(NSDictionary*)parameters completionHandler:(OEXURLRequestHandler)handler;
+//AMAT Changes
+- (void)requestTokenWithUser:(NSString* )username password:(NSString* )password completionHandler:(OEXURLRequestHandler)completionBlock;
 
 @end
 
