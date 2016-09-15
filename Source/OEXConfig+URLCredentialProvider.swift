@@ -18,4 +18,10 @@ extension OEXConfig : URLCredentialProvider {
         }
         return nil
     }
+    @objc public func URLCredentialForServer(host : SecTrust) -> NSURLCredential? {
+        for item in self.basicAuthCredentials {
+            return item.URLCredential
+        }
+        return nil
+    }
 }
