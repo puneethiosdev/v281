@@ -89,7 +89,10 @@ public class CourseOutlineItemView: UIView {
     }
     
     func setDetailText(title : String) {
-        subtitleLabel.attributedText = CourseOutlineItemView.detailFontStyle.attributedStringWithText(title)
+        //kAMAT_Changes 2.0
+        //commenting this line to hide the duration for the video for the component.
+        //        subtitleLabel.attributedText = CourseOutlineItemView.detailFontStyle.attributedStringWithText(title)
+        subtitleLabel.text = ""
         setNeedsUpdateConstraints()
     }
     
