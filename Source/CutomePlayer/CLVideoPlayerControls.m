@@ -1004,7 +1004,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     self.tableSettings.hidden = YES;
     self.view_OptionsInner.hidden = YES;
     
-    [self bringSubviewToFront:self.tableSettings];
+//    [self bringSubviewToFront:self.tableSettings];
+    [self.settings showVideoSpeed];
 }
 
 - (void)analyticsShowTranscript {
