@@ -1,10 +1,10 @@
-    //
-    //  OEXAppDelegate.m
-    //  edXVideoLocker
-    //
-    //  Created by Nirbhay Agarwal on 15/05/14.
-    //  Copyright (c) 2014 edX. All rights reserved.
-    //
+//
+//  OEXAppDelegate.m
+//  edXVideoLocker
+//
+//  Created by Nirbhay Agarwal on 15/05/14.
+//  Copyright (c) 2014 edX. All rights reserved.
+//
 
 @import edXCore;
 #import <Crashlytics/Crashlytics.h>
@@ -36,14 +36,14 @@
 #import "OEXSession.h"
 #import "OEXSegmentConfig.h"
 
-    //kAMAT_CHANGES
+//kAMAT_CHANGES
 #import "SEGReachability.h"
 #import "OEXNetworkConstants.h"
 #import "OEXUserLicenseAgreementViewController.h"
 #import "OEXRegistrationViewController.h"
 #import "OEXLoginSplashViewController.h"
 
-    //SFSafari
+//SFSafari
 #import <SafariServices/SafariServices.h>
 
 #import "OEXRouter.h"
@@ -53,10 +53,10 @@
 @interface OEXAppDelegate () <UIApplicationDelegate>{
     
     NSMutableDictionary *schemaDictionary;
-        //SFSafari
-        //bool isFromSourceApplicationAnnotation;
+    //SFSafari
+    //bool isFromSourceApplicationAnnotation;
     
-        //kAMAT_CHANGES
+    //kAMAT_CHANGES
     NSURLConnection *vpnConnection;
     NSURLConnection *versionChkConnection;
     NSMutableData *versionData;
@@ -66,7 +66,7 @@
 @property (nonatomic, strong) NSMutableDictionary* dictCompletionHandler;
 @property (nonatomic, strong) OEXEnvironment* environment;
 
-    //kAMAT_CHANGES
+//kAMAT_CHANGES
 @property (strong, nonatomic) UIActivityIndicatorView* activityIndicator;
 
 @end
@@ -78,9 +78,9 @@
 
 - (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions {
 #if DEBUG
-        // Skip all this initialization if we're running the unit tests
-        // So they can start from a clean state.
-        // dispatch_async so that the XCTest bundle (where TestEnvironmentBuilder lives) has already loaded
+    // Skip all this initialization if we're running the unit tests
+    // So they can start from a clean state.
+    // dispatch_async so that the XCTest bundle (where TestEnvironmentBuilder lives) has already loaded
     if([[NSProcessInfo processInfo].arguments containsObject:@"-UNIT_TEST"]) {
         dispatch_async(dispatch_get_main_queue(), ^{
             Class builder = NSClassFromString(@"TestEnvironmentBuilder");
@@ -95,7 +95,7 @@
     }
 #endif
     
-        // logout user automatically if server changed
+    // logout user automatically if server changed
     [[[ServerChangedChecker alloc] init] logoutIfServerChanged];
     
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
@@ -103,10 +103,10 @@
     [self.window makeKeyAndVisible];
     
     if ([self.reachability isReachableViaWWAN])
-        {
+    {
         UIAlertView *cellularInternetAlert = [[UIAlertView alloc] initWithTitle:nil message:OEXLocalizedString(@"CONNECT_TO_WIFI_MESSAGE", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
         [cellularInternetAlert show];
-        }
+    }
     
     [self setupGlobalEnvironment];
     [self.environment.session performMigrations];
@@ -140,7 +140,7 @@
         [[OEXGoogleSocial sharedInstance] setHandledOpenUrl:YES];
     }
     
-        //SFSafari
+    //SFSafari
     [self.window.rootViewController.presentedViewController dismissViewControllerAnimated:true completion:nil];
     
     if ([url.absoluteString containsString:UNDEFINED_USER]) {
@@ -155,13 +155,13 @@
         NSArray *urlComponents = [urlSchemaString componentsSeparatedByString:@"&"];
         
         for (NSString *keyValuePair in urlComponents)
-            {
+        {
             NSArray *pairComponents = [keyValuePair componentsSeparatedByString:@"="];
             NSString *key = [[pairComponents firstObject] stringByRemovingPercentEncoding];
             NSString *value = [[pairComponents lastObject] stringByRemovingPercentEncoding];
             
             [schemaDictionary setObject:value forKey:key];
-            }
+        }
         
         NSLog(@"The Schema dictionary is:%@", schemaDictionary);
         
@@ -181,28 +181,28 @@
         OEXUserDetails* userDetails = [[OEXUserDetails alloc] initWithUserDictionary:customUserDetails];
         [[OEXSession sharedSession] saveAccessToken:accessToken userDetails:userDetails];
         
-            //These methods are implemented by edx after sign in
+        //These methods are implemented by edx after sign in
         [[OEXGoogleSocial sharedInstance] clearHandler];
         
         [OEXInterface setCCSelectedLanguage:@""];
         [[NSUserDefaults standardUserDefaults] setObject:schemaDictionary[@"user"] forKey:USER_EMAIL];
-            // Analytics User Login
+        // Analytics User Login
         
         [[OEXAnalytics sharedAnalytics] trackUserLogin:@"SSO"];
         
-            //kAMAT_CHANGES for v2.0
-            //Because two times openInWindow method is calling after successful SSO check
-            //Here and applicationDidBecomeActive method.
-            //So we are checking here
-            //SFSafari
-            //isFromSourceApplicationAnnotation = YES;
+        //kAMAT_CHANGES for v2.0
+        //Because two times openInWindow method is calling after successful SSO check
+        //Here and applicationDidBecomeActive method.
+        //So we are checking here
+        //SFSafari
+        //isFromSourceApplicationAnnotation = YES;
         [self.environment.router openInWindow:self.window];
     }
     
     return handled;
 }
 
-    //kAMAT_CHANGES;
+//kAMAT_CHANGES;
 #pragma - Auto Connect VPN
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
@@ -214,11 +214,26 @@
         [self stopRotatingActivityIndicator];
     }
     else{
-        [self performVPNAvailability];
+        NSLog(@"%s - YES INTERNET ",__FUNCTION__);
+        if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count] &&  [NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"OEXLoginSplashViewController"]) {
+            
+            NSLog(@"%@",[[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]);
+            NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
+            
+            if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count]) {
+                [(OEXLoginSplashViewController*)[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] rotateActivityIndicator];
+                [self performVPNAvailability];
+                NSLog(@"No Need of SSO because we are in signup,signin, eula");
+            }
+            
+        }else{
+            //NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
+            [self performVPNAvailability];
+        }
     }
 }
 
-    //kAMAT_CHANGES
+//kAMAT_CHANGES
 #pragma - VPN Check
 - (void) performVPNAvailability
 {
@@ -235,7 +250,7 @@
     
     [self stopRotatingActivityIndicator];
     
-        //Check session
+    //Check session
     OEXUserDetails* currentUser = self.environment.session.currentUser;
     if(currentUser == nil) {
         [self OpenSsoUrlInSafari];
@@ -299,7 +314,7 @@
     if(handler) {
         [self.dictCompletionHandler removeObjectForKey: identifier];
         OEXLogInfo(@"DOWNLOADS", @"Calling completion handler for session %@", identifier);
-            //[self presentNotification];
+        //[self presentNotification];
         handler();
     }
 }
@@ -314,27 +329,27 @@
     
     OEXConfig* config = self.environment.config;
     
-        //Logging
+    //Logging
     [DebugMenuLogger setup];
     
-        //Rechability
+    //Rechability
     self.reachability = [[InternetReachability alloc] init];
     [_reachability startNotifier];
     
-        //SegmentIO
+    //SegmentIO
     OEXSegmentConfig* segmentIO = [config segmentConfig];
     if(segmentIO.apiKey && segmentIO.isEnabled) {
         [SEGAnalytics setupWithConfiguration:[SEGAnalyticsConfiguration configurationWithWriteKey:segmentIO.apiKey]];
     }
     
-        //NewRelic Initialization with edx key
+    //NewRelic Initialization with edx key
     OEXNewRelicConfig* newrelic = [config newRelicConfig];
     if(newrelic.apiKey && newrelic.isEnabled) {
         [NewRelicAgent enableCrashReporting:NO];
         [NewRelicAgent startWithApplicationToken:newrelic.apiKey];
     }
     
-        //Initialize Fabric
+    //Initialize Fabric
     OEXFabricConfig* fabric = [config fabricConfig];
     if(fabric.appKey && fabric.isEnabled) {
         [Fabric with:@[CrashlyticsKit]];
@@ -354,9 +369,9 @@
                 [vpnAlert show];
             }
         } else if (SIGN_UP_ALERT_TAG == alertView.tag)
-            {
+        {
             [self.environment.router openInWindow:self.window];
-            }
+        }
         
     } else if ((1 == buttonIndex) && (VERSION_ALERT_TAG == alertView.tag)) {
         if ([[UIApplication sharedApplication] canOpenURL:[NSURL URLWithString:kDownloadURLForProduction]]) {
@@ -437,8 +452,8 @@
     NSHTTPURLResponse* httpResponse = (NSHTTPURLResponse*)response;
     int responseStatusCode = (int)[httpResponse statusCode];
     if (200 == responseStatusCode) {
-            //kAMAT_CHANGES 2.0
-            //[self.environment.router openInWindow:self.window];
+        //kAMAT_CHANGES 2.0
+        //[self.environment.router openInWindow:self.window];
         if (vpnConnection == connection) {
             NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
             versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
@@ -446,10 +461,10 @@
             
             versionData = [[NSMutableData alloc] initWithCapacity:0];
             if (!versionChkConnection)
-                {
+            {
                 versionChkConnection = nil;
                 versionData = nil;
-                }
+            }
             
             
             [self performSelector:@selector(checkDoWeNeedToCallSSO) withObject:nil afterDelay:1.0f];
@@ -480,13 +495,13 @@
             nextVersion = versionJson[@"app_version"];
         }
         
-            //Getting the Bundle version
+        //Getting the Bundle version
         NSDictionary* infoDict = [[NSBundle mainBundle] infoDictionary];
         if (infoDict && infoDict.count) {
             currentVersion = [[NSBundle mainBundle] objectForInfoDictionaryKey:(NSString *)kCFBundleVersionKey];
         }
         
-            //Comparing the versions
+        //Comparing the versions
         if(![currentVersion isEqualToString:nextVersion]){
             UIAlertView *versionAlert = [[UIAlertView alloc] initWithTitle:@"AppliedX" message:[NSString stringWithFormat:@"%@ v%@ %@", kVERSION_ALERT_TEXT1, nextVersion, kVERSION_ALERT_TEXT2] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Update", nil];
             [versionAlert setTag:VERSION_ALERT_TAG];
@@ -496,7 +511,7 @@
     }//version check
 }
 
-    //kAMAT_Changes 2.0
+//kAMAT_Changes 2.0
 - (BOOL)application:(UIApplication *)application
 continueUserActivity: (NSUserActivity *)userActivity
  restorationHandler: (void(^)(NSArray *restorableObjects))restorationHandler

@@ -122,33 +122,32 @@ OEXRegistrationViewControllerDelegate
 
 
 - (void)showLoggedInContent {
-        //kAMAT_CHANGES
-        //    if ([[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers] count] &&[NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"edX.RevealViewController"]) {
-        //
-        //        NSLog(@" Tracked Controller %@",[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers]);
-        //        //NSLog(@"In RevealViewController");
-        //    }else{
-    
-    [self removeCurrentContentController];
-    
-    OEXUserDetails* currentUser = self.environment.session.currentUser;
-    [self.environment.analytics identifyUser:currentUser];
-    
-    self.revealController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"SideNavigationContainer"];
-    self.revealController.delegate = self.revealController;
-    if ([[NSUserDefaults standardUserDefaults] objectForKey:@"isDeepLink"] != nil) {
-        NSString *courseID = [[NSUserDefaults standardUserDefaults] objectForKey:@"isDeepLink"];
-        [self showCourseCatalogDetail:courseID];
-        [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"isDeepLink"];
-        [[NSUserDefaults standardUserDefaults] synchronize];
-    } else {
-        [self showMyCoursesAnimated:NO pushingCourseWithID:nil];
+    //kAMAT_CHANGES
+    if ([[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers] count] &&[NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"edX.RevealViewController"]) {
+        
+        NSLog(@" Tracked Controller %@",[[UIWindow getVisibleViewControllerFrom:[[[UIApplication sharedApplication] keyWindow] rootViewController]] childViewControllers]);
+        //NSLog(@"In RevealViewController");
+    }else{
+        [self removeCurrentContentController];
+        
+        OEXUserDetails* currentUser = self.environment.session.currentUser;
+        [self.environment.analytics identifyUser:currentUser];
+        
+        self.revealController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"SideNavigationContainer"];
+        self.revealController.delegate = self.revealController;
+        if ([[NSUserDefaults standardUserDefaults] objectForKey:@"isDeepLink"] != nil) {
+            NSString *courseID = [[NSUserDefaults standardUserDefaults] objectForKey:@"isDeepLink"];
+            [self showCourseCatalogDetail:courseID];
+            [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"isDeepLink"];
+            [[NSUserDefaults standardUserDefaults] synchronize];
+        } else {
+            [self showMyCoursesAnimated:NO pushingCourseWithID:nil];
+        }
+        
+        UIViewController* rearController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"RearViewController"];
+        [self.revealController setDrawerViewController:rearController animated:NO];
+        [self makeContentControllerCurrent:self.revealController];
     }
-    
-    UIViewController* rearController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"RearViewController"];
-    [self.revealController setDrawerViewController:rearController animated:NO];
-    [self makeContentControllerCurrent:self.revealController];
-        //}
 }
 
 - (void)showLoginScreenFromController:(UIViewController*)controller completion:(void(^)(void))completion {

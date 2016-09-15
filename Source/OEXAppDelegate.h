@@ -9,6 +9,8 @@
 @import UIKit;
 @import MessageUI;
 #import "Reachability.h"
+    //kAMAT_CHANGES
+#import "UIWindow+TopController.h"
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -18,7 +20,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) id <Reachability> reachability;
 @property MFMailComposeViewController *appliedxMailVC;
-    //KAMAT_CHANGES
+    //kAMAT_CHANGES
 - (void) performVPNAvailability;
 
 - (void)callCompletionHandlerForSession:(NSString*)identifier;
