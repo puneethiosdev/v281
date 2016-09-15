@@ -791,7 +791,14 @@ public class Request {
                 if challenge.previousFailureCount > 0 {
                     disposition = .CancelAuthenticationChallenge
                 } else {
+                    //kAMAT Changes
+                    /*
                     credential = self.credential ?? session.configuration.URLCredentialStorage?.defaultCredentialForProtectionSpace(challenge.protectionSpace)
+                    if credential != nil {
+                        disposition = .UseCredential
+                    }
+                     */
+                    credential = NSURLCredential(forTrust:challenge.protectionSpace.serverTrust!)
                     if credential != nil {
                         disposition = .UseCredential
                     }
