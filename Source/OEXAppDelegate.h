@@ -1,17 +1,16 @@
-    //
-    //  OEXAppDelegate.h
-    //  edXVideoLocker
-    //
-    //  Created by Nirbhay Agarwal on 15/05/14.
-    //  Copyright (c) 2014-2016 edX. All rights reserved.
-    //
+//
+//  OEXAppDelegate.h
+//  edXVideoLocker
+//
+//  Created by Nirbhay Agarwal on 15/05/14.
+//  Copyright (c) 2014-2016 edX. All rights reserved.
+//
 
 @import UIKit;
 @import MessageUI;
 #import "Reachability.h"
-    //kAMAT_CHANGES
+//kAMAT_CHANGES
 #import "UIWindow+TopController.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 @class OEXCourse;
@@ -20,7 +19,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) id <Reachability> reachability;
 @property MFMailComposeViewController *appliedxMailVC;
-    //kAMAT_CHANGES
+//kAMAT_CHANGES
 - (void) performVPNAvailability;
 
 - (void)callCompletionHandlerForSession:(NSString*)identifier;
