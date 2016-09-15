@@ -12,7 +12,8 @@ import MessageUI
 import edXCore
 
 private enum OEXRearViewOptions: Int {
-    case UserProfile, MyCourse, MyVideos, FindCourses, MySettings, SubmitFeedback, Debug, Logout
+    //kAMAT_Changes
+    case UserProfile, MyCourse, /*MyVideos,*/ FindCourses, /*MySettings,*/ SubmitFeedback, Debug, Logout
 }
 
 private let LogoutCellDefaultHeight: CGFloat = 130.0
@@ -32,9 +33,11 @@ class OEXRearTableViewController : UITableViewController {
     }
     
     @IBOutlet var coursesLabel: UILabel!
-    @IBOutlet var videosLabel: UILabel!
+    //kAMAT_Changes
+    //@IBOutlet var videosLabel: UILabel!
     @IBOutlet var findCoursesLabel: UILabel!
-    @IBOutlet var settingsLabel: UILabel!
+    //kAMAT_Changes
+    //@IBOutlet var settingsLabel: UILabel!
     @IBOutlet var submitFeedbackLabel: UILabel!
     @IBOutlet var logoutButton: UIButton!
     
@@ -64,9 +67,11 @@ class OEXRearTableViewController : UITableViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OEXRearTableViewController.dataAvailable(_:)), name: NOTIFICATION_URL_RESPONSE, object: nil)
         
         coursesLabel.text = Strings.myCourses.oex_uppercaseStringInCurrentLocale()
-        videosLabel.text = Strings.myVideos.oex_uppercaseStringInCurrentLocale()
+        //kAMAT_Changes
+        //videosLabel.text = Strings.myVideos.oex_uppercaseStringInCurrentLocale()
         findCoursesLabel.text = Strings.findCourses.oex_uppercaseStringInCurrentLocale()
-        settingsLabel.text = Strings.mySettings.oex_uppercaseStringInCurrentLocale()
+        //kAMAT_Changes
+        //settingsLabel.text = Strings.mySettings.oex_uppercaseStringInCurrentLocale()
         submitFeedbackLabel.text = Strings.SubmitFeedback.optionTitle.oex_uppercaseStringInCurrentLocale()
         logoutButton.setTitle(Strings.logout.oex_uppercaseStringInCurrentLocale(), forState: .Normal)
         
@@ -105,9 +110,11 @@ class OEXRearTableViewController : UITableViewController {
     
     private func setNaturalTextAlignment() {
         coursesLabel.textAlignment = .Natural
-        videosLabel.textAlignment = .Natural
+        //kAMAT_Changes
+        //videosLabel.textAlignment = .Natural
         findCoursesLabel.textAlignment = .Natural
-        settingsLabel.textAlignment = .Natural
+        //kAMAT_Changes
+        //settingsLabel.textAlignment = .Natural
         submitFeedbackLabel.textAlignment = .Natural
         userNameLabel.textAlignment = .Natural
         userNameLabel.adjustsFontSizeToFitWidth = true
@@ -118,9 +125,11 @@ class OEXRearTableViewController : UITableViewController {
         userNameLabel.accessibilityLabel = userNameLabel.text
         userEmailLabel.accessibilityLabel = userEmailLabel.text
         coursesLabel.accessibilityLabel = coursesLabel.text
-        videosLabel.accessibilityLabel = videosLabel.text
+        //kAMAT_Changes
+        //videosLabel.accessibilityLabel = videosLabel.text
         findCoursesLabel.accessibilityLabel = findCoursesLabel.text
-        settingsLabel.accessibilityLabel = settingsLabel.text
+        //kAMAT_Changes
+        //settingsLabel.accessibilityLabel = settingsLabel.text
         submitFeedbackLabel.accessibilityLabel = submitFeedbackLabel.text
         logoutButton.accessibilityLabel = logoutButton.titleLabel!.text
         userProfilePicture.accessibilityLabel = Strings.accessibilityUserAvatar
@@ -157,13 +166,17 @@ class OEXRearTableViewController : UITableViewController {
                 environment.router?.showProfileForUsername(username: currentUserName)
             case .MyCourse:
                 environment.router?.showMyCourses()
+                /*
             case .MyVideos:
                 environment.router?.showMyVideos()
+                */
             case .FindCourses:
                 environment.router?.showCourseCatalog(nil)
                 environment.analytics.trackUserFindsCourses()
+                /*
             case .MySettings:
                 environment.router?.showMySettings()
+                 */
             case .SubmitFeedback:
                 launchEmailComposer()
             case .Debug:
