@@ -30,6 +30,7 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, retain) NSString* username;
 @property (nonatomic, retain) NSString* video_id;
 @property (nonatomic, retain) NSString* video_url;
+@property (nonatomic, retain) NSString* video_url_signed;
 
 @end
 

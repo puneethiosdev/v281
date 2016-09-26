@@ -27,5 +27,5 @@
 @dynamic username;
 @dynamic video_id;
 @dynamic video_url;
-
+@synthesize video_url_signed;
 @end
