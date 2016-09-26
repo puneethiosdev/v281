@@ -1,3 +1,8 @@
-API_HOST_URL: 'http://localhost:8000'
-ENVIRONMENT_DISPLAY_NAME: 'Localhost'
-FEEDBACK_EMAIL_ADDRESS: 'support@example.com'
+API_HOST_URL: 'locakHost://?'
+COURSE_ENROLLMENT:
+    ENABLED: true
+    EXTERNAL_COURSE_SEARCH_URL: 'locakHost://courses'
+    COURSE_SEARCH_URL: 'locakHost://courses'
+COURSE_SEARCH_URL: 'locakHost://?'
+ENVIRONMENT_DISPLAY_NAME: 'edX'
+FEEDBACK_EMAIL_ADDRESS: 'test@test.com'

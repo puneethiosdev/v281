@@ -92,54 +92,7 @@ class DownloadsAccessoryView : UIView {
      This is the original method, we created a duplicate one below to hide download option.
      When we require download option we can uncomment this method
      */
-    /*
-     var state : State {
-     didSet {
-     switch state {
-     case .Available:
-     useIcon(.ContentCanDownload)
-     downloadSpinner.hidden = true
-     downloadButton.userInteractionEnabled = true
-     downloadButton.hidden = false
-     self.userInteractionEnabled = true
-     countLabel.hidden = false
-     
-     if let count = itemCount {
-     let message = Strings.downloadManyVideos(videoCount: count)
-     self.accessibilityLabel = message
-     }
-     else {
-     self.accessibilityLabel = Strings.download
-     }
-     self.accessibilityTraits = UIAccessibilityTraitButton
-     case .Downloading:
-     downloadSpinner.startAnimating()
-     downloadSpinner.hidden = false
-     downloadButton.userInteractionEnabled = true
-     self.userInteractionEnabled = true
-     downloadButton.hidden = true
-     countLabel.hidden = true
-     
-     self.accessibilityLabel = Strings.downloading
-     self.accessibilityTraits = UIAccessibilityTraitButton
-     case .Done:
-     useIcon(.ContentDidDownload)
-     downloadSpinner.hidden = true
-     self.userInteractionEnabled = false
-     downloadButton.hidden = false
-     countLabel.hidden = false
-     
-     if let count = itemCount {
-     let message = Strings.downloadManyVideos(videoCount: count)
-     self.accessibilityLabel = message
-     }
-     else {
-     self.accessibilityLabel = Strings.downloaded
-     }
-     self.accessibilityTraits = UIAccessibilityTraitStaticText
-     }
-     }
-     }*/
+    
     var state : State {
         didSet {
             switch state {
@@ -147,9 +100,9 @@ class DownloadsAccessoryView : UIView {
                 useIcon(.ContentCanDownload)
                 downloadSpinner.hidden = true
                 downloadButton.userInteractionEnabled = true
-                downloadButton.hidden = true
+                downloadButton.hidden = false
                 self.userInteractionEnabled = true
-                countLabel.hidden = true
+                countLabel.hidden = false
                 
                 if let count = itemCount {
                     let message = Strings.downloadManyVideos(videoCount: count)
@@ -161,7 +114,7 @@ class DownloadsAccessoryView : UIView {
                 self.accessibilityTraits = UIAccessibilityTraitButton
             case .Downloading:
                 downloadSpinner.startAnimating()
-                downloadSpinner.hidden = true
+                downloadSpinner.hidden = false
                 downloadButton.userInteractionEnabled = true
                 self.userInteractionEnabled = true
                 downloadButton.hidden = true
@@ -173,8 +126,8 @@ class DownloadsAccessoryView : UIView {
                 useIcon(.ContentDidDownload)
                 downloadSpinner.hidden = true
                 self.userInteractionEnabled = false
-                downloadButton.hidden = true
-                countLabel.hidden = true
+                downloadButton.hidden = false
+                countLabel.hidden = false
                 
                 if let count = itemCount {
                     let message = Strings.downloadManyVideos(videoCount: count)
@@ -187,4 +140,52 @@ class DownloadsAccessoryView : UIView {
             }
         }
     }
+    /*
+     var state : State {
+     didSet {
+     switch state {
+     case .Available:
+     useIcon(.ContentCanDownload)
+     downloadSpinner.hidden = true
+     downloadButton.userInteractionEnabled = true
+     downloadButton.hidden = true
+     self.userInteractionEnabled = true
+     countLabel.hidden = true
+     
+     if let count = itemCount {
+     let message = Strings.downloadManyVideos(videoCount: count)
+     self.accessibilityLabel = message
+     }
+     else {
+     self.accessibilityLabel = Strings.download
+     }
+     self.accessibilityTraits = UIAccessibilityTraitButton
+     case .Downloading:
+     downloadSpinner.startAnimating()
+     downloadSpinner.hidden = true
+     downloadButton.userInteractionEnabled = true
+     self.userInteractionEnabled = true
+     downloadButton.hidden = true
+     countLabel.hidden = true
+     
+     self.accessibilityLabel = Strings.downloading
+     self.accessibilityTraits = UIAccessibilityTraitButton
+     case .Done:
+     useIcon(.ContentDidDownload)
+     downloadSpinner.hidden = true
+     self.userInteractionEnabled = false
+     downloadButton.hidden = true
+     countLabel.hidden = true
+     
+     if let count = itemCount {
+     let message = Strings.downloadManyVideos(videoCount: count)
+     self.accessibilityLabel = message
+     }
+     else {
+     self.accessibilityLabel = Strings.downloaded
+     }
+     self.accessibilityTraits = UIAccessibilityTraitStaticText
+     }
+     }
+     }*/
 }
