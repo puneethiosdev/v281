@@ -72,20 +72,20 @@
         [self.table_Downloads setLayoutMargins:UIEdgeInsetsZero];
     }
 #endif
-
+    
     //Initialize Downloading arr
     self.arr_downloadingVideo = [[NSMutableArray alloc] init];
-
+    
     _edxInterface = [OEXInterface sharedInterface];
-
+    
     [self reloadDownloadingVideos];
-
+    
     // set the custom navigation view properties
     self.title = [Strings downloads];
-
+    
     //Listen to notification
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadProgressNotification:) name:DOWNLOAD_PROGRESS_NOTIFICATION object:nil];
-
+    
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(downloadCompleteNotification:)
                                                  name:OEXDownloadEndedNotification object:nil];
@@ -98,14 +98,14 @@
 
 - (void)reloadDownloadingVideos {
     [self.arr_downloadingVideo removeAllObjects];
-
+    
     NSArray* array = [_edxInterface coursesAndVideosForDownloadState:OEXDownloadStatePartial];
-
+    
     NSMutableDictionary* duplicationAvoidingDict = [[NSMutableDictionary alloc] init];
-
+    
     for(NSDictionary* dict in array) {
         NSArray* array = [dict objectForKey:CAV_KEY_VIDEOS];
-
+        
         for(OEXHelperVideoDownload* video in array) {
             if(video.downloadProgress < OEXMaxDownloadProgress) {
                 [self.arr_downloadingVideo addObject:video];
@@ -118,7 +118,7 @@
             }
         }
     }
-
+    
     [self.table_Downloads reloadData];
 }
 
@@ -140,14 +140,14 @@
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForRowAtIndexPath:(NSIndexPath*)indexPath {
     OEXDownloadTableCell* cell = [tableView dequeueReusableCellWithIdentifier:@"CellDownloads" forIndexPath:indexPath];
-
+    
     [self configureCell:cell forIndexPath:indexPath];
 #ifdef __IPHONE_8_0
     if(IS_IOS8) {
         [cell setLayoutMargins:UIEdgeInsetsZero];
     }
 #endif
-
+    
     return cell;
 }
 
@@ -158,29 +158,29 @@
 - (void)configureCell:(OEXDownloadTableCell*)cell forIndexPath:(NSIndexPath*)indexPath {
     if([self.arr_downloadingVideo count] > indexPath.row) {
         OEXHelperVideoDownload* downloadingVideo = [self.arr_downloadingVideo objectAtIndex:indexPath.row];
-
+        
         
         NSString* videoName = downloadingVideo.summary.name;
         if([videoName length] == 0) {
             videoName = @"(Untitled)";
         }
         cell.lbl_title.text = videoName;
-
+        
         if(!downloadingVideo.summary.duration) {
-            cell.lbl_time.text = @"NA";
+            //cell.lbl_time.text = @"NA";
         }
         else {
-            cell.lbl_time.text = [OEXDateFormatting formatSecondsAsVideoLength: downloadingVideo.summary.duration];
+            //cell.lbl_time.text = [OEXDateFormatting formatSecondsAsVideoLength: downloadingVideo.summary.duration];
         }
-
-        float result = (([downloadingVideo.summary.size doubleValue] / 1024) / 1024);
-        cell.lbl_totalSize.text = [NSString stringWithFormat:@"%.2fMB", result];
+        
+        //float result = (([downloadingVideo.summary.size doubleValue] / 1024) / 1024);
+        //cell.lbl_totalSize.text = [NSString stringWithFormat:@"%.2fMB", result];
         float progress = (float)downloadingVideo.downloadProgress;
         [cell.progressView setProgress:progress];
         //
         cell.btn_cancel.tag = indexPath.row;
         cell.btn_cancel.accessibilityLabel = [Strings cancel];
-
+        
         [cell.btn_cancel addTarget:self action:@selector(btnCancelPressed:) forControlEvents:UIControlEventTouchUpInside];
         
         cell.accessibilityLabel = [self downloadStatusAccessibilityLabelForVideoName:videoName percentComplete:(progress / OEXMaxDownloadProgress)];
@@ -196,10 +196,12 @@
 - (void)downloadProgressNotification:(NSNotification*)notification {
     NSDictionary* progress = (NSDictionary*)notification.userInfo;
     NSURLSessionTask* task = [progress objectForKey:DOWNLOAD_PROGRESS_NOTIFICATION_TASK];
-    NSString* url = [task.originalRequest.URL absoluteString];
+    //NSString* url = [task.originalRequest.URL absoluteString];
+    NSString* url = [task.originalRequest.URL.absoluteString substringToIndex:[task.originalRequest.URL.absoluteString rangeOfString:@"?Expires"].location];
+    
     for(OEXHelperVideoDownload* video in _arr_downloadingVideo) {
         if([video.summary.videoURL isEqualToString:url]) {
-//            //NSLog(@"progress for video  %@   id  %@ download  %f", video.name , video.str_VideoTitle , video.DownloadProgress);
+            //            //NSLog(@"progress for video  %@   id  %@ download  %f", video.name , video.str_VideoTitle , video.DownloadProgress);
             [self updateProgressForVisibleRows];
             break;
         }
@@ -207,12 +209,12 @@
 }
 
 - (void)downloadCompleteNotification:(NSNotification*)notification {
-//    [UIView animateWithDuration:ANIMATION_DURATION animations:^{
-//
-////        self.edxInterface.numberOfRecentDownloads++;
-//
-//    } completion:^(BOOL finished) {
-//            }];
+    //    [UIView animateWithDuration:ANIMATION_DURATION animations:^{
+    //
+    ////        self.edxInterface.numberOfRecentDownloads++;
+    //
+    //    } completion:^(BOOL finished) {
+    //            }];
 }
 
 /// Update progress for visible rows
@@ -226,9 +228,9 @@
 
 - (void)updateProgressForVisibleRows {
     NSArray* array = [self.table_Downloads visibleCells];
-
+    
     BOOL needReload = NO;
-
+    
     if(![self.table_Downloads isDecelerating] || ![self.table_Downloads isDragging]) {
         for(OEXDownloadTableCell* cell in array) {
             NSIndexPath* indexPath = [self.table_Downloads indexPathForCell:cell];
@@ -242,7 +244,7 @@
             cell.accessibilityLabel = [self downloadStatusAccessibilityLabelForVideoName:video.summary.name percentComplete:(progress / OEXMaxDownloadProgress)];
         }
     }
-
+    
     if(needReload) {
         [self.arr_downloadingVideo removeAllObjects];
         [self reloadDownloadingVideos];
@@ -251,21 +253,21 @@
 
 - (IBAction)btnCancelPressed:(UIButton*)button {
     NSIndexPath* indexPath = [NSIndexPath indexPathForRow:button.tag inSection:0];
-
+    
     OEXInterface* edxInterface = [OEXInterface sharedInterface];
     if(indexPath.row < [self.arr_downloadingVideo count]) {
         OEXHelperVideoDownload* video = [self.arr_downloadingVideo objectAtIndex:indexPath.row];
-
+        
         [self.table_Downloads beginUpdates];
         [self.table_Downloads deleteRowsAtIndexPaths:[NSArray arrayWithObjects:indexPath, nil] withRowAnimation:UITableViewRowAnimationFade];
         [self.arr_downloadingVideo removeObjectAtIndex:indexPath.row];
         [self.table_Downloads endUpdates];
         [self.table_Downloads reloadData];
-
+        
         [edxInterface cancelDownloadForVideo:video completionHandler:^(BOOL success){
             dispatch_async(dispatch_get_main_queue(), ^{
-                    video.downloadState = OEXDownloadStateNew;
-                });
+                video.downloadState = OEXDownloadStateNew;
+            });
         }];
     }
 }

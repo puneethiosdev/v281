@@ -45,22 +45,24 @@
 - (id)initWithDictionary:(NSDictionary*)dictionary {
     self = [super init];
     if(self != nil) {
+        
+        NSLog(@"%@",dictionary);
         //Section url
         if([[dictionary objectForKey:@"section_url"] isKindOfClass:[NSString class]]) {
             self.sectionURL = [dictionary objectForKey:@"section_url"];
         }
-
+        
         self.path = [[dictionary objectForKey:@"path"] oex_map:^(NSDictionary* pathEntryDict){
             return [[OEXVideoPathEntry alloc] initWithDictionary:pathEntryDict];
         }];
-
+        
         self.unitURL = [dictionary objectForKey:@"unit_url"];
-
+        
         NSDictionary* summary = [dictionary objectForKey:@"summary"];
-
+        
         // Data from inside summary dictionary
         self.category = [summary objectForKey:@"category"];
-
+        
         self.name = [summary objectForKey:@"name"];
         if([self.name length] == 0 || self.name == nil) {
             self.name = [Strings untitled];
@@ -81,17 +83,17 @@
             [encodings safeSetObject:[[OEXVideoEncoding alloc] initWithName:OEXVideoEncodingFallback URL:videoURL size:videoSize] forKey:OEXVideoEncodingFallback];
         }
         self.encodings = encodings;
-
+        
         self.videoThumbnailURL = [summary objectForKey:@"video_thumbnail_url"];
         self.videoID = [summary objectForKey:@"id"] ;
-
+        
         self.duration = [OEXSafeCastAsClass([summary objectForKey:@"duration"], NSNumber) doubleValue];
         
         self.onlyOnWeb = [[summary objectForKey:@"only_on_web"] boolValue];
-
+        
         self.transcripts = [summary objectForKey:@"transcripts"];
     }
-
+    
     return self;
 }
 
