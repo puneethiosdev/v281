@@ -13,14 +13,14 @@ import edXCore
 
 private enum OEXRearViewOptions: Int {
     //kAMAT_Changes
-    case UserProfile, MyCourse, /*MyVideos,*/ FindCourses, /*MySettings,*/ SubmitFeedback, Debug, Logout
+    case UserProfile, MyCourse, MyVideos, FindCourses, /*MySettings,*/ SubmitFeedback, Debug, Logout
 }
 
 private let LogoutCellDefaultHeight: CGFloat = 130.0
 private let versionButtonStyle = OEXTextStyle(weight:.Normal, size:.XXSmall, color: OEXStyles.sharedStyles().neutralWhite())
 
 class OEXRearTableViewController : UITableViewController {
-
+    
     // TODO replace this with a proper injection when we nuke the storyboard
     struct Environment {
         let analytics = OEXRouter.sharedRouter().environment.analytics
@@ -33,8 +33,7 @@ class OEXRearTableViewController : UITableViewController {
     }
     
     @IBOutlet var coursesLabel: UILabel!
-    //kAMAT_Changes
-    //@IBOutlet var videosLabel: UILabel!
+    @IBOutlet var videosLabel: UILabel!
     @IBOutlet var findCoursesLabel: UILabel!
     //kAMAT_Changes
     //@IBOutlet var settingsLabel: UILabel!
@@ -43,7 +42,7 @@ class OEXRearTableViewController : UITableViewController {
     
     @IBOutlet var userNameLabel: UILabel!
     @IBOutlet var userEmailLabel: UILabel!
-
+    
     @IBOutlet var userProfilePicture: UIImageView!
     @IBOutlet weak var appVersionButton: UIButton!
     
@@ -67,8 +66,8 @@ class OEXRearTableViewController : UITableViewController {
         NSNotificationCenter.defaultCenter().addObserver(self, selector: #selector(OEXRearTableViewController.dataAvailable(_:)), name: NOTIFICATION_URL_RESPONSE, object: nil)
         
         coursesLabel.text = Strings.myCourses.oex_uppercaseStringInCurrentLocale()
-        //kAMAT_Changes
-        //videosLabel.text = Strings.myVideos.oex_uppercaseStringInCurrentLocale()
+        
+        videosLabel.text = Strings.myVideos.oex_uppercaseStringInCurrentLocale()
         findCoursesLabel.text = Strings.findCourses.oex_uppercaseStringInCurrentLocale()
         //kAMAT_Changes
         //settingsLabel.text = Strings.mySettings.oex_uppercaseStringInCurrentLocale()
@@ -87,7 +86,7 @@ class OEXRearTableViewController : UITableViewController {
             widthConstraint.constant = 0
             heightConstraint.constant = 85
         }
-
+        
     }
     
     private func setupProfileLoader() {
@@ -110,8 +109,7 @@ class OEXRearTableViewController : UITableViewController {
     
     private func setNaturalTextAlignment() {
         coursesLabel.textAlignment = .Natural
-        //kAMAT_Changes
-        //videosLabel.textAlignment = .Natural
+        videosLabel.textAlignment = .Natural
         findCoursesLabel.textAlignment = .Natural
         //kAMAT_Changes
         //settingsLabel.textAlignment = .Natural
@@ -125,8 +123,7 @@ class OEXRearTableViewController : UITableViewController {
         userNameLabel.accessibilityLabel = userNameLabel.text
         userEmailLabel.accessibilityLabel = userEmailLabel.text
         coursesLabel.accessibilityLabel = coursesLabel.text
-        //kAMAT_Changes
-        //videosLabel.accessibilityLabel = videosLabel.text
+        videosLabel.accessibilityLabel = videosLabel.text
         findCoursesLabel.accessibilityLabel = findCoursesLabel.text
         //kAMAT_Changes
         //settingsLabel.accessibilityLabel = settingsLabel.text
@@ -166,16 +163,16 @@ class OEXRearTableViewController : UITableViewController {
                 environment.router?.showProfileForUsername(username: currentUserName)
             case .MyCourse:
                 environment.router?.showMyCourses()
-                /*
+                
             case .MyVideos:
                 environment.router?.showMyVideos()
-                */
+                
             case .FindCourses:
                 environment.router?.showCourseCatalog(nil)
                 environment.analytics.trackUserFindsCourses()
                 /*
-            case .MySettings:
-                environment.router?.showMySettings()
+                 case .MySettings:
+                 environment.router?.showMySettings()
                  */
             case .SubmitFeedback:
                 launchEmailComposer()
@@ -187,7 +184,7 @@ class OEXRearTableViewController : UITableViewController {
         }
         tableView.deselectRowAtIndexPath(indexPath, animated: true)
     }
-
+    
     override func tableView(tableView: UITableView, heightForRowAtIndexPath indexPath: NSIndexPath) -> CGFloat {
         if indexPath.row == OEXRearViewOptions.Debug.rawValue && !environment.config.shouldShowDebug() {
             return 0
@@ -221,7 +218,7 @@ class OEXRearTableViewController : UITableViewController {
 }
 
 extension OEXRearTableViewController : MFMailComposeViewControllerDelegate {
-
+    
     static func supportEmailMessageTemplate() -> String {
         let osVersionText = Strings.SubmitFeedback.osVersion(version: UIDevice.currentDevice().systemVersion)
         let appVersionText = Strings.SubmitFeedback.appVersion(version: NSBundle.mainBundle().oex_shortVersionString(), build: NSBundle.mainBundle().oex_buildVersionString())
@@ -229,20 +226,20 @@ extension OEXRearTableViewController : MFMailComposeViewControllerDelegate {
         let body = ["\n", Strings.SubmitFeedback.marker, osVersionText, appVersionText, deviceModelText].joinWithSeparator("\n")
         return body
     }
-
+    
     func launchEmailComposer() {
         if !MFMailComposeViewController.canSendMail() {
             let alert = UIAlertView(title: Strings.emailAccountNotSetUpTitle,
-                message: Strings.emailAccountNotSetUpMessage,
-                delegate: nil,
-                cancelButtonTitle: Strings.ok)
+                                    message: Strings.emailAccountNotSetUpMessage,
+                                    delegate: nil,
+                                    cancelButtonTitle: Strings.ok)
             alert.show()
         } else {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
             mail.navigationBar.tintColor = OEXStyles.sharedStyles().navigationItemTintColor()
             mail.setSubject(Strings.SubmitFeedback.messageSubject)
-
+            
             mail.setMessageBody(OEXRearTableViewController.supportEmailMessageTemplate(), isHTML: false)
             if let fbAddress = environment.config.feedbackEmailAddress() {
                 mail.setToRecipients([fbAddress])
