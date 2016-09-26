@@ -21,7 +21,8 @@ public class OEXColors: NSObject {
     }
     
     private func initializeColorsDictionary() -> [String: AnyObject] {
-        guard let filePath = NSBundle.mainBundle().pathForResource("colors", ofType: "json") else { assert(false, "Could not find colors.json") }
+        guard let filePath = NSBundle.mainBundle().pathForResource("colors", ofType: "json") else { assert(false, "Could not find colors.json")
+            return [:]}
         if let data = NSData(contentsOfFile: filePath) {
             var error : NSError?
             if let json = NSJSONSerialization.oex_JSONObjectWithData(data, error: &error) as? [String: AnyObject] {
@@ -30,6 +31,7 @@ public class OEXColors: NSObject {
                 assert(error == nil, "Could not parse colors.json")
         }
         assert(false, "Could not load colors.json")
+        return [:]
     }
     
     public func colorForIdentifier(identifier: String) -> UIColor {
@@ -42,6 +44,8 @@ public class OEXColors: NSObject {
             return color
         }
         assert(false, "Could not find the required color in colors.json")
+        return UIColor.blackColor()
+        
     }
     
 }
