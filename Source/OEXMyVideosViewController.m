@@ -491,9 +491,25 @@ typedef  enum OEXAlertType
             cell.lbl_Title.text = @"(Untitled)";
         }
 
-        double size = [obj_video.summary.size doubleValue];
-        float result = ((size / 1024) / 1024);
-        cell.lbl_Size.text = [NSString stringWithFormat:@"%.2fMB", result];
+        
+        NSFileManager* filemgr = [NSFileManager defaultManager];
+        NSString* path = [obj_video.filePath stringByAppendingPathExtension:@"mp4"];
+        
+        if([filemgr fileExistsAtPath:path]) {
+            NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+            NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+            long long fileSize = [fileSizeNumber longLongValue];
+            
+            //double size = [obj_video.summary.size doubleValue];
+            float result = ((fileSize / 1024) / 1024);
+            cell.lbl_Size.text = [NSString stringWithFormat:@"%.2fMB", result];
+        }else{
+            
+            double size = [obj_video.summary.size doubleValue];
+            float result = ((size / 1024) / 1024);
+            cell.lbl_Size.text = [NSString stringWithFormat:@"%.2fMB", result];
+        }
+        
 
         if(!obj_video.summary.duration) {
             cell.lbl_Time.text = @"NA";
