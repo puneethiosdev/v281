@@ -333,7 +333,7 @@
 /* Prompt leading user to create account screen */
 "LOGIN_SPLASH_SIGN_UP"="Sign up and start learning";
 /* Prompt leading user to sign in screen */
-"LOGIN_SPLASH_SIGN_IN"="Already have an account? Sign in";
+"LOGIN_SPLASH_SIGN_IN"="Sign in";
 /* Button title to log out the current user */
 "LOGOUT"="Logout";
 /* Option to sort discussion post list by most activity */
