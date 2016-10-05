@@ -439,6 +439,10 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
     NSFileManager* filemgr = [NSFileManager defaultManager];
     NSString* path = [obj_video.filePath stringByAppendingPathExtension:@"mp4"];
     
+    //As we're not getting video length/duration from backend. We're hiding the video duration.
+    //Autolayouts are implemented for video size, duration we are not disturbing the UI
+    //Just changing the outlet reference, when we get the video length/duration from backend then uncomment below block
+    /*
     if([filemgr fileExistsAtPath:path]) {
         NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
         NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
@@ -460,7 +464,29 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
     else {
         cell.lbl_Time.text = [OEXDateFormatting formatSecondsAsVideoLength: obj_video.summary.duration];
     }
+     */
+    
+    //Remove this condition, if we're getting video length/duration from backend.
+    //Start
+    if([filemgr fileExistsAtPath:path]) {
+        NSDictionary *fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:path error:nil];
+        NSNumber *fileSizeNumber = [fileAttributes objectForKey:NSFileSize];
+        long long fileSize = [fileSizeNumber longLongValue];
+        
+        //double size = [obj_video.summary.size doubleValue];
+        float result = ((fileSize / 1024) / 1024);
+        cell.lbl_Time.text = [NSString stringWithFormat:@"%.2fMB", result];
+    }else{
+        
+        double size = [obj_video.summary.size doubleValue];
+        float result = ((size / 1024) / 1024);
+        cell.lbl_Time.text = [NSString stringWithFormat:@"%.2fMB", result];
+    }
+    //Hide the size label
+    cell.lbl_Size.hidden = YES;
 
+    //End
+    
     //Played state
     UIImage* playedImage;
     if(obj_video.watchedState == OEXPlayedStateWatched) {
