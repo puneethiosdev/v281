@@ -41,7 +41,7 @@
 @end
 
 @implementation OEXVideoSummary
-
+@synthesize videoURL_Signed;
 - (id)initWithDictionary:(NSDictionary*)dictionary {
     self = [super init];
     if(self != nil) {

@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Vappliedx</string>
+	<string>appliedx</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFiles</key>
@@ -31,7 +31,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.6</string>
+	<string>2.6.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleSpokenName</key>
@@ -45,12 +45,12 @@
 			<string>org.edx.mobile</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>appliedx</string>
+				<string>appliedxproduction</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2.6.1</string>
+	<string>2.6.0</string>
 	<key>FacebookDisplayName</key>
 	<string>edX</string>
 	<key>ITSAppUsesNonExemptEncryption</key>

@@ -27,7 +27,7 @@ static OEXDownloadManager* _downloadManager = nil;
 
 static NSURLSession* videosBackgroundSession = nil;
 
-@interface OEXDownloadManager () <NSURLSessionDownloadDelegate,NSURLConnectionDelegate>
+@interface OEXDownloadManager () <NSURLSessionDownloadDelegate,NSURLConnectionDelegate,NSURLSessionDelegate>
 {
     NSMutableData      *responseData;
 }
@@ -156,17 +156,51 @@ static NSURLSession* videosBackgroundSession = nil;
 
 - (void)startDownloadForVideo:(VideoData*)video WithCompletionHandler:(void (^)(NSURLSessionDownloadTask* downloadTask))completionHandler {
     //kAMAT_CHANGES
-    //NSURLSessionDownloadTask* _downloadTask = [self startBackgroundDownloadForVideo:video];
-    //completionHandler(_downloadTask);
-    [self performSelector:@selector(signTheVideoURL:) withObject:video];
-    //[self signTheVideoURL:video];
-    NSLog(@"----Started----");
     
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 4 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
-        NSURLSessionDownloadTask* _downloadTask = [self startBackgroundDownloadForVideo:_videoObject];
+    if (video.video_url_signed == nil) {
+        
+        NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@", SERVER_URL, VIDEO_SIGNED_URL, [video.video_url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+        
+        NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+        NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: self delegateQueue: [NSOperationQueue mainQueue]];
+        
+        
+        NSURLSessionDataTask *sigingDownloadTask = [defaultSession
+                                                    dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                                        
+                                                        if (data!=nil) {
+                                                            NSString *responseStr = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+                                                            
+                                                            [video setVideo_url_signed:responseStr];
+                                                            
+                                                            NSLog(@"-----%@",video.video_url);
+                                                            NSLog(@"-----%@\n",video.video_url_signed);
+                                                            NSURLSessionDownloadTask* _downloadTask = [self startBackgroundDownloadForVideo:video];
+                                                            
+                                                            completionHandler(_downloadTask);
+                                                            
+                                                            
+                                                        }
+                                                    }];
+        
+        
+        [sigingDownloadTask resume];
+        
+    }else{
+        NSURLSessionDownloadTask* _downloadTask = [self startBackgroundDownloadForVideo:video];
+        
         completionHandler(_downloadTask);
-    });
-    
+    }
+    /*
+     [self performSelector:@selector(signTheVideoURL:) withObject:video];
+     //[self signTheVideoURL:video];
+     NSLog(@"----Started----");
+     
+     dispatch_after(dispatch_time(DISPATCH_TIME_NOW, 4 * NSEC_PER_SEC), dispatch_get_main_queue(), ^{
+     NSURLSessionDownloadTask* _downloadTask = [self startBackgroundDownloadForVideo:_videoObject];
+     completionHandler(_downloadTask);
+     });
+     */
 }
 
 - (NSData*)resumeDataForURLString:(NSString*)URLString {
@@ -503,7 +537,7 @@ static NSURLSession* videosBackgroundSession = nil;
 {
     NSLog(@"%s", __func__);
     [responseData appendData:data];
-
+    
 }
 - (void)connection:(NSURLConnection *)connection
   didFailWithError:(NSError *)error
@@ -514,21 +548,21 @@ static NSURLSession* videosBackgroundSession = nil;
 {
     NSLog(@"%s", __func__);
     if (responseData != nil) {
+        
+        NSString *response = [[NSString alloc] initWithData:responseData encoding:NSASCIIStringEncoding];
+        NSLog(@"%s -- Signed URL -%@",__FUNCTION__,response);
+        NSLog(@"%s -- Signed URL After replacing spaces -%@",__FUNCTION__,[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
+        if (response) {
             
-            NSString *response = [[NSString alloc] initWithData:responseData encoding:NSASCIIStringEncoding];
-            NSLog(@"%s -- Signed URL -%@",__FUNCTION__,response);
-            NSLog(@"%s -- Signed URL After replacing spaces -%@",__FUNCTION__,[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
-            if (response) {
-                
-                //NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:600.0];
-                
-                [_videoObject setVideo_url_signed:[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-                //[NSURLConnection connectionWithRequest:urlRequest delegate:self];
-            }
-            else{
-                
-                
-            }
+            //NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:600.0];
+            
+            [_videoObject setVideo_url_signed:[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+            //[NSURLConnection connectionWithRequest:urlRequest delegate:self];
+        }
+        else{
+            
+            
+        }
         
     }else{
         UIAlertView *nilDataAlert = [[UIAlertView alloc] initWithTitle:kAppName message:@"Unable to Play video. Please try again" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -548,6 +582,13 @@ static NSURLSession* videosBackgroundSession = nil;
     [signingRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
     //[signingRequest addValue:bearerToken forHTTPHeaderField:@"Autherization"];
     [NSURLConnection connectionWithRequest:signingRequest delegate:self];
+}
+
+//kAMAT_CHANGES
+#pragma mark - NSURLSessionDelegate Methods
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
 }
 @end
 

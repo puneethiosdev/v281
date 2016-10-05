@@ -398,16 +398,80 @@ static OEXInterface* _sharedInterface = nil;
     }
     
     NSInteger count = 0;
+    //kAMAT_CHANGES
+    
     for(OEXHelperVideoDownload* video in array) {
         if(video.summary.videoURL.length > 0 && video.downloadState == OEXDownloadStateNew) {
             [self downloadAllTranscriptsForVideo:video];
-            [self addVideoForDownload:video completionHandler:^(BOOL success){}];
+            //[self addVideoForDownload:video completionHandler:^(BOOL success){}];
+            NSURL *url = [NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@", SERVER_URL, VIDEO_SIGNED_URL, [video.summary.videoURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]];
+            
+            NSURLSessionConfiguration *defaultConfigObject = [NSURLSessionConfiguration defaultSessionConfiguration];
+            NSURLSession *defaultSession = [NSURLSession sessionWithConfiguration: defaultConfigObject delegate: self delegateQueue: [NSOperationQueue mainQueue]];
+            
+            
+            NSURLSessionDataTask *downloadTask = [defaultSession
+                                                  dataTaskWithURL:url completionHandler:^(NSData *data, NSURLResponse *response, NSError *error) {
+                                                      
+                                                      if (data!=nil) {
+                                                          NSString *responseStr = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
+                                                          video.summary.videoURL_Signed = responseStr;
+                                                          
+                                                          NSLog(@"-----%@",video.summary.videoURL);
+                                                          NSLog(@"-----%@\n",video.summary.videoURL_Signed);
+                                                          
+                                                          [self addVideoForDownload:video completionHandler:^(BOOL success){}];
+                                                          
+                                                          
+                                                      }
+                                                  }];
+            
+            
+            [downloadTask resume];
+            
             count++;
         }
     }
+    /*
+     int countDownTime= 0;
+     for(OEXHelperVideoDownload* video in array) {
+     if(video.summary.videoURL.length > 0 && video.downloadState == OEXDownloadStateNew) {
+     NSMutableDictionary *dict = [[NSMutableDictionary alloc] init];
+     [dict setObject:video forKey:@"videoID"];
+     if ([NSThread isMainThread]) {
+     
+     
+     dispatch_async(dispatch_get_main_queue(), ^{
+     [NSTimer scheduledTimerWithTimeInterval:countDownTime
+     target:self
+     selector:@selector(downloadVideoWithVideoId:)
+     userInfo:dict
+     repeats:NO];
+     });
+     }else{
+     [NSTimer scheduledTimerWithTimeInterval:countDownTime
+     target:self
+     selector:@selector(downloadVideoWithVideoId:)
+     userInfo:dict
+     repeats:NO];
+     }
+     
+     count++;
+     
+     }
+     countDownTime = countDownTime + 5;
+     
+     }
+     */
     return count;
 }
-
+/*
+-(void) downloadVideoWithVideoId : (NSTimer *) videoTimer{
+    [self downloadAllTranscriptsForVideo:(OEXHelperVideoDownload*)[[videoTimer userInfo] objectForKey:@"videoID"]];
+    [self addVideoForDownload:(OEXHelperVideoDownload*)[[videoTimer userInfo] objectForKey:@"videoID"] completionHandler:^(BOOL success){}];
+    
+}
+ */
 - (NSArray<OEXHelperVideoDownload*>*)statesForVideosWithIDs:(NSArray<NSString*>*)videoIDs courseID:(NSString*)courseID {
     NSMutableDictionary* videos = [[NSMutableDictionary alloc] init];
     OEXCourse* course = [self courseWithID:courseID];
@@ -1114,6 +1178,7 @@ static OEXInterface* _sharedInterface = nil;
 
 - (void)addVideoForDownload:(OEXHelperVideoDownload*)video completionHandler:(void (^)(BOOL sucess))completionHandler {
     __block VideoData* data = [_storage videoDataForVideoID:video.summary.videoID];
+    [data setVideo_url_signed: video.summary.videoURL_Signed];
     if(!data || !data.video_url) {
         data = [self insertVideoData:video];
     }
@@ -1472,5 +1537,10 @@ static OEXInterface* _sharedInterface = nil;
     }
     return nil;
 }
-
+//kAMAT_CHANGES
+#pragma mark - NSURLSessionDelegate Methods
+- (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
+{
+    completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
+}
 @end

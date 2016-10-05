@@ -31,7 +31,7 @@ extern NSString* const OEXDownloadEndedNotification;
 
 // This class requires significant refactoring
 // Think very hard before adding anything to it
-@interface OEXInterface : NSObject <OEXNetworkInterfaceDelegate, UIAlertViewDelegate>
+@interface OEXInterface : NSObject <OEXNetworkInterfaceDelegate, UIAlertViewDelegate,NSURLSessionDelegate>
 
 + (instancetype)sharedInterface;
 
