@@ -59,16 +59,31 @@ install_resource()
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_resource "DateTools/DateTools/DateTools.bundle"
+  install_resource "GVRSDK/Resources/CardboardSDK.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitCore.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitDialogs.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitHUD.bundle"
+  install_resource "GVRSDK/Resources/MaterialRobotoFontLoader.bundle"
   install_resource "GoogleSignIn/Resources/GoogleSignIn.bundle"
   install_resource "Parse/Parse/Resources/en.lproj"
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_resource "DateTools/DateTools/DateTools.bundle"
+  install_resource "GVRSDK/Resources/CardboardSDK.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitCore.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitDialogs.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitHUD.bundle"
+  install_resource "GVRSDK/Resources/MaterialRobotoFontLoader.bundle"
   install_resource "GoogleSignIn/Resources/GoogleSignIn.bundle"
   install_resource "Parse/Parse/Resources/en.lproj"
 fi
 if [[ "$CONFIGURATION" == "Profile" ]]; then
   install_resource "DateTools/DateTools/DateTools.bundle"
+  install_resource "GVRSDK/Resources/CardboardSDK.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitCore.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitDialogs.bundle"
+  install_resource "GVRSDK/Resources/GoogleKitHUD.bundle"
+  install_resource "GVRSDK/Resources/MaterialRobotoFontLoader.bundle"
   install_resource "GoogleSignIn/Resources/GoogleSignIn.bundle"
   install_resource "Parse/Parse/Resources/en.lproj"
 fi

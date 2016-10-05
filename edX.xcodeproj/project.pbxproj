@@ -4534,6 +4534,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = edX.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -4552,6 +4553,7 @@
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxprod;
 				PRODUCT_NAME = edX;
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/edX-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4563,6 +4565,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -4603,6 +4606,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.mobile;
 				PRODUCT_NAME = edXTests;
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Test/edXTests-Bridging-Header.h";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/edX.app/edX";
 				WRAPPER_EXTENSION = xctest;
@@ -4613,8 +4617,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				DEFINES_MODULE = YES;
@@ -4631,6 +4635,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCore;
 				PRODUCT_NAME = edXCore;
+				PROVISIONING_PROFILE = "731eb9ad-eb51-4296-86ef-5cdf2feb5ace";
 				SKIP_INSTALL = YES;
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -4643,8 +4648,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4662,6 +4667,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCore;
 				PRODUCT_NAME = edXCore;
+				PROVISIONING_PROFILE = "731eb9ad-eb51-4296-86ef-5cdf2feb5ace";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -4673,8 +4679,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				COPY_PHASE_STRIP = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
@@ -4692,6 +4698,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCore;
 				PRODUCT_NAME = edXCore;
+				PROVISIONING_PROFILE = "731eb9ad-eb51-4296-86ef-5cdf2feb5ace";
 				SKIP_INSTALL = YES;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VERSIONING_SYSTEM = "apple-generic";
@@ -4704,7 +4711,8 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -4714,6 +4722,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -4724,7 +4733,8 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -4735,6 +4745,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 			};
 			name = Release;
@@ -4744,7 +4755,8 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -4755,6 +4767,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 			};
 			name = Profile;
@@ -4763,7 +4776,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				DEBUG_INFORMATION_FORMAT = dwarf;
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
@@ -4774,6 +4788,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
@@ -4784,7 +4799,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -4796,6 +4812,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
 			};
@@ -4805,7 +4822,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
@@ -4817,6 +4835,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
 			};
@@ -4910,6 +4929,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = edX.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -4927,6 +4947,7 @@
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
 				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxprod;
 				PRODUCT_NAME = edX;
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/edX-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = app;
@@ -4939,6 +4960,7 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = edX.entitlements;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
 				EMBEDDED_CONTENT_CONTAINS_SWIFT = YES;
 				ENABLE_BITCODE = NO;
 				FRAMEWORK_SEARCH_PATHS = (
@@ -4957,7 +4979,7 @@
 				OTHER_SWIFT_FLAGS = "";
 				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxprod;
 				PRODUCT_NAME = edX;
-				PROVISIONING_PROFILE = "${RELEASE_PROFILE}";
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/edX-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4969,6 +4991,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -5009,6 +5032,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.mobile;
 				PRODUCT_NAME = edXTests;
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Test/edXTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/edX.app/edX";
@@ -5022,6 +5046,7 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -5062,6 +5087,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.mobile;
 				PRODUCT_NAME = edXTests;
+				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Test/edXTests-Bridging-Header.h";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/edX.app/edX";
 				WRAPPER_EXTENSION = xctest;

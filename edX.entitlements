@@ -4,8 +4,8 @@
 <dict>
 	<key>com.apple.developer.associated-domains</key>
 	<array>
-		<string>applinks:appliedx.amat.com</string>
-		<string>applinks:appliedx</string>
+		<string>applinks:appliedxvpcdev.amat.com</string>
+		<string>applinks:appliedxvpcdev</string>
 	</array>
 </dict>
 </plist>

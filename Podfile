@@ -18,6 +18,7 @@ pod 'FBSDKCoreKit', '~> 4.6'
 pod 'FBSDKLoginKit', '~> 4.6'
 pod 'Parse', '~> 1.7'
 pod 'Smartling.i18n', '~> 1.0'
+pod 'GVRSDK'
 end
 
 target 'edXTests' do

@@ -19,13 +19,21 @@
 #import "OEXStyles.h"
 #import "OEXVideoSummary.h"
 
+//kAMAT_Changes 3.0
+#import "GVRVideoView.h"
 
-@interface OEXVideoPlayerInterface ()
+
+@interface OEXVideoPlayerInterface () <GVRVideoViewDelegate>
 {
     UILabel* labelTitle;
     //kAMAT_CHANGES 2.0
     NSMutableData      *responseData;
     OEXHelperVideoDownload *globalVideo;
+    
+    //KAMAT_CHANGES 3.0
+    GVRVideoView *_videoView;
+    BOOL _isPaused;
+    BOOL isVRVideo;
 }
 
 @property(nonatomic, assign) CGRect defaultFrame;
@@ -51,8 +59,12 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
     _videoPlayerVideoView = self.view;
     self.fadeInOnLoad = YES;
+    
+    isVRVideo = NO;
+    
     
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     //Add observer
@@ -80,11 +92,18 @@
     //assign controls
     [self.moviePlayerController setControls:movieControls];
     _shouldRotate = YES;
+    
+    
+    
     NSError* error = nil;
     BOOL success = [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
     if(!success) {
         OEXLogInfo(@"VIDEO", @"error: could not set audio session category => AVAudioSessionCategoryPlayback");
     }
+    
+    //kAMAT_Changes
+    //remove this code this is for testing the VR player orientation
+    //[self enableFullscreenAutorotation];
 }
 
 - (void) enableFullscreenAutorotation {
@@ -111,9 +130,10 @@
     float timeinterval = [[OEXInterface sharedInterface] lastPlayedIntervalForVideo:video];
     [self updateLastPlayedVideoWith:video];
     
-    if (video.downloadState == OEXDownloadStateComplete && [filemgr fileExistsAtPath:path]) {
-        [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval];
-    } else{
+    if(video.downloadState == OEXDownloadStateComplete && [filemgr fileExistsAtPath:path]) {
+        [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval videoURL:video.summary.videoURL];
+        
+    }else{
         //kAMAT_CHANGES 2.0
         [self checkCloudFrontURL:video withTimeInterval:timeinterval];
     }
@@ -131,7 +151,7 @@
     
     //Validate empty URL
     if (video.summary.videoURL.length == 0) {
-        [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval];
+        [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval videoURL:video.summary.videoURL];
     }else{
         
         //        OEXSession* session = [OEXSession sharedSession];
@@ -140,12 +160,13 @@
         //Validate cloudfront URL
         if ([video.summary.videoURL containsString:CLOUD_FRONT_HOST_NAME]) {
             NSMutableURLRequest *signingRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@", SERVER_URL, VIDEO_SIGNED_URL, [video.summary.videoURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
+            NSLog(@"Signing Request %@",signingRequest);
             NSLog(@"%s -- Unsigned URL -%@",__FUNCTION__,signingRequest);
             [signingRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
             //            [signingRequest addValue:bearerToken forHTTPHeaderField:@"Autherization"];
             [NSURLConnection connectionWithRequest:signingRequest delegate:self];
         } else {
-            [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval];
+            [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval videoURL:video.summary.videoURL];
         }
     }
     
@@ -170,9 +191,17 @@
     _videoPlayerVideoView = videoPlayerVideoView;
     [self setViewFromVideoPlayerView:_videoPlayerVideoView];
 }
-
-- (void)playVideoFromURL:(NSURL*)URL withTitle:(NSString*)title timeInterval:(NSTimeInterval)interval;
+//To get the Video type (i.e VR type), we are changing this method parameters
+//- (void)playVideoFromURL:(NSURL*)URL withTitle:(NSString*)title timeInterval:(NSTimeInterval)interval
+- (void)playVideoFromURL:(NSURL*)URL withTitle:(NSString*)title timeInterval:(NSTimeInterval)interval videoURL : (NSString*) signed_VideoURL;
 {
+    //  NSString *videoPath = [[NSBundle mainBundle] pathForResource:@"congo" ofType:@"mp4"];
+    //  [_videoView loadFromUrl:[[NSURL alloc] initFileURLWithPath:videoPath]];
+    
+    //to test..
+    
+    //NSString *URL1 = @"https://www.youtube.com/watch?v=g7btxyIbQQ0&list=PLU8wpH_LfhmtKoee0Uv90nmscm5iezRoW&index=2";
+    
     if(!URL) {
         return;
     }
@@ -180,36 +209,64 @@
     self.view = _videoPlayerVideoView;
     [self setViewFromVideoPlayerView:_videoPlayerVideoView];
     
-    _moviePlayerController.videoTitle = title;
-    self.lastPlayedTime = interval;
-    [_moviePlayerController.view setBackgroundColor:[UIColor blackColor]];
-    [_moviePlayerController setContentURL:URL];
-    [_moviePlayerController prepareToPlay];
-    [_moviePlayerController setAutoPlaying:YES];
-    _moviePlayerController.lastPlayedTime = interval;
-    [_moviePlayerController play];
     
-    float speed = [OEXInterface getOEXVideoSpeed:[OEXInterface getCCSelectedPlaybackSpeed]];
     
-    _moviePlayerController.controls.playbackRate = speed;
-    [_moviePlayerController setCurrentPlaybackRate:speed];
-    if(!_moviePlayerController.isFullscreen) {
-        [_moviePlayerController.view setFrame:_videoPlayerVideoView.bounds];
-        [self.view addSubview:_moviePlayerController.view];
-    }
-    
-    if(self.fadeInOnLoad) {
-        self.moviePlayerController.view.alpha = 0.0f;
-        double delayInSeconds = 0.3;
-        dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
-        dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
-            [UIView animateWithDuration:1.0 animations:^{
-                self.moviePlayerController.view.alpha = 1.f;
-            }];
-        });
-    }
-    else {
-        self.moviePlayerController.view.alpha = 1;
+    if ([signed_VideoURL containsString:@"_VR_Video"]) {
+        
+        //kAMAT_Changes 3.0
+        _videoView = [[GVRVideoView alloc] initWithFrame:_videoPlayerVideoView.bounds];
+        //_videoView = [[GVRVideoView alloc] init];
+        
+        
+        _videoView.delegate = self;
+        _videoView.enableFullscreenButton = YES;
+        _videoView.enableCardboardButton = YES;
+        _isPaused = NO;
+        
+        [self.view addSubview:_videoView];
+        [self.view bringSubviewToFront:_videoView];
+        
+        
+        
+        
+        [_videoView setFrame:CGRectMake(_videoPlayerVideoView.frame.origin.x, _videoPlayerVideoView.frame.origin.y, _videoPlayerVideoView.frame.size.width, _videoPlayerVideoView.frame.size.height)];
+        [_videoView loadFromUrl:URL];
+        
+        isVRVideo = YES;
+    }else{
+        
+        isVRVideo = NO;
+        _moviePlayerController.videoTitle = title;
+        self.lastPlayedTime = interval;
+        [_moviePlayerController.view setBackgroundColor:[UIColor blackColor]];
+        [_moviePlayerController setContentURL:URL];
+        [_moviePlayerController prepareToPlay];
+        [_moviePlayerController setAutoPlaying:YES];
+        _moviePlayerController.lastPlayedTime = interval;
+        [_moviePlayerController play];
+        
+        float speed = [OEXInterface getOEXVideoSpeed:[OEXInterface getCCSelectedPlaybackSpeed]];
+        
+        _moviePlayerController.controls.playbackRate = speed;
+        [_moviePlayerController setCurrentPlaybackRate:speed];
+        if(!_moviePlayerController.isFullscreen) {
+            [_moviePlayerController.view setFrame:_videoPlayerVideoView.bounds];
+            [self.view addSubview:_moviePlayerController.view];
+        }
+        
+        if(self.fadeInOnLoad) {
+            self.moviePlayerController.view.alpha = 0.0f;
+            double delayInSeconds = 0.3;
+            dispatch_time_t popTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(delayInSeconds * NSEC_PER_SEC));
+            dispatch_after(popTime, dispatch_get_main_queue(), ^(void){
+                [UIView animateWithDuration:1.0 animations:^{
+                    self.moviePlayerController.view.alpha = 1.f;
+                }];
+            });
+        }
+        else {
+            self.moviePlayerController.view.alpha = 1;
+        }
     }
 }
 
@@ -320,24 +377,100 @@
 }
 
 - (void)manageOrientation {
-    if(!((self.moviePlayerController.playbackState == MPMoviePlaybackStatePlaying) || self.moviePlayerController.playbackState == MPMoviePlaybackStatePaused ) && !_moviePlayerController.isFullscreen) {
-        return;
-    }
     
-    UIInterfaceOrientation deviceOrientation = [self currentOrientation];
-    
-    if(deviceOrientation == UIInterfaceOrientationPortrait) {      // PORTRAIT MODE
-        if(self.moviePlayerController.fullscreen) {
-            [_moviePlayerController setFullscreen:NO withOrientation:UIInterfaceOrientationPortrait];
-            _moviePlayerController.controlStyle = MPMovieControlStyleNone;
-            [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleEmbedded];
+    if (!isVRVideo) {
+        
+        if(!((self.moviePlayerController.playbackState == MPMoviePlaybackStatePlaying) || self.moviePlayerController.playbackState == MPMoviePlaybackStatePaused ) && !_moviePlayerController.isFullscreen) {
+            return;
         }
-    }   //LANDSCAPE MODE
-    else if(deviceOrientation == UIDeviceOrientationLandscapeLeft || deviceOrientation == UIInterfaceOrientationLandscapeRight) {
-        [_moviePlayerController setFullscreen:YES withOrientation:deviceOrientation animated:YES forceRotate:YES];
-        _moviePlayerController.controlStyle = MPMovieControlStyleNone;
-        [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleFullscreen];
+        
+        UIInterfaceOrientation deviceOrientation = [self currentOrientation];
+        
+        if(deviceOrientation == UIInterfaceOrientationPortrait) {      // PORTRAIT MODE
+            if(self.moviePlayerController.fullscreen) {
+                [_moviePlayerController setFullscreen:NO withOrientation:UIInterfaceOrientationPortrait];
+                _moviePlayerController.controlStyle = MPMovieControlStyleNone;
+                [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleEmbedded];
+            }
+        }   //LANDSCAPE MODE
+        else if(deviceOrientation == UIDeviceOrientationLandscapeLeft || deviceOrientation == UIInterfaceOrientationLandscapeRight) {
+            [_moviePlayerController setFullscreen:YES withOrientation:deviceOrientation animated:YES forceRotate:YES];
+            _moviePlayerController.controlStyle = MPMovieControlStyleNone;
+            [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleFullscreen];
+        }
+        
+        
+    }else{
+        UIInterfaceOrientation deviceOrientation = [self currentOrientation];
+        
+        if(deviceOrientation == UIInterfaceOrientationPortrait) {      // PORTRAIT MODE
+            //        if(self.moviePlayerController.fullscreen) {
+            //            [_moviePlayerController setFullscreen:NO withOrientation:UIInterfaceOrientationPortrait];
+            //            _moviePlayerController.controlStyle = MPMovieControlStyleNone;
+            //            [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleEmbedded];
+            //        }
+            [_videoView setFrame:self.defaultFrame];
+            
+        }   //LANDSCAPE MODE
+        else if(deviceOrientation == UIDeviceOrientationLandscapeLeft || deviceOrientation == UIInterfaceOrientationLandscapeRight ||
+                /* kAMAT_Changes*/  deviceOrientation == UIDeviceOrientationLandscapeRight ||
+                deviceOrientation == UIInterfaceOrientationLandscapeLeft) {
+            
+            //Showing an alert to tell user to put the device in Anti clock-wise horizontal mode.
+            if (/* kAMAT_Changes*/  deviceOrientation == UIDeviceOrientationLandscapeRight ||
+                deviceOrientation == UIInterfaceOrientationLandscapeLeft) {
+                UIAlertView *orientationAlert;
+                if (orientationAlert == nil){
+                    orientationAlert  = [[UIAlertView alloc] initWithTitle:@"appliedx" message:@"Please turn your device in anti clock wise to view VR Video in Split mode" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
+                    [orientationAlert show];
+                    
+                    [self.view bringSubviewToFront:orientationAlert];
+                }
+            }
+            else  {
+                _videoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+            }
+            
+            [_videoView setFrame:self.defaultFrame];
+            
+            //        [_moviePlayerController setFullscreen:YES withOrientation:deviceOrientation animated:YES forceRotate:YES];
+            //        _moviePlayerController.controlStyle = MPMovieControlStyleNone;
+            //        [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleFullscreen];
+            //dispatch_after_seconds(0.01) {
+            //    if let button = self.videoView.subviews[1] as? UIButton {
+            //
+            //        button.sendActionsForControlEvents(.TouchUpInside)
+            //    }
+            
+        }
+        
     }
+    
+    /*
+     if(!((self.moviePlayerController.playbackState == MPMoviePlaybackStatePlaying) || self.moviePlayerController.playbackState == MPMoviePlaybackStatePaused ) && !_moviePlayerController.isFullscreen) {
+     return;
+     }
+     
+     UIInterfaceOrientation deviceOrientation = [self currentOrientation];
+     
+     if(deviceOrientation == UIInterfaceOrientationPortrait) {      // PORTRAIT MODE
+     if(self.moviePlayerController.fullscreen) {
+     [_moviePlayerController setFullscreen:NO withOrientation:UIInterfaceOrientationPortrait];
+     _moviePlayerController.controlStyle = MPMovieControlStyleNone;
+     [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleEmbedded];
+     }
+     }   //LANDSCAPE MODE
+     else if(deviceOrientation == UIDeviceOrientationLandscapeLeft || deviceOrientation == UIInterfaceOrientationLandscapeRight) {
+     [_moviePlayerController setFullscreen:YES withOrientation:deviceOrientation animated:YES forceRotate:YES];
+     _moviePlayerController.controlStyle = MPMovieControlStyleNone;
+     [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleFullscreen];
+     }
+     */
+    
+    //    if(!((_videoView.playbackState == MPMoviePlaybackStatePlaying) || self.moviePlayerController.playbackState == MPMoviePlaybackStatePaused ) && !_moviePlayerController.isFullscreen) {
+    //        return;
+    //    }
+    
     
     [self setNeedsStatusBarAppearanceUpdate];
 }
@@ -380,9 +513,18 @@
     }
     
     //you MUST use [CLMoviePlayerController setFrame:] to adjust frame, NOT [CLMoviePlayerController.view setFrame:]
-    [self.moviePlayerController setFrame:self.defaultFrame];
+    //    [self.moviePlayerController setFrame:self.defaultFrame];
+    //KAMAT_changes
+    //    [_videoView setFrame:self.defaultFrame];
+    //    id fullScreenButton = _videoView.subviews[1];
+    //    if  ([fullScreenButton isKindOfClass:[UIButton class]]){
+    //        [fullScreenButton sendActionsForControlEvents:UIControlEventTouchUpInside];
+    //    }
+    
     //    self.moviePlayerController.view.layer.borderColor = [UIColor redColor].CGColor;
     //    self.moviePlayerController.view.layer.borderWidth = 2;
+    
+    //    _videoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
 }
 
 - (void)moviePlayerWillMoveFromWindow {
@@ -453,6 +595,7 @@
 
 - (void)connection:(NSURLConnection *)connection didReceiveAuthenticationChallenge:(NSURLAuthenticationChallenge *)challenge {
     
+    //    NSURLCredential *credential = [NSURLCredential credentialWithUser:@"staff" password:@"edx123" persistence:NSURLCredentialPersistenceForSession];
     //
     NSURLCredential *credential = [NSURLCredential credentialWithUser:@"" password:@"" persistence:NSURLCredentialPersistenceForSession];
     
@@ -489,7 +632,7 @@
             //            [self playSignedVideo:response inTable:self.table_Videos atIndex:selectedVideoIndexPath];
             float timeinterval = [[OEXInterface sharedInterface] lastPlayedIntervalForVideo:globalVideo];
             [self playVideoFromURL:[NSURL URLWithString:response] withTitle:globalVideo.summary.name
-                      timeInterval:timeinterval];
+                      timeInterval:timeinterval videoURL:globalVideo.summary.videoURL];
             
         }
     }else{
@@ -498,5 +641,33 @@
     }
 }
 
+#pragma mark - GVRVideoViewDelegate
+
+- (void)widgetViewDidTap:(GVRWidgetView *)widgetView {
+    if (_isPaused) {
+        [_videoView resume];
+    } else {
+        [_videoView pause];
+    }
+    _isPaused = !_isPaused;
+}
+
+- (void)widgetView:(GVRWidgetView *)widgetView didLoadContent:(id)content {
+    NSLog(@"Finished loading video");
+}
+
+- (void)widgetView:(GVRWidgetView *)widgetView
+didFailToLoadContent:(id)content
+  withErrorMessage:(NSString *)errorMessage {
+    NSLog(@"Failed to load video: %@", errorMessage);
+}
+
+- (void)videoView:(GVRVideoView*)videoView didUpdatePosition:(NSTimeInterval)position {
+    // Loop the video when it reaches the end.
+    if (position == videoView.duration) {
+        [_videoView seekTo:0];
+        [_videoView resume];
+    }
+}
 
 @end
