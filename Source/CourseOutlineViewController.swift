@@ -23,7 +23,7 @@ public class CourseOutlineViewController :
     PullRefreshControllerDelegate
 {
     public typealias Environment = protocol<OEXAnalyticsProvider, DataManagerProvider, OEXInterfaceProvider, NetworkManagerProvider, ReachabilityProvider, OEXRouterProvider>
-
+    
     
     private var rootID : CourseBlockID?
     private var environment : Environment
@@ -81,7 +81,7 @@ public class CourseOutlineViewController :
         navigationItem.rightBarButtonItems = [webController.barButtonItem,fixedSpace,modeController.barItem]
         navigationItem.backBarButtonItem = UIBarButtonItem(title: " ", style: .Plain, target: nil, action: nil)
     }
-
+    
     public required init?(coder aDecoder: NSCoder) {
         // required by the compiler because UIViewController implements NSCoding,
         // but we don't actually want to serialize these things
@@ -118,8 +118,8 @@ public class CourseOutlineViewController :
                     self.environment.analytics.trackScreenWithName(OEXAnalyticsScreenSectionOutline, courseID: self.courseID, value: block.internalName)
                 }
             },
-            failure: {
-                Logger.logError("ANALYTICS", "Unable to load block: \($0)")
+                                               failure: {
+                                                Logger.logError("ANALYTICS", "Unable to load block: \($0)")
             }
         )
     }
@@ -212,33 +212,33 @@ public class CourseOutlineViewController :
         self.blockIDStream.backWithStream(Stream(value: rootID))
         
         headersLoader.listen(self,
-            success: {[weak self] headers in
-                self?.setupNavigationItem(headers.block)
+                             success: {[weak self] headers in
+                                self?.setupNavigationItem(headers.block)
             },
-            failure: {[weak self] error in
-                self?.showErrorIfNecessary(error)
+                             failure: {[weak self] error in
+                                self?.showErrorIfNecessary(error)
             }
         )
         
         rowsLoader.listen(self,
-            success : {[weak self] groups in
-                if let owner = self {
-                    owner.tableController.groups = groups
-                    owner.tableController.tableView.reloadData()
-                    owner.loadController.state = groups.count == 0 ? owner.emptyState() : .Loaded
-                }
+                          success : {[weak self] groups in
+                            if let owner = self {
+                                owner.tableController.groups = groups
+                                owner.tableController.tableView.reloadData()
+                                owner.loadController.state = groups.count == 0 ? owner.emptyState() : .Loaded
+                            }
             },
-            failure : {[weak self] error in
-                self?.showErrorIfNecessary(error)
+                          failure : {[weak self] error in
+                            self?.showErrorIfNecessary(error)
             },
-            finally: {[weak self] in
-                if let active = self?.rowsLoader.active where !active {
-                    self?.tableController.refreshController.endRefreshing()
-                }
+                          finally: {[weak self] in
+                            if let active = self?.rowsLoader.active where !active {
+                                self?.tableController.refreshController.endRefreshing()
+                            }
             }
         )
     }
-
+    
     // MARK: Outline Table Delegate
     
     func outlineTableControllerChoseShowDownloads(controller: CourseOutlineTableController) {
@@ -258,7 +258,10 @@ public class CourseOutlineViewController :
         }
         
         self.environment.dataManager.interface?.downloadVideos(videos)
+        self.showOverlayMessage("Your Video will download in few seconds. Please wait...")
         
+        self.view.userInteractionEnabled = false;
+        NSTimer.scheduledTimerWithTimeInterval(4.0, target: self, selector: #selector(CourseOutlineViewController.enableUserInteraction), userInfo: nil, repeats: false)
         let courseID = self.courseID
         let analytics = environment.analytics
         
@@ -266,8 +269,8 @@ public class CourseOutlineViewController :
             { parentID in
                 analytics.trackSubSectionBulkVideoDownload(parentID, subsection: block.blockID, courseID: courseID, videoCount: videos.count)
             },
-            failure: {error in
-                Logger.logError("ANALYTICS", "Unable to find parent of block: \(block). Error: \(error.localizedDescription)")
+                                                                    failure: {error in
+                                                                        Logger.logError("ANALYTICS", "Unable to find parent of block: \(block). Error: \(error.localizedDescription)")
             }
         )
     }
@@ -278,11 +281,17 @@ public class CourseOutlineViewController :
             self.showOverlayMessage(Strings.noWifiMessage)
             return
         }
+        self.showOverlayMessage("Your Video will download in few seconds. Please wait...")
+        self.view.userInteractionEnabled = false;
+        NSTimer.scheduledTimerWithTimeInterval(4.0, target: self, selector: #selector(CourseOutlineViewController.enableUserInteraction), userInfo: nil, repeats: false)
         
         self.environment.dataManager.interface?.downloadVideosWithIDs([block.blockID], courseID: courseID)
         environment.analytics.trackSingleVideoDownload(block.blockID, courseID: courseID, unitURL: block.webURL?.absoluteString)
     }
-    
+    func enableUserInteraction() {
+        self.view.userInteractionEnabled = true;
+        
+    }
     func outlineTableController(controller: CourseOutlineTableController, choseBlock block: CourseBlock, withParentID parent : CourseBlockID) {
         self.environment.router?.showContainerForBlockWithID(block.blockID, type:block.displayType, parentID: parent, courseID: courseQuerier.courseID, fromController:self)
     }
@@ -329,7 +338,7 @@ extension CourseOutlineViewController {
     public func t_populateLastAccessedItem(item : CourseLastAccessed) -> Bool {
         self.tableController.showLastAccessedWithItem(item)
         return self.tableController.tableView.tableHeaderView != nil
-
+        
     }
     
     public func t_didTriggerSetLastAccessed() -> Bool {
