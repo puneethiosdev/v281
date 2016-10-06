@@ -4551,9 +4551,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxprod;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxvpcdev;
 				PRODUCT_NAME = edX;
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/edX-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
@@ -4606,7 +4606,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.mobile;
 				PRODUCT_NAME = edXTests;
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Test/edXTests-Bridging-Header.h";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/edX.app/edX";
 				WRAPPER_EXTENSION = xctest;
@@ -4722,7 +4722,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 			};
@@ -4745,7 +4745,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 			};
 			name = Release;
@@ -4767,7 +4767,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 			};
 			name = Profile;
@@ -4788,7 +4788,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
@@ -4812,7 +4812,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
 			};
@@ -4835,7 +4835,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
 			};
@@ -4945,9 +4945,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "-D DEBUG";
-				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxprod;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxvpcdev;
 				PRODUCT_NAME = edX;
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/edX-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				WRAPPER_EXTENSION = app;
@@ -4977,9 +4977,9 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				OTHER_LDFLAGS = "$(inherited)";
 				OTHER_SWIFT_FLAGS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxprod;
+				PRODUCT_BUNDLE_IDENTIFIER = com.amat.appliedxvpcdev;
 				PRODUCT_NAME = edX;
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/edX-Bridging-Header.h";
 				WRAPPER_EXTENSION = app;
 			};
@@ -5032,7 +5032,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.mobile;
 				PRODUCT_NAME = edXTests;
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Test/edXTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/edX.app/edX";
@@ -5087,7 +5087,7 @@
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.mobile;
 				PRODUCT_NAME = edXTests;
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "0b1a2bd4-22d9-42a2-8c22-b01ec46c11f2";
 				SWIFT_OBJC_BRIDGING_HEADER = "$(SRCROOT)/Test/edXTests-Bridging-Header.h";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/edX.app/edX";
 				WRAPPER_EXTENSION = xctest;

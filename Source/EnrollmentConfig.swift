@@ -48,9 +48,7 @@ class EnrollmentConfig : NSObject {
     }
     
     func isCourseDiscoveryEnabled()-> Bool {
-        //kAMAT Changes
-        //return self.type != .None
-        return self.type != .Webview
+        return self.type != .None
     }
 }
 

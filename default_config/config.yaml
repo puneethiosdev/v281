@@ -1,8 +1,9 @@
-API_HOST_URL: 'locakHost://?'
+API_HOST_URL: 'localhost'
 COURSE_ENROLLMENT:
     ENABLED: true
-    EXTERNAL_COURSE_SEARCH_URL: 'locakHost://courses'
-    COURSE_SEARCH_URL: 'locakHost://courses'
-COURSE_SEARCH_URL: 'locakHost://?'
+    TYPE: 'webview'
+    WEBVIEW:
+        SEARCH_BAR_ENABLED: true
+        COURSE_SEARCH_URL: 'localhost'
 ENVIRONMENT_DISPLAY_NAME: 'edX'
-FEEDBACK_EMAIL_ADDRESS: 'test@test.com'
+FEEDBACK_EMAIL_ADDRESS: 'sample@example.com'

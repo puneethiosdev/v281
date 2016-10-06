@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>appliedx</string>
+	<string>Vappliedx</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIconFiles</key>
@@ -45,7 +45,7 @@
 			<string>org.edx.mobile</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>appliedxproduction</string>
+				<string>appliedx</string>
 			</array>
 		</dict>
 	</array>

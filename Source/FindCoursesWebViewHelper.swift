@@ -145,12 +145,21 @@ class FindCoursesWebViewHelper: NSObject, WKNavigationDelegate {
     }
     
     func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
+        
+        if ((challenge.protectionSpace) == NSURLAuthenticationMethodServerTrust){
+           let credential1 = NSURLCredential(forTrust:challenge.protectionSpace.serverTrust!)
+            completionHandler(.UseCredential, credential1)
+        }
+        
         if let credential = config?.URLCredentialForHost(challenge.protectionSpace.host) {
             completionHandler(.UseCredential, credential)
         }
         else {
             completionHandler(.PerformDefaultHandling, nil)
         }
+        
+        
+        
     }
 
 }
