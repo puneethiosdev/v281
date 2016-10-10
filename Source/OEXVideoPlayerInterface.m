@@ -101,9 +101,11 @@
         OEXLogInfo(@"VIDEO", @"error: could not set audio session category => AVAudioSessionCategoryPlayback");
     }
     
+    //7-10-2016 kAMAT_changes
     //kAMAT_Changes
     //remove this code this is for testing the VR player orientation
-    //[self enableFullscreenAutorotation];
+    if (!isVRVideo)
+        [self enableFullscreenAutorotation];
 }
 
 - (void) enableFullscreenAutorotation {
@@ -388,13 +390,16 @@
         
         if(deviceOrientation == UIInterfaceOrientationPortrait) {      // PORTRAIT MODE
             if(self.moviePlayerController.fullscreen) {
+                //7-10-2016 kAMAT_changes
+                //[_moviePlayerController setFrame:self.defaultFrame];
+                
                 [_moviePlayerController setFullscreen:NO withOrientation:UIInterfaceOrientationPortrait];
                 _moviePlayerController.controlStyle = MPMovieControlStyleNone;
                 [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleEmbedded];
             }
         }   //LANDSCAPE MODE
         else if(deviceOrientation == UIDeviceOrientationLandscapeLeft || deviceOrientation == UIInterfaceOrientationLandscapeRight) {
-            [_moviePlayerController setFullscreen:YES withOrientation:deviceOrientation animated:YES forceRotate:YES];
+            [_moviePlayerController setFullscreen:NO withOrientation:deviceOrientation animated:YES forceRotate:YES];
             _moviePlayerController.controlStyle = MPMovieControlStyleNone;
             [_moviePlayerController.controls setStyle:CLVideoPlayerControlsStyleFullscreen];
         }
@@ -513,7 +518,12 @@
     }
     
     //you MUST use [CLMoviePlayerController setFrame:] to adjust frame, NOT [CLMoviePlayerController.view setFrame:]
-    //    [self.moviePlayerController setFrame:self.defaultFrame];
+    if (!isVRVideo)
+    {
+        [self.moviePlayerController setFrame:self.defaultFrame];
+    }else {
+        [_videoView setFrame:self.defaultFrame];
+    }
     //KAMAT_changes
     //    [_videoView setFrame:self.defaultFrame];
     //    id fullScreenButton = _videoView.subviews[1];
