@@ -119,7 +119,7 @@ typedef enum
 
 @property (nonatomic, weak) id <CLVideoPlayerControlsDelegate> delegate;
 
-
+- (void)fullscreenPressed:(UIButton*)button;
 @end
 
 NS_ASSUME_NONNULL_END
