@@ -28,6 +28,10 @@
     UILabel* labelTitle;
     //kAMAT_CHANGES 2.0
     NSMutableData      *responseData;
+    NSTimer *m_timer; //Timer to trigger handle the movie player straming
+    UILabel *bufferingLable;
+
+    
     OEXHelperVideoDownload *globalVideo;
     
     //KAMAT_CHANGES 3.0
@@ -65,6 +69,9 @@
     
     isVRVideo = NO;
     
+    //straming
+    bufferingLable = nil;
+    
     
     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
     //Add observer
@@ -79,6 +86,18 @@
                                                  name:MPMoviePlayerPlaybackDidFinishNotification object:_moviePlayerController];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(willResignActive:) name:UIApplicationWillResignActiveNotification object:nil];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieDurationNotification) name:MPMovieDurationAvailableNotification object:nil];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+       m_timer = [NSTimer scheduledTimerWithTimeInterval:0.5
+                                                   target:self
+                                                 selector:@selector(movieDurationNotification)
+                                                 userInfo:nil
+                                                  repeats:YES];
+        [m_timer fire];
+    });
+
     
     //create a player
     self.moviePlayerController = [[CLVideoPlayer alloc] initWithFrame:CGRectMake(0, 0, self.view.frame.size.width, self.view.frame.size.height)];
@@ -228,8 +247,10 @@
         [self.view addSubview:_videoView];
         [self.view bringSubviewToFront:_videoView];
         
-        
-        
+        //Customization of VR player button colors
+        for (UIButton *playerContolBtn in _videoView.subviews) {
+            playerContolBtn.tintColor = [UIColor colorWithRed:65/255.0f green:119/255.0f blue:187/255.0f alpha:1.0];
+        }
         
         [_videoView setFrame:CGRectMake(_videoPlayerVideoView.frame.origin.x, _videoPlayerVideoView.frame.origin.y, _videoPlayerVideoView.frame.size.width, _videoPlayerVideoView.frame.size.height)];
         [_videoView loadFromUrl:URL];
@@ -245,6 +266,8 @@
         [_moviePlayerController prepareToPlay];
         [_moviePlayerController setAutoPlaying:YES];
         _moviePlayerController.lastPlayedTime = interval;
+        //kAMAT_Changes
+//        _moviePlayerController.movieSourceType = MPMovieSourceTypeStreaming;
         [_moviePlayerController play];
         
         float speed = [OEXInterface getOEXVideoSpeed:[OEXInterface getCCSelectedPlaybackSpeed]];
@@ -351,6 +374,10 @@
     else {
         [_moviePlayerController stop];
     }
+    //Stop VR Video
+    if (_videoView != nil) {
+        [_videoView stop];
+    }
     _shouldRotate = NO;
 }
 
@@ -366,16 +393,25 @@
 }
 
 - (void)orientationChanged:(NSNotification*)notification {
-    if(_shouldRotate) {
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(manageOrientation) object:nil];
-        
-        if(![self isVerticallyCompact]) {
-            [self manageOrientation];
-        }
-        else {
-            [self performSelector:@selector(manageOrientation) withObject:nil afterDelay:0.8];
+    //To enable landscape orientation in MyVideos section, we are commenting this code.
+    
+    if (!isVRVideo) {
+
+    }else{
+       // _videoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+
+        if(_shouldRotate) {
+            [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(manageOrientation) object:nil];
+            
+            if(![self isVerticallyCompact]) {
+                [self manageOrientation];
+            }
+            else {
+                [self performSelector:@selector(manageOrientation) withObject:nil afterDelay:0.8];
+            }
         }
     }
+    
 }
 
 - (void)manageOrientation {
@@ -486,6 +522,50 @@
 
 - (void)enterFullScreenMode:(NSNotification*)notification {
     [self setNeedsStatusBarAppearanceUpdate];
+}
+//- (void)movieDurationNotification:(NSNotification*)notification {
+
+- (void)movieDurationNotification {
+    
+    //NSLog(@" duration %f",_moviePlayerController.duration);
+    //NSLog(@" playableDuration %f",_moviePlayerController.playableDuration);
+    if (bufferingLable == nil)
+    {
+    bufferingLable = [[UILabel alloc] init];
+    bufferingLable.textColor = [UIColor blueColor];
+    bufferingLable.text = @"Buffering..Please wait";
+        
+        CGSize size = [bufferingLable.text sizeWithAttributes:
+                       @{NSFontAttributeName: [UIFont systemFontOfSize:17.0f]}];
+        
+        // Values are fractional -- you should take the ceilf to get equivalent values
+        CGSize adjustedSize = CGSizeMake(ceilf(size.width), ceilf(size.height));
+        [bufferingLable setFrame:CGRectMake(0, 0, adjustedSize.width, adjustedSize.height)];
+        bufferingLable.autoresizingMask = (UIViewAutoresizingFlexibleWidth | UIViewAutoresizingFlexibleHeight| UIViewAutoresizingFlexibleTopMargin | UIViewAutoresizingFlexibleBottomMargin | UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin);
+        
+    [bufferingLable setCenter:_moviePlayerController.view.center];
+    [_moviePlayerController.view addSubview:bufferingLable];
+        
+    }
+    
+    if (_moviePlayerController.duration > 0.0 && _moviePlayerController.playableDuration > 0.0)
+    {
+        if (_moviePlayerController.playableDuration >= _moviePlayerController.duration / 10)
+        {
+            // playable duration is half of the player duration.
+            // That is half of the video is buffered.
+            bufferingLable.hidden = YES;
+            
+            [_moviePlayerController play];
+            [m_timer invalidate];
+        } else {
+            [_moviePlayerController pause];
+            //bufferingLable.hidden = NO;
+        }
+    } else {
+        [_moviePlayerController pause];
+        //bufferingLable.hidden = NO;
+    }
 }
 
 - (void)viewDidLayoutSubviews {
@@ -654,6 +734,11 @@
 #pragma mark - GVRVideoViewDelegate
 
 - (void)widgetViewDidTap:(GVRWidgetView *)widgetView {
+    //Customization of VR player button colors
+//    for (UIButton *playerContolBtn in _videoView.subviews) {
+//        playerContolBtn.tintColor = [UIColor colorWithRed:65/255.0f green:119/255.0f blue:187/255.0f alpha:1.0];
+//    }
+
     if (_isPaused) {
         [_videoView resume];
     } else {
@@ -669,10 +754,21 @@
 - (void)widgetView:(GVRWidgetView *)widgetView
 didFailToLoadContent:(id)content
   withErrorMessage:(NSString *)errorMessage {
+    //Customization of VR player button colors
+    for (UIButton *playerContolBtn in _videoView.subviews) {
+        playerContolBtn.tintColor = [UIColor colorWithRed:65/255.0f green:119/255.0f blue:187/255.0f alpha:1.0];
+    }
+
     NSLog(@"Failed to load video: %@", errorMessage);
 }
 
 - (void)videoView:(GVRVideoView*)videoView didUpdatePosition:(NSTimeInterval)position {
+    
+    //Customization of VR player button colors
+    for (UIButton *playerContolBtn in _videoView.subviews) {
+        playerContolBtn.tintColor = [UIColor colorWithRed:65/255.0f green:119/255.0f blue:187/255.0f alpha:1.0];
+    }
+
     // Loop the video when it reaches the end.
     if (position == videoView.duration) {
         [_videoView seekTo:0];

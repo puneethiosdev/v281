@@ -46,7 +46,7 @@
     self = [super init];
     if(self != nil) {
         
-        NSLog(@"%@",dictionary);
+        //NSLog(@"%@",dictionary);
         //Section url
         if([[dictionary objectForKey:@"section_url"] isKindOfClass:[NSString class]]) {
             self.sectionURL = [dictionary objectForKey:@"section_url"];
