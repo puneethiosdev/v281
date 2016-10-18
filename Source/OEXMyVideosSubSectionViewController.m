@@ -568,6 +568,9 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
         [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:_selectedIndexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
         _selectedIndexPath = indexPath;
         
+        [self.videoPlayerInterface stopVRPlayer];
+        [self.videoPlayerInterface.moviePlayerController pause];
+        
         [self playVideoForIndexPath:indexPath];
     }
     
@@ -593,14 +596,14 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
     [self.table_SubSectionVideos deselectRowAtIndexPath:indexPath animated:NO];
     self.contraintEditingView.constant = 0;
     [self handleComponentsFrame];
-    [_videoPlayerInterface playVideoFor:obj];
     
     if ([self.currentTappedVideo.summary.videoURL containsString:@"_VR_Video"]) {
         isVRVideo = YES;
     }else{
         isVRVideo = NO;
     }
-    
+    [_videoPlayerInterface playVideoFor:obj];
+
     // Send Analytics
     [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
 }
@@ -842,6 +845,8 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
         
         UIButton *btn;
         [self.videoPlayerInterface.moviePlayerController.controls fullscreenPressed:btn];
+    }else{
+        [self.videoPlayerInterface rotateVRPlayerInLandscape];
     }
 }
 - (void)viewWillDisappear:(BOOL)animated {

@@ -334,10 +334,10 @@ typedef  enum OEXAlertType
 - (void)resetPlayer {
     if(_videoPlayerInterface) {
         [self.videoPlayerInterface removeFromParentViewController];
-        
         [self.videoPlayerInterface.moviePlayerController stop];
         [self removePlayerObserver];
         [_videoPlayerInterface resetPlayer];
+        [_videoPlayerInterface stopVRPlayer];
         _videoPlayerInterface = nil;
     }
 }
@@ -674,6 +674,8 @@ typedef  enum OEXAlertType
             [tableView reloadRowsAtIndexPaths:[NSArray arrayWithObjects:_selectedIndexPath, nil] withRowAnimation:UITableViewRowAnimationNone];
             _selectedIndexPath = indexPath;
             
+            [_videoPlayerInterface stopVRPlayer];
+            [_videoPlayerInterface.moviePlayerController pause];
             [self playVideoForIndexPath:indexPath];
         }
         else {
@@ -862,13 +864,13 @@ typedef  enum OEXAlertType
     self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
     self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
     
-    [_videoPlayerInterface playVideoFor:self.currentTappedVideo];
     
     if ([self.currentTappedVideo.summary.videoURL containsString:@"_VR_Video"]) {
         isVRVideo = YES;
     }else{
         isVRVideo = NO;
     }
+    [_videoPlayerInterface playVideoFor:self.currentTappedVideo];
     // Send Analytics
     [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
 }
@@ -1476,6 +1478,39 @@ typedef  enum OEXAlertType
     if (!isVRVideo) {
     UIButton *button = nil;
     [self.videoPlayerInterface.moviePlayerController.controls fullscreenPressed:button];
+    }else{
+        
+        [self.videoPlayerInterface rotateVRPlayerInLandscape];
+
+        /*
+        UIInterfaceOrientation deviceOrientation = [self currentOrientation];
+        if(deviceOrientation == UIInterfaceOrientationPortrait) {
+            [grVideoView setFrame:self.defaultFrame];
+            grVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+        }
+         */
     }
 }
+/*
+- (void)setViewFromVideoPlayerView:(UIView*)videoPlayerView {
+    BOOL wasLoaded = self.isViewLoaded;
+    self.view = videoPlayerView;
+    if(!wasLoaded) {
+        // Call this manually since if we set self.view ourselves it doesn't ever get called.
+        // This whole thing should get factored so that we just always use our own view
+        // And owners can add it where they choose and the whole thing goes through the natural
+        // view controller APIs
+        [self viewDidLoad];
+        [self beginAppearanceTransition:true animated:true];
+        [self endAppearanceTransition];
+    }
+    
+}
+
+- (void)setVideoPlayerVideoView:(UIView*)videoPlayerVideoView {
+    //_videoPlayerVideoView = videoPlayerVideoView;
+    //[self setViewFromVideoPlayerView:_videoPlayerVideoView];
+}
+*/
+
 @end

@@ -195,7 +195,15 @@
 
 - (void)setViewFromVideoPlayerView:(UIView*)videoPlayerView {
     BOOL wasLoaded = self.isViewLoaded;
-    self.view = videoPlayerView;
+    
+    //To overcome the UIViewControllerHierarchyInconsistency exception, we are having this try catch block
+    @try {
+        self.view = videoPlayerView;
+    } @catch (NSException *exception) {
+        
+    } @finally {
+        
+    }
     if(!wasLoaded) {
         // Call this manually since if we set self.view ourselves it doesn't ever get called.
         // This whole thing should get factored so that we just always use our own view
@@ -394,12 +402,12 @@
 
 - (void)orientationChanged:(NSNotification*)notification {
     //To enable landscape orientation in MyVideos section, we are commenting this code.
-    
+    //AMAT
     if (!isVRVideo) {
-
+        
     }else{
-       // _videoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
-
+        // _videoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+        
         if(_shouldRotate) {
             [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(manageOrientation) object:nil];
             
@@ -413,7 +421,16 @@
     }
     
 }
+- (void) stopVRPlayer{
+    if (_videoView != nil) {
+        [_videoView pause];
+    }
+}
+- (void) rotateVRPlayerInLandscape{
+    _videoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+    [self setNeedsStatusBarAppearanceUpdate];
 
+}
 - (void)manageOrientation {
     
     if (!isVRVideo) {
