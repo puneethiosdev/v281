@@ -32,6 +32,8 @@
 #import "OEXCustomNavigationView.h"
 #import "OEXCustomEditingView.h"
 
+#import "GVRVideoView.h"
+
 
 #define HEADER_HEIGHT 80.0
 #define SHIFT_LEFT 40.0
@@ -47,7 +49,7 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
     OEXAlertTypePlayBackContentUnAvailable
 };
 
-@interface OEXMyVideosSubSectionViewController () <UITableViewDelegate, OEXStatusMessageControlling>
+@interface OEXMyVideosSubSectionViewController () <UITableViewDelegate, OEXStatusMessageControlling,GVRVideoViewDelegate>
 {
     NSIndexPath* clickedIndexpath;
     BOOL isVRVideo;
@@ -80,6 +82,8 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint* contraintEditingView;
 @property (weak, nonatomic) IBOutlet OEXCustomEditingView* customEditing;
 @property (weak, nonatomic) IBOutlet OEXCheckBox* selectAllButton;
+
+@property(nonatomic) GVRVideoView *vrPlayerVideoView;
 
 @end
 
@@ -581,31 +585,47 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
     NSArray* videos = [self.arr_SubsectionData objectAtIndex:indexPath.section];
     
     OEXHelperVideoDownload* obj = [videos objectAtIndex:indexPath.row];
-    
-    // Set the path of the downloaded videos
-    [_dataInterface downloadAllTranscriptsForVideo:obj];
-    
-    //stop current video
-    [_videoPlayerInterface.moviePlayerController stop];
-    
     self.currentTappedVideo = obj;
-    self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
-    self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
-    self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", obj.summary.name];
-    self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
-    [self.table_SubSectionVideos deselectRowAtIndexPath:indexPath animated:NO];
-    self.contraintEditingView.constant = 0;
-    [self handleComponentsFrame];
     
     if ([self.currentTappedVideo.summary.videoURL containsString:@"_VR_Video"]) {
         isVRVideo = YES;
+        
+        self.vrPlayerVideoView = [[GVRVideoView alloc] init];
+        self.vrPlayerVideoView.delegate = self;
+        self.vrPlayerVideoView.enableFullscreenButton = YES;
+        self.vrPlayerVideoView.enableCardboardButton = YES;
+        self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+        
+        NSFileManager* filemgr = [NSFileManager defaultManager];
+        NSString* path = [self.currentTappedVideo.filePath stringByAppendingPathExtension:@"mp4"];
+        
+        if([filemgr fileExistsAtPath:path]) {
+            [self.vrPlayerVideoView loadFromUrl:[NSURL fileURLWithPath:path]];
+        }
+        
     }else{
         isVRVideo = NO;
+        
+        // Set the path of the downloaded videos
+        [_dataInterface downloadAllTranscriptsForVideo:obj];
+        
+        //stop current video
+        [_videoPlayerInterface.moviePlayerController stop];
+        
+        self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
+        self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
+        self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", obj.summary.name];
+        self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
+        [self.table_SubSectionVideos deselectRowAtIndexPath:indexPath animated:NO];
+        self.contraintEditingView.constant = 0;
+        [self handleComponentsFrame];
+        
+        
+        [_videoPlayerInterface playVideoFor:obj];
+        
+        // Send Analytics
+        [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
     }
-    [_videoPlayerInterface playVideoFor:obj];
-
-    // Send Analytics
-    [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
 }
 
 - (void)handleComponentsFrame {
@@ -1181,6 +1201,44 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
 
 - (BOOL)prefersStatusBarHidden {
     return self.videoPlayerInterface.moviePlayerController.fullscreen;
+}
+
+#pragma mark - GVRVideoViewDelegate
+
+- (void)widgetViewDidTap:(GVRWidgetView *)widgetView {
+    
+}
+
+- (void)widgetView:(GVRWidgetView *)widgetView didLoadContent:(id)content {
+    NSLog(@"Finished loading video");
+}
+- (void)widgetView:(GVRWidgetView *)widgetView
+didChangeDisplayMode:(GVRWidgetDisplayMode)displayMode{
+    [widgetView.subviews[0] setNeedsLayout];
+    
+    switch (displayMode) {
+        case kGVRWidgetDisplayModeEmbedded:
+        {
+            [self.vrPlayerVideoView stop];
+            [self.vrPlayerVideoView removeFromSuperview];
+        }
+            break;
+            
+        default:
+            break;
+    }
+}
+
+- (void)widgetView:(GVRWidgetView *)widgetView
+didFailToLoadContent:(id)content
+  withErrorMessage:(NSString *)errorMessage {
+    NSLog(@"Failed to load video: %@", errorMessage);
+}
+
+- (void)videoView:(GVRVideoView*)videoView didUpdatePosition:(NSTimeInterval)position{
+    // Loop the video when it reaches the end.
+    //[videoView.subviews[0] setNeedsLayout];
+    
 }
 
 @end
