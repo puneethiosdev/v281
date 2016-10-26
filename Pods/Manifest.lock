@@ -32,7 +32,7 @@ PODS:
   - GoogleSymbolUtilities (1.0.3)
   - GoogleUtilities (1.1.0):
     - GoogleSymbolUtilities (~> 1.0.0)
-  - GVRSDK (1.0.0)
+  - GVRSDK (1.0.1)
   - Masonry (0.6.4)
   - NewRelicAgent (4.186.1)
   - OCMock (3.2.2)
@@ -66,7 +66,7 @@ DEPENDENCIES:
   - FBSDKLoginKit (~> 4.6)
   - FBSnapshotTestCase (~> 1.8.1)
   - GoogleSignIn (~> 2.4)
-  - GVRSDK
+  - GVRSDK (~> 1.0.1)
   - Masonry (~> 0.6)
   - NewRelicAgent (~> 4.1)
   - OCMock (~> 3.1)
@@ -92,7 +92,7 @@ SPEC CHECKSUMS:
   GoogleSignIn: 79929b51e6299c69f1197bbd9c7a1367d523ecd8
   GoogleSymbolUtilities: 82ad9f93d3615244b3f4ce440f5ab2515e8b4f56
   GoogleUtilities: 8ed9134debe11719097881711464752900668f10
-  GVRSDK: 628f22b46ee93c96b1fc0f799a88e0755038533d
+  GVRSDK: 2cbac1df15500d5dfdba26e932eb2d35aa67b242
   Masonry: 281802d04d787ea2973179ee8bcb50500579ede2
   NewRelicAgent: 5cd52dafe03e74c5066073a00fd500df9d966e7e
   OCMock: 18c9b7e67d4c2770e95bb77a9cc1ae0c91fe3835

@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		0881D0BA1DC07EE900BFF548 /* OEXMyVideosVRViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0881D0B91DC07EE900BFF548 /* OEXMyVideosVRViewController.m */; };
 		08C7CDE51D8AB59700F3D5EC /* ic_captions.png in Resources */ = {isa = PBXBuildFile; fileRef = 08C7CDE21D8AB59700F3D5EC /* ic_captions.png */; };
 		08C7CDE61D8AB59700F3D5EC /* UIWindow+TopController.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C7CDE41D8AB59700F3D5EC /* UIWindow+TopController.m */; };
 		0B1212221B4F089A002EE96C /* OEXCoursewareAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1212211B4F089A002EE96C /* OEXCoursewareAccess.m */; };
@@ -744,6 +745,8 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0881D0B81DC07EE900BFF548 /* OEXMyVideosVRViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXMyVideosVRViewController.h; sourceTree = "<group>"; };
+		0881D0B91DC07EE900BFF548 /* OEXMyVideosVRViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEXMyVideosVRViewController.m; sourceTree = "<group>"; };
 		08C7CDE21D8AB59700F3D5EC /* ic_captions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ic_captions.png; sourceTree = "<group>"; };
 		08C7CDE31D8AB59700F3D5EC /* UIWindow+TopController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+TopController.h"; sourceTree = "<group>"; };
 		08C7CDE41D8AB59700F3D5EC /* UIWindow+TopController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+TopController.m"; sourceTree = "<group>"; };
@@ -2251,6 +2254,8 @@
 				198826F0195D6979005D4D8A /* OEXMyVideosViewController.m */,
 				19321F6019615E3300B7D75C /* OEXMyVideosSubSectionViewController.h */,
 				19321F6119615E3300B7D75C /* OEXMyVideosSubSectionViewController.m */,
+				0881D0B81DC07EE900BFF548 /* OEXMyVideosVRViewController.h */,
+				0881D0B91DC07EE900BFF548 /* OEXMyVideosVRViewController.m */,
 			);
 			name = "My Videos";
 			sourceTree = "<group>";
@@ -4170,6 +4175,7 @@
 				77BC3E691AE0091400E51529 /* OEXPushNotificationProcessor.m in Sources */,
 				775E5A811BE1C88A0046B26B /* LiveObjectCache.swift in Sources */,
 				77DC295E1ABC9D4400FAD22C /* NSObject+OEXReplaceNull.m in Sources */,
+				0881D0BA1DC07EE900BFF548 /* OEXMyVideosVRViewController.m in Sources */,
 				B4B6D6031A949EFC000F44E8 /* OEXRegistrationOption.m in Sources */,
 				5D43B1871B0C1F9200448B52 /* PostsViewController.swift in Sources */,
 				5DD0FFC31B17ED2100837121 /* DiscussionCommentsViewController.swift in Sources */,
