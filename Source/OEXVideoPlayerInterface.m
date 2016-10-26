@@ -168,11 +168,17 @@
             [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval videoURL:video.summary.videoURL];
             
         }else{
+            
+            //Disable streaming videos
+            /*
             UIAlertView *orientationAlert  = [[UIAlertView alloc] initWithTitle:@"" message:@"Please download VRVideo before watching" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [orientationAlert show];
-            
             [self.navigationController popViewControllerAnimated:NO];
+            */
             
+            //Enable steaming videos
+            [self checkCloudFrontURL:video withTimeInterval:timeinterval];
+
         }
     }
     else{
@@ -224,8 +230,8 @@
         //Validate cloudfront URL
         if ([video.summary.videoURL containsString:CLOUD_FRONT_HOST_NAME]) {
             NSMutableURLRequest *signingRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@", SERVER_URL, VIDEO_SIGNED_URL, [video.summary.videoURL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
-            NSLog(@"Signing Request %@",signingRequest);
-            NSLog(@"%s -- Unsigned URL -%@",__FUNCTION__,signingRequest);
+            //NSLog(@"Signing Request %@",signingRequest);
+            //NSLog(@"%s -- Unsigned URL -%@",__FUNCTION__,signingRequest);
             [signingRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
             //            [signingRequest addValue:bearerToken forHTTPHeaderField:@"Autherization"];
             [NSURLConnection connectionWithRequest:signingRequest delegate:self];
@@ -778,8 +784,8 @@
     NSLog(@"%s", __func__);
     if (responseData != nil) {
         NSString *response = [[NSString alloc] initWithData:responseData encoding:NSASCIIStringEncoding];
-        NSLog(@"%s -- Signed URL -%@",__FUNCTION__,response);
-        NSLog(@"%s -- Signed URL After replacing spaces -%@",__FUNCTION__,[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
+        //NSLog(@"%s -- Signed URL -%@",__FUNCTION__,response);
+        //NSLog(@"%s -- Signed URL After replacing spaces -%@",__FUNCTION__,[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
         if (response) {
             //[self playSignedVideo:[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding] inTable:self.table_Videos atIndex:selectedVideoIndexPath];
             //            [self playSignedVideo:response inTable:self.table_Videos atIndex:selectedVideoIndexPath];

@@ -455,9 +455,9 @@
         //kAMAT_CHANGES 2.0
         //[self.environment.router openInWindow:self.window];
         if (vpnConnection == connection) {
-            NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
-            versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
-            [versionChkConnection start];
+            //NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
+            //versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
+            //[versionChkConnection start];
             
             versionData = [[NSMutableData alloc] initWithCapacity:0];
             if (!versionChkConnection)
@@ -505,7 +505,7 @@
         if(![currentVersion isEqualToString:nextVersion]){
             UIAlertView *versionAlert = [[UIAlertView alloc] initWithTitle:@"AppliedX" message:[NSString stringWithFormat:@"%@ v%@ %@", kVERSION_ALERT_TEXT1, nextVersion, kVERSION_ALERT_TEXT2] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Update", nil];
             [versionAlert setTag:VERSION_ALERT_TAG];
-            [versionAlert show];
+            //[versionAlert show];
             
         }
     }//version check

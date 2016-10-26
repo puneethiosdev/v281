@@ -38,6 +38,7 @@
 #import "OEXStyles.h"
 
 #import "GVRVideoView.h"
+#import "OEXMyVideosVRViewController.h"
 
 
 #define RECENT_HEADER_HEIGHT 30.0
@@ -853,18 +854,32 @@ typedef  enum OEXAlertType
         self.lbl_NavTitle.textAlignment = NSTextAlignmentCenter;
         [self resetPlayer];
         [self.collectionView reloadData];
-        
-        self.vrPlayerVideoView = [[GVRVideoView alloc] init];
-        self.vrPlayerVideoView.delegate = self;
-        self.vrPlayerVideoView.enableFullscreenButton = YES;
-        self.vrPlayerVideoView.enableCardboardButton = YES;
-        self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
-        
+        /*
+         self.vrPlayerVideoView = [[GVRVideoView alloc] init];
+         self.vrPlayerVideoView.delegate = self;
+         self.vrPlayerVideoView.enableFullscreenButton = YES;
+         self.vrPlayerVideoView.enableCardboardButton = YES;
+         self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+         */
         NSFileManager* filemgr = [NSFileManager defaultManager];
         NSString* path = [self.currentTappedVideo.filePath stringByAppendingPathExtension:@"mp4"];
         
         if([filemgr fileExistsAtPath:path]) {
-            [self.vrPlayerVideoView loadFromUrl:[NSURL fileURLWithPath:path]];
+            /*
+             [self.vrPlayerVideoView loadFromUrl:[NSURL fileURLWithPath:path]];
+             
+             NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
+             NSString *documentPath = [searchPaths objectAtIndex:0];
+             NSString* pathOfLocalFile = [documentPath stringByAppendingPathComponent:@"AMV4-HB.mp4"];
+             
+             float timeinterval = [[OEXInterface sharedInterface] lastPlayedIntervalForVideo:video];
+             
+             [self playVideoFromURL:[NSURL fileURLWithPath:pathOfLocalFile] withTitle:video.summary.name timeInterval:timeinterval videoURL:video.summary.videoURL];
+             */
+            OEXMyVideosVRViewController *vr = [[OEXMyVideosVRViewController alloc] init];
+            vr.videoURL = [NSURL fileURLWithPath:path];
+            [self.navigationController pushViewController:vr animated:YES];
+            
         }
         
         
@@ -1504,8 +1519,14 @@ typedef  enum OEXAlertType
 - (void)manageOrientation {
     
     if (!isVRVideo) {
-        UIButton *button = nil;
-        [self.videoPlayerInterface.moviePlayerController.controls fullscreenPressed:button];
+        if (self.videoPlayerInterface.moviePlayerController.playbackState == MPMoviePlaybackStatePlaying) {
+            
+            UIButton *button = nil;
+            [self.videoPlayerInterface.moviePlayerController.controls fullscreenPressed:button];
+            NSLog(@"%s - Playing/Paused",__FUNCTION__);
+        }else{
+            NSLog(@"%s - No action",__FUNCTION__);
+        }
     }else{
         
         [self.videoPlayerInterface rotateVRPlayerInLandscape];

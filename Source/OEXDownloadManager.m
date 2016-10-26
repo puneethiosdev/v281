@@ -418,7 +418,7 @@ static NSURLSession* videosBackgroundSession = nil;
     
     //__block NSString* downloadUrl = [downloadTask.originalRequest.URL absoluteString];
     __block NSString* fileurl = [OEXFileUtility filePathForVideoURL:downloadUrl username:[OEXSession sharedSession].currentUser.username];
-    NSLog(@"Video Downloaded URL: %@",fileurl);
+    //NSLog(@"Video Downloaded URL: %@",fileurl);
     dispatch_async(dispatch_get_main_queue(), ^{
         if([[NSFileManager defaultManager] fileExistsAtPath:fileurl]) {
             [[NSFileManager defaultManager] removeItemAtPath:fileurl error:nil];
