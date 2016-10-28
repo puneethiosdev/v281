@@ -23,11 +23,12 @@
     [self.view setBackgroundColor:[UIColor whiteColor]];
     
     
-    self.vrPlayerVideoView = [[GVRVideoView alloc] init];
+    self.vrPlayerVideoView = [[GVRVideoView alloc] initWithFrame:self.view.frame];
     self.vrPlayerVideoView.delegate = self;
     self.vrPlayerVideoView.enableFullscreenButton = YES;
     self.vrPlayerVideoView.enableCardboardButton = YES;
-    self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+    [self.view addSubview:self.vrPlayerVideoView];
+    //self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
     
     //NSFileManager* filemgr = [NSFileManager defaultManager];
     //NSString* path = [self.currentTappedVideo.filePath stringByAppendingPathExtension:@"mp4"];

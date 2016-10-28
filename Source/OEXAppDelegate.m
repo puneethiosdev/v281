@@ -455,9 +455,9 @@
         //kAMAT_CHANGES 2.0
         //[self.environment.router openInWindow:self.window];
         if (vpnConnection == connection) {
-            //NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
-            //versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
-            //[versionChkConnection start];
+            NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
+            versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
+            [versionChkConnection start];
             
             versionData = [[NSMutableData alloc] initWithCapacity:0];
             if (!versionChkConnection)
@@ -475,8 +475,7 @@
     }
 }
 
-- (void)connection:(NSURLConnection *)connection didReceiveData:(nonnull NSData *)data
-{
+- (void)connection:(NSURLConnection *)connection didReceiveData:(nonnull NSData *)data{
     if (versionChkConnection == connection) {
         [versionData appendData:data];
     }

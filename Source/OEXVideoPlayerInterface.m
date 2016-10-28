@@ -138,7 +138,7 @@
         
         NSArray *searchPaths = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES);
         NSString *documentPath = [searchPaths objectAtIndex:0];
-        NSString* pathOfLocalFile = [documentPath stringByAppendingPathComponent:@"AMV4-HB.mp4"];
+        NSString* pathOfLocalFile = [documentPath stringByAppendingPathComponent:@"AMV4-HB_Intro.mp4"];
         
         float timeinterval = [[OEXInterface sharedInterface] lastPlayedIntervalForVideo:video];
         
@@ -170,15 +170,14 @@
         }else{
             
             //Disable streaming videos
-            /*
             UIAlertView *orientationAlert  = [[UIAlertView alloc] initWithTitle:@"" message:@"Please download VRVideo before watching" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
             [orientationAlert show];
             [self.navigationController popViewControllerAnimated:NO];
-            */
+            
             
             //Enable steaming videos
-            [self checkCloudFrontURL:video withTimeInterval:timeinterval];
-
+            //[self checkCloudFrontURL:video withTimeInterval:timeinterval];
+            
         }
     }
     else{
@@ -292,7 +291,9 @@
     if ([signed_VideoURL containsString:@"_VR_Video"]) {
         
         //kAMAT_Changes 3.0
-        _videoView = [[GVRVideoView alloc] initWithFrame:_videoPlayerVideoView.bounds];
+        if (_videoView == nil) {
+            _videoView = [[GVRVideoView alloc] initWithFrame:_videoPlayerVideoView.bounds];
+        }
         //_videoView = [[GVRVideoView alloc] init];
         
         
@@ -300,7 +301,7 @@
         _videoView.enableFullscreenButton = YES;
         _videoView.enableCardboardButton = YES;
         _videoView.enableTouchTracking = YES;
-        _videoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+        //_videoView.displayMode = kGVRWidgetDisplayModeFullscreen;
         
         _isPaused = NO;
         
@@ -531,10 +532,12 @@
                 deviceOrientation == UIInterfaceOrientationLandscapeLeft) {
                 UIAlertView *orientationAlert;
                 if (orientationAlert == nil){
+                    /*
                     orientationAlert  = [[UIAlertView alloc] initWithTitle:@"appliedx" message:@"Please turn your device in anti clock wise to view VR Video in Split mode" delegate:nil cancelButtonTitle:@"Ok" otherButtonTitles:nil];
                     [orientationAlert show];
                     
                     [self.view bringSubviewToFront:orientationAlert];
+                     */
                 }
             }
             else  {
