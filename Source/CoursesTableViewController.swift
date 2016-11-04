@@ -40,9 +40,12 @@ class CourseCardCell : UITableViewCell {
     }
 }
 
-protocol CoursesTableViewControllerDelegate : class {
+@objc protocol CoursesTableViewControllerDelegate : class {
     func coursesTableChoseCourse(course : OEXCourse)
+    func courseTableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath)
+
 }
+private let footerHeight = 30
 
 class CoursesTableViewController: UITableViewController {
     
@@ -57,6 +60,7 @@ class CoursesTableViewController: UITableViewController {
     private let context: Context
     
     weak var delegate : CoursesTableViewControllerDelegate?
+
     var courses : [OEXCourse] = []
     let insetsController = ContentInsetsController()
     
@@ -115,6 +119,13 @@ class CoursesTableViewController: UITableViewController {
         cell.course = course
 
         return cell
+    }
+    override func tableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath){
+        
+        if self.courses.count-1 == indexPath.row {
+            self.delegate?.courseTableView(tableView, willDisplayCell: cell, forRowAtIndexPath: indexPath)
+        }
+
     }
     
     override func viewDidLayoutSubviews() {

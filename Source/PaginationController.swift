@@ -68,7 +68,8 @@ public class PaginationController<A> : NSObject, Paginator {
 
     private func viewScrolled() {
         if !self.paginator.stream.active && (viewManipulator.scrollView?.scrolledNearBottom ?? false) && viewManipulator.canPaginate && self.paginator.hasNext {
-            self.paginator.loadMore()
+            //kAMAT_CHANGES
+            //self.paginator.loadMore()
             self.updateVisibility()
         }
         else if !self.paginator.hasNext && (viewManipulator.scrollView?.scrolledNearBottom ?? false){

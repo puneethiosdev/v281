@@ -7,14 +7,21 @@
 //
 
 import UIKit
+private let FilterViewFrame = CGRectMake(0, 0, 30, 30)
+private let PageSize = 20
+private let footerHeight = 30
 
-class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate {
+class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate,NSURLSessionTaskDelegate,UISearchBarDelegate,NSURLSessionDelegate {
     typealias Environment = protocol<NetworkManagerProvider, OEXRouterProvider, OEXSessionProvider>
     
     private let environment : Environment
     private let tableController : CoursesTableViewController
     private let loadController = LoadStateViewController()
     private let insetsController = ContentInsetsController()
+    private let searchBar = UISearchBar()
+    private var loadmoreView = UIView();
+    var filterCoursesCount : Int16 = 0
+    var pageNumber : Int = 1
     
     init(environment : Environment) {
         self.environment = environment
@@ -22,6 +29,20 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         super.init(nibName: nil, bundle: nil)
         self.navigationItem.title = Strings.findCourses
         self.navigationItem.backBarButtonItem = UIBarButtonItem(title: " ", style: .Plain, target: nil, action: nil)
+        
+        //Right bar button
+        filterRightBarButton()
+        
+    }
+    func filterRightBarButton() {
+        let allcoursesItem = UIBarButtonItem(title: "View all courses", style:.Plain, target: nil, action: nil)
+        allcoursesItem.oex_setAction {
+            self.loadController.state = .Initial
+            self.searchBar.resignFirstResponder()
+            self.searchBar.text = nil
+            self.data_request(kFILTER_COURSES,hasLoadMore: false)
+        }
+        self.navigationItem.rightBarButtonItem = allcoursesItem
     }
 
     required init?(coder aDecoder: NSCoder) {
@@ -33,7 +54,7 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         precondition(username != "", "Shouldn't be showing course catalog without a logged in user")
         
         let paginator = WrappedPaginator(networkManager: self.environment.networkManager) { page in
-            return CourseCatalogAPI.getCourseCatalog(username, page: page)
+            return CourseCatalogAPI.getCourseCatalog(username, page: 1)
         }
         return PaginationController(paginator: paginator, tableView: self.tableController.tableView)
     }()
@@ -41,30 +62,60 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.accessibilityIdentifier = "course-catalog-screen";
+        
+        //Initialize Course SearchBar
+        searchBar.delegate = self
+        searchBar.showsCancelButton = true
+        self.view.addSubview(searchBar)
+        searchBar.snp_makeConstraints{ make in
+            make.leading.equalTo(self.view)
+            make.trailing.equalTo(self.view)
+            make.top.equalTo(self.view)
+        }
+        
         addChildViewController(tableController)
         tableController.didMoveToParentViewController(self)
         self.loadController.setupInController(self, contentView: tableController.view)
         
         self.view.addSubview(tableController.view)
+        /*
+         tableController.view.snp_makeConstraints {make in
+         make.edges.equalTo(self.view)
+         }
+         */
         tableController.view.snp_makeConstraints {make in
-            make.edges.equalTo(self.view)
+            make.leading.equalTo(self.view)
+            make.trailing.equalTo(self.view)
+            make.top.equalTo(searchBar.snp_bottom)
+            make.bottom.equalTo(self.view)
         }
         
+        loadmoreView = UIView(frame: CGRect(x: 0, y: 0, width: 0, height: footerHeight))
+        let activityIndicator = SpinnerView(size: .Large, color: .Primary)
+        loadmoreView.addSubview(activityIndicator)
+        activityIndicator.snp_makeConstraints { make in
+            make.center.equalTo(loadmoreView)
+        }
+        loadmoreView.hidden = true
+        self.view.addSubview(loadmoreView)
+    
         self.view.backgroundColor = OEXStyles.sharedStyles().standardBackgroundColor()
         
         tableController.delegate = self
-
-        paginationController.stream.listen(self, success:
-            {[weak self] courses in
-                self?.loadController.state = .Loaded
-                self?.tableController.courses = courses
-                self?.tableController.tableView.reloadData()
-            }, failure: {[weak self] error in
-                self?.loadController.state = LoadState.failed(error)
-            }
-        )
-        paginationController.loadMore()
         
+        data_request(kFILTER_COURSES,hasLoadMore: false)
+        /*
+         paginationController.stream.listen(self, success:
+         {[weak self] courses in
+         self?.loadController.state = .Loaded
+         self?.tableController.courses = courses
+         self?.tableController.tableView.reloadData()
+         }, failure: {[weak self] error in
+         self?.loadController.state = LoadState.failed(error)
+         }
+         )
+         paginationController.loadMore()
+         */
         insetsController.setupInController(self, scrollView: tableController.tableView)
         insetsController.addSource(
             // add a little padding to the bottom since we have a big space between
@@ -72,6 +123,166 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
             ConstantInsetsSource(insets: UIEdgeInsets(top: 0, left: 0, bottom: StandardVerticalMargin, right: 0), affectsScrollIndicators: false)
         )
     }
+    override func viewWillDisappear(animated: Bool) {
+        super.viewWillDisappear(true)
+        searchBar.resignFirstResponder()
+    }
+    //Hide, Display Load more option
+    func showLoadMoreOption(){
+        tableController.view.snp_updateConstraints {make in
+            make.leading.equalTo(self.view)
+            make.trailing.equalTo(self.view)
+            make.top.equalTo(searchBar.snp_bottom)
+            make.bottom.equalTo(self.view).offset(-30)
+        }
+        loadmoreView.hidden = false;
+        loadmoreView.snp_updateConstraints{ make in
+            make.leading.equalTo(self.view)
+            make.trailing.equalTo(self.view)
+            make.top.equalTo(tableController.view.snp_bottom)
+            make.bottom.equalTo(self.view)
+        }
+        tableController.view.updateConstraints()
+    }
+    func hideLoadMoreOption(){
+        tableController.view.snp_updateConstraints {make in
+            make.leading.equalTo(self.view)
+            make.trailing.equalTo(self.view)
+            make.top.equalTo(searchBar.snp_bottom)
+            make.bottom.equalTo(self.view)
+        }
+        loadmoreView.snp_updateConstraints{ make in
+            make.leading.equalTo(self.view)
+            make.trailing.equalTo(self.view)
+            make.top.equalTo(tableController.view.snp_bottom)
+            make.bottom.equalTo(self.view)
+        }
+        tableController.view.updateConstraints()
+        tableController.view.setNeedsLayout()
+        tableController.view.updateConstraintsIfNeeded()
+        
+        loadmoreView.updateConstraints()
+        loadmoreView.setNeedsLayout()
+        loadmoreView.updateConstraintsIfNeeded()
+        
+        loadmoreView.hidden = true;
+        
+        self.view.layoutIfNeeded()
+    }
+    //Request to get filter courses
+    func data_request(filterCourseURL : String, hasLoadMore : Bool)
+    {
+        //Is it required to display load more option at bottom
+        if hasLoadMore {
+            showLoadMoreOption()
+        }
+        let escapedAddress : String = filterCourseURL.stringByAddingPercentEncodingWithAllowedCharacters(.URLQueryAllowedCharacterSet())!
+        
+        let url:NSURL = NSURL(string: escapedAddress)!
+        
+        let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration(), delegate: self, delegateQueue: nil)
+        
+        let dataTask = session.dataTaskWithRequest(NSURLRequest.init(URL: url), completionHandler: { (let data, let response, let error) in
+            
+            guard let _:NSData = data, let _:NSURLResponse = response  where error == nil else {
+                print("error")
+                return
+            }
+            do {
+                let filterCoursesJson = JSON.init(data: data!, options: NSJSONReadingOptions(), error: nil)
+                //print(filterCoursesJson)
+                let allEmails = filterCoursesJson["results"].array?.flatMap {item in
+                    item.dictionaryObject.map { OEXCourse(dictionary: $0) }
+                }
+                
+                let courses : [OEXCourse] = allEmails!
+                self.filterCoursesCount = filterCoursesJson["total"].int16!
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    
+                    if(courses.count == 0){
+                        self.loadController.state = .Loaded
+                        self.tableController.courses = courses
+                        self.tableController.tableView.reloadData()
+                        
+                        
+                        self.showOverlayMessage("We couldn't find any results for " + self.searchBar.text!+".")
+                        self.searchBar.text = nil;
+                        self.data_request(kFILTER_COURSES,hasLoadMore: false)
+                        
+                        
+                    }else{
+                        self.loadController.state = .Loaded
+                        self.tableController.courses = courses
+                        self.tableController.tableView.reloadData()
+                        
+                    }
+                    self.hideLoadMoreOption()
+                }
+            }
+            
+        })
+        dataTask.resume()
+    }
+    // MARK: NSURLSessionDelegate methods
+    func URLSession(session: NSURLSession, task: NSURLSessionTask, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void){
+        
+        let credential = NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!)
+        completionHandler(.UseCredential, credential)
+        
+        
+    }
+    func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?){
+        
+    }
+    
+    func URLSession(session: NSURLSession, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void){
+        let credential = NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!)
+        completionHandler(.UseCredential, credential)
+        
+    }
+    // MARK: UISearchBarDelegate methods
+    func searchBarShouldBeginEditing(searchBar: UISearchBar) -> Bool {
+        return true
+    }
+    func searchBar(searchBar: UISearchBar, shouldChangeTextInRange range: NSRange, replacementText text: String) -> Bool {
+        //For BackSpace
+        if (text == "") {
+            return true;
+        }
+        //Don't allow first letter as space
+        if (range.location == 0) {
+            let trimmedString = text.stringByTrimmingCharactersInSet(.whitespaceCharacterSet())
+            if (trimmedString.characters.count == 0){
+                return false;
+            }else{
+                return true;
+            }
+        }
+        return true
+    }
+    func searchBarSearchButtonClicked(searchBar: UISearchBar) {
+        searchBar.resignFirstResponder()
+        
+        self.loadController.state = .Initial
+        data_request(kFILTER_COURSES+"?search_string="+searchBar.text!,hasLoadMore: false)
+        
+    }
+    func searchBarCancelButtonClicked(searchBar: UISearchBar){
+        /*
+         if (searchBar.text != nil && searchBar.text?.characters.count != 0) {
+         searchBar.resignFirstResponder()
+         searchBar.text = nil
+         self.loadController.state = .Initial
+         data_request("kFILTER_COURSES")
+         }else{
+         searchBar.resignFirstResponder()
+         searchBar.text = nil
+         }*/
+        searchBar.resignFirstResponder()
+        searchBar.text = nil
+    }
+    // MARK: CoursesTableViewControllerDelegate methods
     
     func coursesTableChoseCourse(course: OEXCourse) {
         //kAMAT Changes
@@ -80,9 +291,31 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         }
         self.environment.router?.showCourseCatalogDetail(courseID, fromController:self)
     }
+    func courseTableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath){
+        if filterCoursesCount == 0 {
+            
+        }else{
+            //print("Last row \(indexPath.row)")
+            if filterCoursesCount-1 > indexPath.row {
+                pageNumber += 1
+                
+                if (searchBar.text != nil && searchBar.text?.characters.count != 0) {
+                    searchBar.resignFirstResponder()
+                    //self.loadController.state = .Initial
+                    data_request(kFILTER_COURSES+"?search_string="+searchBar.text!+"&page_size=\(pageNumber*PageSize)",hasLoadMore: true)
+                }else{
+                    searchBar.resignFirstResponder()
+                    //self.loadController.state = .Initial
+                    data_request(kFILTER_COURSES+"?page_size=\(pageNumber*PageSize)",hasLoadMore: true)
+                }
+            }
+        }
+    }
+    
 }
 
 // Testing only
+
 extension CourseCatalogViewController {
     
     var t_loaded : Stream<()> {
@@ -90,5 +323,6 @@ extension CourseCatalogViewController {
             return
         }
     }
-
+    
 }
+

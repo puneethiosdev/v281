@@ -173,8 +173,8 @@ static NSURLSession* videosBackgroundSession = nil;
                                                             
                                                             [video setVideo_url_signed:responseStr];
                                                             
-                                                            NSLog(@"-----%@",video.video_url);
-                                                            NSLog(@"-----%@\n",video.video_url_signed);
+                                                            //NSLog(@"-----%@",video.video_url);
+                                                            //NSLog(@"-----%@\n",video.video_url_signed);
                                                             NSURLSessionDownloadTask* _downloadTask = [self startBackgroundDownloadForVideo:video];
                                                             
                                                             completionHandler(_downloadTask);
