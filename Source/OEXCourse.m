@@ -1,10 +1,10 @@
-    //
-    //  OEXCourse.m
-    //  edXVideoLocker
-    //
-    //  Created by Rahul Varma on 05/06/14.
-    //  Copyright (c) 2014 edX. All rights reserved.
-    //
+//
+//  OEXCourse.m
+//  edXVideoLocker
+//
+//  Created by Rahul Varma on 05/06/14.
+//  Copyright (c) 2014 edX. All rights reserved.
+//
 
 #import "OEXCourse.h"
 
@@ -75,7 +75,7 @@ NSString* NSStringForOEXStartType(OEXStartType type) {
 @property (nonatomic, copy) NSString* org;
 @property (nonatomic, copy) NSString* video_outline;
 @property (nonatomic, copy) NSString* course_id;
-    //kAMAT_CHANGES
+//kAMAT_CHANGES
 @property (nonatomic, copy) NSString* course_id_amat;
 
 @property (nonatomic, copy) NSString* root_block_usage_key;
@@ -99,46 +99,89 @@ NSString* NSStringForOEXStartType(OEXStartType type) {
     self = [super init];
     if(self != nil) {
         info = [info oex_replaceNullsWithEmptyStrings];
-        self.end = [OEXDateFormatting dateWithServerString:[info objectForKey:@"end"]];
         
-        NSDate* start = [OEXDateFormatting dateWithServerString:[info objectForKey:@"start"]];
-        self.start_display_info = [[OEXCourseStartDisplayInfo alloc]
-                                   initWithDate:start
-                                   displayDate:[info objectForKey:@"start_display"]
-                                   type:OEXStartTypeForString([info objectForKey:@"start_type"])];
-        self.course_image_url = [info objectForKey:@"course_image"];
-        self.name = [info objectForKey:@"name"];
-        self.org = [info objectForKey:@"org"];
-        self.video_outline = [info objectForKey:@"video_outline"];
-        self.course_id = [info objectForKey:@"id"];
+        //Checking for Custom parameters
+        if ([info objectForKey:@"_type"] != nil) {
+            self.end = [OEXDateFormatting dateWithServerString:[info objectForKey:@"end"]];
+            
+            NSDate* start = [OEXDateFormatting dateWithServerString:@"2016-01-26T20:00:00Z"];
+            self.start_display_info = [[OEXCourseStartDisplayInfo alloc]
+                                       initWithDate:start
+                                       displayDate:[info objectForKey:@"start_display"]
+                                       type:OEXStartTypeForString([info objectForKey:@"start_type"])];
+            self.course_image_url = [[info objectForKey:@"data"] objectForKey:@"image_url"];
+            self.name = [[[info objectForKey:@"data"] objectForKey:@"content"] objectForKey:@"display_name"];
+            self.org = [[info objectForKey:@"data"]objectForKey:@"org"];
+            self.video_outline = [info objectForKey:@"video_outline"];
+            self.course_id = [[info objectForKey:@"data"]objectForKey:@"id"];
             //kAMAT_CHANGES
-        self.course_id_amat = [info objectForKey:@"course_id"];
-        
-        self.root_block_usage_key = [info objectForKey:@"root_block_usage_key"];
-        self.number = [info objectForKey:@"number"];
-        self.effort = [info objectForKey:@"effort"];
-        self.short_description = [info objectForKey:@"short_description"];
-        self.overview_html = [info objectForKey:@"overview"];
-        self.course_updates = [info objectForKey:@"course_updates"];
-        self.course_handouts = [info objectForKey:@"course_handouts"];
-        self.course_about = [info objectForKey:@"course_about"];
-        self.subscription_id = [info objectForKey:@"subscription_id"];
-        NSDictionary* accessInfo = [info objectForKey:@"courseware_access"];
-        self.courseware_access = [[OEXCoursewareAccess alloc] initWithDictionary: accessInfo];
-        NSDictionary* updatesInfo = [info objectForKey:@"latest_updates"];
-        self.latest_updates = [[OEXLatestUpdates alloc] initWithDictionary:updatesInfo];
-        self.discussionUrl = [info objectForKey:@"discussion_url"];
-        NSDictionary* mediaInfo = OEXSafeCastAsClass(info[@"media"], NSDictionary);
-        
-        NSMutableDictionary<NSString*, CourseMediaInfo*>* parsedMediaInfo = [[NSMutableDictionary alloc] init];
-        [mediaInfo enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
-            NSString* type = OEXSafeCastAsClass(key, NSString);
-            NSDictionary* content = OEXSafeCastAsClass(obj, NSDictionary);
-            CourseMediaInfo* info = [[CourseMediaInfo alloc] initWithDict:content];
-            [parsedMediaInfo setObjectOrNil:info forKey:type];
-        }];
-        self.mediaInfo = parsedMediaInfo;
-        
+            self.course_id_amat = [[info objectForKey:@"data"]objectForKey:@"id"];
+            
+            self.root_block_usage_key = [info objectForKey:@"root_block_usage_key"];
+            self.number = [[info objectForKey:@"data"] objectForKey:@"number"];
+            self.effort = [[info objectForKey:@"data"] objectForKey:@"effort"];
+            self.short_description = [[[info objectForKey:@"data"] objectForKey:@"content"]objectForKey:@"short_description"];
+            self.overview_html = [[[info objectForKey:@"data"] objectForKey:@"content"]objectForKey:@"overview"];
+            self.course_updates = [info objectForKey:@"course_updates"];
+            self.course_handouts = [info objectForKey:@"course_handouts"];
+            self.course_about = [info objectForKey:@"course_about"];
+            self.subscription_id = [info objectForKey:@"subscription_id"];
+            NSDictionary* accessInfo = [info objectForKey:@"courseware_access"];
+            self.courseware_access = [[OEXCoursewareAccess alloc] initWithDictionary: accessInfo];
+            NSDictionary* updatesInfo = [info objectForKey:@"latest_updates"];
+            self.latest_updates = [[OEXLatestUpdates alloc] initWithDictionary:updatesInfo];
+            self.discussionUrl = [info objectForKey:@"discussion_url"];
+            NSDictionary* mediaInfo = OEXSafeCastAsClass(info[@"media"], NSDictionary);
+            
+            NSMutableDictionary<NSString*, CourseMediaInfo*>* parsedMediaInfo = [[NSMutableDictionary alloc] init];
+            [mediaInfo enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                NSString* type = OEXSafeCastAsClass(key, NSString);
+                NSDictionary* content = OEXSafeCastAsClass(obj, NSDictionary);
+                CourseMediaInfo* info = [[CourseMediaInfo alloc] initWithDict:content];
+                [parsedMediaInfo setObjectOrNil:info forKey:type];
+            }];
+            self.mediaInfo = parsedMediaInfo;
+        }else{
+            self.end = [OEXDateFormatting dateWithServerString:[info objectForKey:@"end"]];
+            
+            NSDate* start = [OEXDateFormatting dateWithServerString:[info objectForKey:@"start"]];
+            self.start_display_info = [[OEXCourseStartDisplayInfo alloc]
+                                       initWithDate:start
+                                       displayDate:[info objectForKey:@"start_display"]
+                                       type:OEXStartTypeForString([info objectForKey:@"start_type"])];
+            self.course_image_url = [info objectForKey:@"course_image"];
+            self.name = [info objectForKey:@"name"];
+            self.org = [info objectForKey:@"org"];
+            self.video_outline = [info objectForKey:@"video_outline"];
+            self.course_id = [info objectForKey:@"id"];
+            //kAMAT_CHANGES
+            self.course_id_amat = [info objectForKey:@"course_id"];
+            
+            self.root_block_usage_key = [info objectForKey:@"root_block_usage_key"];
+            self.number = [info objectForKey:@"number"];
+            self.effort = [info objectForKey:@"effort"];
+            self.short_description = [info objectForKey:@"short_description"];
+            self.overview_html = [info objectForKey:@"overview"];
+            self.course_updates = [info objectForKey:@"course_updates"];
+            self.course_handouts = [info objectForKey:@"course_handouts"];
+            self.course_about = [info objectForKey:@"course_about"];
+            self.subscription_id = [info objectForKey:@"subscription_id"];
+            NSDictionary* accessInfo = [info objectForKey:@"courseware_access"];
+            self.courseware_access = [[OEXCoursewareAccess alloc] initWithDictionary: accessInfo];
+            NSDictionary* updatesInfo = [info objectForKey:@"latest_updates"];
+            self.latest_updates = [[OEXLatestUpdates alloc] initWithDictionary:updatesInfo];
+            self.discussionUrl = [info objectForKey:@"discussion_url"];
+            NSDictionary* mediaInfo = OEXSafeCastAsClass(info[@"media"], NSDictionary);
+            
+            NSMutableDictionary<NSString*, CourseMediaInfo*>* parsedMediaInfo = [[NSMutableDictionary alloc] init];
+            [mediaInfo enumerateKeysAndObjectsUsingBlock:^(id  _Nonnull key, id  _Nonnull obj, BOOL * _Nonnull stop) {
+                NSString* type = OEXSafeCastAsClass(key, NSString);
+                NSDictionary* content = OEXSafeCastAsClass(obj, NSDictionary);
+                CourseMediaInfo* info = [[CourseMediaInfo alloc] initWithDict:content];
+                [parsedMediaInfo setObjectOrNil:info forKey:type];
+            }];
+            self.mediaInfo = parsedMediaInfo;
+        }
     }
     return self;
 }

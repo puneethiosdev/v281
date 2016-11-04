@@ -184,7 +184,10 @@ class EnrolledCoursesViewController : OfflineSupportViewController, CoursesTable
             preconditionFailure("course without a course id")
         }
     }
-    
+    func courseTableView(tableView: UITableView, willDisplayCell cell: UITableViewCell, forRowAtIndexPath indexPath: NSIndexPath){
+        //print("Last row \(indexPath.row)")
+
+    }
     func refreshControllerActivated(controller: PullRefreshController) {
         self.enrollmentFeed.refresh()
         self.userPreferencesFeed.refresh()

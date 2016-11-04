@@ -417,8 +417,8 @@ static OEXInterface* _sharedInterface = nil;
                                                           NSString *responseStr = [[NSString alloc] initWithData:data encoding:NSASCIIStringEncoding];
                                                           video.summary.videoURL_Signed = responseStr;
                                                           
-                                                          NSLog(@"-----%@",video.summary.videoURL);
-                                                          NSLog(@"-----%@\n",video.summary.videoURL_Signed);
+                                                          //NSLog(@"-----%@",video.summary.videoURL);
+                                                          //NSLog(@"-----%@\n",video.summary.videoURL_Signed);
                                                           
                                                           [self addVideoForDownload:video completionHandler:^(BOOL success){}];
                                                           
