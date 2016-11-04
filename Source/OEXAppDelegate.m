@@ -64,6 +64,9 @@
     NSMutableData *versionData;
     NSUserDefaults *defaults;
     
+    BOOL isFirstVersionCheck;
+    
+    
 }
 @property (nonatomic, strong) NSMutableDictionary* dictCompletionHandler;
 @property (nonatomic, strong) OEXEnvironment* environment;
@@ -103,6 +106,11 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     self.window.backgroundColor = [UIColor whiteColor];
     [self.window makeKeyAndVisible];
+    
+    isFirstVersionCheck = YES;
+    NSDate *backgroundDate = [NSDate date];
+    [[NSUserDefaults standardUserDefaults] setObject:backgroundDate forKey:@"BackgroundDate"];
+    
     
     if ([self.reachability isReachableViaWWAN])
     {
@@ -203,6 +211,12 @@
     
     return handled;
 }
+
+- (void)applicationDidEnterBackground:(UIApplication *)application
+{
+    
+}
+
 
 //kAMAT_CHANGES;
 #pragma - Auto Connect VPN
@@ -464,17 +478,27 @@
         //kAMAT_CHANGES 2.0
         //[self.environment.router openInWindow:self.window];
         if (vpnConnection == connection) {
-            NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
-            versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
-            [versionChkConnection start];
             
-            versionData = [[NSMutableData alloc] initWithCapacity:0];
-            if (!versionChkConnection)
-            {
-                versionChkConnection = nil;
-                versionData = nil;
+            
+            NSDate *oldDate = [[NSUserDefaults standardUserDefaults] objectForKey:@"BackgroundDate"];
+            NSDate* enddate = oldDate;
+            NSDate* currentdate = [NSDate date];
+            NSTimeInterval distanceBetweenDates = [currentdate timeIntervalSinceDate:enddate];
+            
+            if (distanceBetweenDates >= 172800 || isFirstVersionCheck) {
+                isFirstVersionCheck = NO;
+                
+                NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
+                versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
+                [versionChkConnection start];
+                
+                versionData = [[NSMutableData alloc] initWithCapacity:0];
+                if (!versionChkConnection)
+                {
+                    versionChkConnection = nil;
+                    versionData = nil;
+                }
             }
-            
             
             [self performSelector:@selector(checkDoWeNeedToCallSSO) withObject:nil afterDelay:1.0f];
         }
