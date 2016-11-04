@@ -19,6 +19,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @property (nonatomic, strong) id <Reachability> reachability;
 @property MFMailComposeViewController *appliedxMailVC;
+
+@property (nonatomic)BOOL isVRVideosPlaying;
+
 //kAMAT_CHANGES
 - (void) performVPNAvailability;
 

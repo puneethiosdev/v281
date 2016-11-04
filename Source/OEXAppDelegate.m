@@ -43,6 +43,8 @@
 #import "OEXRegistrationViewController.h"
 #import "OEXLoginSplashViewController.h"
 
+#import "OEXMyVideosVRViewController.h"
+
 //SFSafari
 #import <SafariServices/SafariServices.h>
 
@@ -206,6 +208,11 @@
 #pragma - Auto Connect VPN
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
+    /*! If VR Viodes are playing then should not call version web service & display alerts */
+    if (self.isVRVideosPlaying) {
+        return;
+    }
+    
     if(!self.reachability) {
         
         UIAlertView *noInternetAlert = [[UIAlertView alloc] initWithTitle:OEXLocalizedString(@"NETWORK_NOT_AVAILABLE_TITLE", nil) message:OEXLocalizedString(@"NETWORK_NOT_AVAILABLE_MESSAGE", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
@@ -232,6 +239,8 @@
         }
     }
 }
+
+
 
 //kAMAT_CHANGES
 #pragma - VPN Check
@@ -504,7 +513,7 @@
         if(![currentVersion isEqualToString:nextVersion]){
             UIAlertView *versionAlert = [[UIAlertView alloc] initWithTitle:@"AppliedX" message:[NSString stringWithFormat:@"%@ v%@ %@", kVERSION_ALERT_TEXT1, nextVersion, kVERSION_ALERT_TEXT2] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Update", nil];
             [versionAlert setTag:VERSION_ALERT_TAG];
-            //[versionAlert show];
+            [versionAlert show];
             
         }
     }//version check

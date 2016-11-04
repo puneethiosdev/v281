@@ -10,5 +10,4 @@
 
 @interface OEXMyVideosVRViewController : UIViewController
 @property (nonatomic,retain) NSURL *videoURL;
-
 @end

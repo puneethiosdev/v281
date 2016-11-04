@@ -19,6 +19,8 @@
 #import "OEXStyles.h"
 #import "OEXVideoSummary.h"
 
+#import "OEXAppDelegate.h"
+
 //kAMAT_Changes 3.0
 #import "GVRVideoView.h"
 
@@ -302,7 +304,8 @@
         _videoView.enableCardboardButton = YES;
         _videoView.enableTouchTracking = YES;
         //_videoView.displayMode = kGVRWidgetDisplayModeFullscreen;
-        
+        [self setVRVideosPlaying:YES];
+
         _isPaused = NO;
         
         [self.view addSubview:_videoView];
@@ -315,7 +318,7 @@
         
         [_videoView setFrame:CGRectMake(_videoPlayerVideoView.frame.origin.x, _videoPlayerVideoView.frame.origin.y, _videoPlayerVideoView.frame.size.width, _videoPlayerVideoView.frame.size.height)];
         [_videoView loadFromUrl:URL];
-        
+        [self setVRVideosPlaying:YES];
         isVRVideo = YES;
     }else{
         
@@ -354,6 +357,12 @@
             self.moviePlayerController.view.alpha = 1;
         }
     }
+}
+
+- (void)setVRVideosPlaying:(BOOL)playing
+{
+    OEXAppDelegate *appDelegate = (OEXAppDelegate *) [[UIApplication sharedApplication] delegate];
+    appDelegate.isVRVideosPlaying = playing;
 }
 
 - (void)setAutoPlaying:(BOOL)playing {
@@ -438,6 +447,7 @@
     //Stop VR Video
     if (_videoView != nil) {
         [_videoView stop];
+        [self setVRVideosPlaying:NO];
     }
     _shouldRotate = NO;
 }
@@ -842,10 +852,11 @@ didFailToLoadContent:(id)content
     //    }
     
     // Loop the video when it reaches the end.
-    //    if (position == videoView.duration) {
-    //        [_videoView seekTo:0];
-    //        [_videoView resume];
-    //    }
+    // Remove and pop the viewcontroller if video reached the end.
+    if (position == videoView.duration) {
+        [self setVRVideosPlaying:NO];
+        _videoView.displayMode = kGVRWidgetDisplayModeEmbedded;
+    }
 }
 - (void)widgetView:(GVRWidgetView *)widgetView
 didChangeDisplayMode:(GVRWidgetDisplayMode)displayMode{
@@ -853,9 +864,10 @@ didChangeDisplayMode:(GVRWidgetDisplayMode)displayMode{
     switch (displayMode) {
         case kGVRWidgetDisplayModeEmbedded:
         {
+            
             [_videoView stop];
             [_videoView removeFromSuperview];
-            
+            [self setVRVideosPlaying:NO];
             [self.navigationController popViewControllerAnimated:YES];
         }
             break;

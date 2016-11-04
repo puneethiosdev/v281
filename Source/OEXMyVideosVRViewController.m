@@ -8,6 +8,7 @@
 
 #import "OEXMyVideosVRViewController.h"
 #import "GVRVideoView.h"
+#import "OEXAppDelegate.h"
 
 @interface OEXMyVideosVRViewController () <GVRVideoViewDelegate>
 @property(nonatomic) GVRVideoView *vrPlayerVideoView;
@@ -28,16 +29,38 @@
     self.vrPlayerVideoView.enableFullscreenButton = YES;
     self.vrPlayerVideoView.enableCardboardButton = YES;
     [self.view addSubview:self.vrPlayerVideoView];
-    //self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
+    self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
     
     //NSFileManager* filemgr = [NSFileManager defaultManager];
     //NSString* path = [self.currentTappedVideo.filePath stringByAppendingPathExtension:@"mp4"];
     
     [self.vrPlayerVideoView loadFromUrl:self.videoURL];
     
-    
+    [self setVRVideosPlaying:YES];
     
     // Do any additional setup after loading the view.
+}
+
+- (void)dealloc
+{
+    [self setVRVideosPlaying:NO];
+}
+
+- (void)setVRVideosPlaying:(BOOL)playing
+{
+    OEXAppDelegate *appDelegate = (OEXAppDelegate *) [[UIApplication sharedApplication] delegate];
+    appDelegate.isVRVideosPlaying = playing;
+}
+
+- (void)viewWillAppear:(BOOL)animated
+{
+    [super viewWillAppear:animated];
+    [self setVRVideosPlaying:YES];
+}
+
+- (void)viewDidDisappear:(BOOL)animated
+{
+    [super viewDidDisappear:animated];
 }
 
 - (void)didReceiveMemoryWarning {
@@ -61,6 +84,7 @@ didChangeDisplayMode:(GVRWidgetDisplayMode)displayMode{
     switch (displayMode) {
         case kGVRWidgetDisplayModeEmbedded:
         {
+            [self setVRVideosPlaying:NO];
             [self.vrPlayerVideoView stop];
             [self.vrPlayerVideoView removeFromSuperview];
             [self.navigationController popViewControllerAnimated:YES];
@@ -79,9 +103,11 @@ didFailToLoadContent:(id)content
 }
 
 - (void)videoView:(GVRVideoView*)videoView didUpdatePosition:(NSTimeInterval)position{
-    // Loop the video when it reaches the end.
-    //[videoView.subviews[0] setNeedsLayout];
-    
+    // Remove and pop the viewcontroller if video reached the end.
+    if (position == videoView.duration) {
+        [self setVRVideosPlaying:NO];
+        self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeEmbedded;
+    }
 }
 
 /*
@@ -93,5 +119,4 @@ didFailToLoadContent:(id)content
     // Pass the selected object to the new view controller.
 }
 */
-
 @end
