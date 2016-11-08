@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0881D0BA1DC07EE900BFF548 /* OEXMyVideosVRViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0881D0B91DC07EE900BFF548 /* OEXMyVideosVRViewController.m */; };
+		08BA8D7D1DD10EBD00D19941 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08BA8D7C1DD10EBD00D19941 /* Images.xcassets */; };
 		08C7CDE51D8AB59700F3D5EC /* ic_captions.png in Resources */ = {isa = PBXBuildFile; fileRef = 08C7CDE21D8AB59700F3D5EC /* ic_captions.png */; };
 		08C7CDE61D8AB59700F3D5EC /* UIWindow+TopController.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C7CDE41D8AB59700F3D5EC /* UIWindow+TopController.m */; };
 		0B1212221B4F089A002EE96C /* OEXCoursewareAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1212211B4F089A002EE96C /* OEXCoursewareAccess.m */; };
@@ -747,6 +748,7 @@
 /* Begin PBXFileReference section */
 		0881D0B81DC07EE900BFF548 /* OEXMyVideosVRViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXMyVideosVRViewController.h; sourceTree = "<group>"; };
 		0881D0B91DC07EE900BFF548 /* OEXMyVideosVRViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEXMyVideosVRViewController.m; sourceTree = "<group>"; };
+		08BA8D7C1DD10EBD00D19941 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = edX/Images.xcassets; sourceTree = "<group>"; };
 		08C7CDE21D8AB59700F3D5EC /* ic_captions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ic_captions.png; sourceTree = "<group>"; };
 		08C7CDE31D8AB59700F3D5EC /* UIWindow+TopController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+TopController.h"; sourceTree = "<group>"; };
 		08C7CDE41D8AB59700F3D5EC /* UIWindow+TopController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWindow+TopController.m"; sourceTree = "<group>"; };
@@ -3025,6 +3027,7 @@
 		BECB7B021924C0C3009C77F1 = {
 			isa = PBXGroup;
 			children = (
+				08BA8D7C1DD10EBD00D19941 /* Images.xcassets */,
 				08C7CDE81D8AD03200F3D5EC /* edX.entitlements */,
 				77E647B11C90C21100B6740D /* App */,
 				77E6478F1C90C10300B6740D /* Core */,
@@ -3682,6 +3685,7 @@
 				805329101B0E80E50093B177 /* DiscussionResponses.storyboard in Resources */,
 				6960892D1D53935500EE66DD /* courseCertificate@3x.png in Resources */,
 				1905BFF31A31B097001917FA /* NEW_USER.htm in Resources */,
+				08BA8D7D1DD10EBD00D19941 /* Images.xcassets in Resources */,
 				6926CDB11D59BE3600A16E22 /* ic_seek_thumb@2x.png in Resources */,
 				69ECC6351D50D1170030CF87 /* ic_next_default.png in Resources */,
 				69ECC6311D50D1170030CF87 /* ic_download.png in Resources */,
@@ -4539,6 +4543,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 776F39221B4D944B00ED11E3 /* Pods-edX.profile.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = edX.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
@@ -4936,6 +4942,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 771772C51ADC4022001A5AC6 /* Pods-edX.debug.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = edX.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
@@ -4967,6 +4975,8 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 771772C61ADC4022001A5AC6 /* Pods-edX.release.xcconfig */;
 			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_LAUNCHIMAGE_NAME = "Brand Assets";
 				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_ENTITLEMENTS = edX.entitlements;
 				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
