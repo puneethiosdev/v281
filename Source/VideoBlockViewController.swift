@@ -210,6 +210,10 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         rotateDeviceMessageView?.snp_remakeConstraints {make in
             make.height.equalTo(0.0)
         }
+        //Rotate video to full screen
+        guard let videoPlayer = videoController.moviePlayerController else { return }
+        videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
+        
     }
     
     func movieTimedOut() {
