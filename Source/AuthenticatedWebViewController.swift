@@ -285,8 +285,7 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
         showError(error)
     }
     
-    //kAMAT Changes
-    /*
+    
     public func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
     // Don't use basic auth on exchange endpoint. That is explicitly non protected
     // and it screws up the authorization headers
@@ -300,8 +299,9 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
     completionHandler(.PerformDefaultHandling, nil)
     }
     }
-    */
     
+    //kAMAT Changes
+    /*
     public func webView(webView: WKWebView, didReceiveAuthenticationChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void) {
         // Don't use basic auth on exchange endpoint. That is explicitly non protected
         // and it screws up the authorization headers
@@ -318,5 +318,6 @@ public class AuthenticatedWebViewController: UIViewController, WKNavigationDeleg
             completionHandler(.UseCredential, credential)
         }
     }
+     */
 }
 
