@@ -15,7 +15,7 @@ private let StandardVideoAspectRatio : CGFloat = 0.6
 class VideoBlockViewController : UIViewController, CourseBlockViewController, OEXVideoPlayerInterfaceDelegate, StatusBarOverriding, InterfaceOrientationOverriding {
     
     typealias Environment = protocol<DataManagerProvider, OEXInterfaceProvider, ReachabilityProvider>
-
+    
     let environment : Environment
     let blockID : CourseBlockID?
     let courseQuerier : CourseOutlineQuerier
@@ -25,7 +25,8 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     
     var rotateDeviceMessageView : IconMessageView?
     var contentView : UIView?
-    
+    //kAMAT_CHANGES
+    var videoURL : String = ""
     let loadController : LoadStateViewController
     
     init(environment : Environment, blockID : CourseBlockID?, courseID: String) {
@@ -46,7 +47,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     var courseID : String {
         return courseQuerier.courseID
     }
-
+    
     required init?(coder aDecoder: NSCoder) {
         // required by the compiler because UIViewController implements NSCoding,
         // but we don't actually want to serialize these things
@@ -55,22 +56,26 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     
     func addLoadListener() {
         loader.listen (self,
-            success : { [weak self] block in
-                if let video = block.type.asVideo,
-                    let encoding = video.preferredEncoding where encoding.isYoutube,
-                    let URL = encoding.URL
-                {
-                    self?.showYoutubeMessage(URL)
-                }
-                else if
-                    let video = self?.environment.interface?.stateForVideoWithID(self?.blockID, courseID : self?.courseID)
-                    where block.type.asVideo?.preferredEncoding != nil
-                {
-                    self?.showLoadedBlock(block, forVideo: video)
-                }
-                else {
-                    self?.showError(nil)
-                }
+                       success : { [weak self] block in
+                        if let video = block.type.asVideo,
+                            let encoding = video.preferredEncoding where encoding.isYoutube,
+                            let URL = encoding.URL
+                        {
+                            //kAMAT_CHANGES
+                            self!.videoURL = URL
+                            self?.showYoutubeMessage(URL)
+                        }
+                        else if
+                            let video = self?.environment.interface?.stateForVideoWithID(self?.blockID, courseID : self?.courseID)
+                            where block.type.asVideo?.preferredEncoding != nil
+                        {
+                            //kAMAT_CHANGES
+                            self!.videoURL = (video.summary?.videoURL)!
+                            self?.showLoadedBlock(block, forVideo: video)
+                        }
+                        else {
+                            self?.showError(nil)
+                        }
             }, failure : {[weak self] error in
                 self?.showError(error)
             }
@@ -92,6 +97,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         rotateDeviceMessageView = IconMessageView(icon: .RotateDevice, message: Strings.rotateDevice)
         contentView!.addSubview(rotateDeviceMessageView!)
         
+        
         view.backgroundColor = OEXStyles.sharedStyles().standardBackgroundColor()
         view.setNeedsUpdateConstraints()
         
@@ -102,7 +108,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         super.viewWillAppear(animated)
         self.loadVideoIfNecessary()
     }
-
+    
     override func viewDidAppear(animated : Bool) {
         
         // There's a weird OS bug where the bottom layout guide doesn't get set properly until
@@ -210,9 +216,16 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         rotateDeviceMessageView?.snp_remakeConstraints {make in
             make.height.equalTo(0.0)
         }
-        //Rotate video to full screen
-        guard let videoPlayer = videoController.moviePlayerController else { return }
-        videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
+        //kAMAT_CHANGES
+        if self.videoURL.containsString("_VR_Video") {
+            print("VRVideo + \(self.videoURL)");
+        }else{
+            //Rotate video to full screen
+            guard let videoPlayer = videoController.moviePlayerController else { return }
+            videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
+            print("NormalVideo + \(self.videoURL)");
+            
+        }
         
     }
     
@@ -228,7 +241,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     private func showError(error : NSError?) {
         loadController.state = LoadState.failed(error, icon: .UnknownError, message: Strings.videoContentNotAvailable)
     }
-
+    
     private func showYoutubeMessage(URL: String) {
         let buttonInfo = MessageButtonInfo(title: Strings.Video.viewOnYoutube) {
             if let URL = NSURL(string: URL) {
@@ -240,14 +253,14 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     
     private func showLoadedBlock(block : CourseBlock, forVideo video: OEXHelperVideoDownload) {
         navigationItem.title = block.displayName
-
+        
         dispatch_async(dispatch_get_main_queue()) {
             self.loadController.state = .Loaded
         }
-
+        
         videoController.playVideoFor(video)
     }
-
+    
     private func canDownloadVideo() -> Bool {
         let hasWifi = environment.reachability.isReachableViaWiFi() ?? false
         let onlyOnWifi = environment.dataManager.interface?.shouldDownloadOnlyOnWifi ?? false
