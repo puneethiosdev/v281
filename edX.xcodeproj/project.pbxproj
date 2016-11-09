@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0881D0BA1DC07EE900BFF548 /* OEXMyVideosVRViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 0881D0B91DC07EE900BFF548 /* OEXMyVideosVRViewController.m */; };
+		089F33431DD309C6000B852B /* Default-320.png in Resources */ = {isa = PBXBuildFile; fileRef = 089F33421DD309C6000B852B /* Default-320.png */; };
 		08BA8D7D1DD10EBD00D19941 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 08BA8D7C1DD10EBD00D19941 /* Images.xcassets */; };
 		08C7CDE51D8AB59700F3D5EC /* ic_captions.png in Resources */ = {isa = PBXBuildFile; fileRef = 08C7CDE21D8AB59700F3D5EC /* ic_captions.png */; };
 		08C7CDE61D8AB59700F3D5EC /* UIWindow+TopController.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C7CDE41D8AB59700F3D5EC /* UIWindow+TopController.m */; };
@@ -748,6 +749,7 @@
 /* Begin PBXFileReference section */
 		0881D0B81DC07EE900BFF548 /* OEXMyVideosVRViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXMyVideosVRViewController.h; sourceTree = "<group>"; };
 		0881D0B91DC07EE900BFF548 /* OEXMyVideosVRViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEXMyVideosVRViewController.m; sourceTree = "<group>"; };
+		089F33421DD309C6000B852B /* Default-320.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Default-320.png"; sourceTree = "<group>"; };
 		08BA8D7C1DD10EBD00D19941 /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = edX/Images.xcassets; sourceTree = "<group>"; };
 		08C7CDE21D8AB59700F3D5EC /* ic_captions.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = ic_captions.png; sourceTree = "<group>"; };
 		08C7CDE31D8AB59700F3D5EC /* UIWindow+TopController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIWindow+TopController.h"; sourceTree = "<group>"; };
@@ -2063,6 +2065,7 @@
 		69ECC5F41D50D1170030CF87 /* Splash */ = {
 			isa = PBXGroup;
 			children = (
+				089F33421DD309C6000B852B /* Default-320.png */,
 				69ECC5F51D50D1170030CF87 /* Default-568h@2x.png */,
 				69ECC5F61D50D1170030CF87 /* Default-667h@2x.png */,
 				69ECC5F71D50D1170030CF87 /* Default-736h@3x.png */,
@@ -3598,6 +3601,7 @@
 				6960892C1D53935500EE66DD /* courseCertificate@2x.png in Resources */,
 				69ECC61D1D50D1170030CF87 /* bt_logout_default.png in Resources */,
 				69ECC6501D50D1170030CF87 /* Default@2x.png in Resources */,
+				089F33431DD309C6000B852B /* Default-320.png in Resources */,
 				69ECC6341D50D1170030CF87 /* ic_next_deactive.png in Resources */,
 				1AFEB1B91BBD88F3004C471D /* languages.json in Resources */,
 				B4B6D63B1A950C28000F44E8 /* registration.json in Resources */,
