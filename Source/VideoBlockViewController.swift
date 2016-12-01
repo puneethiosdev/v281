@@ -218,12 +218,12 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         }
         //kAMAT_CHANGES
         if self.videoURL.containsString("_VR_Video") {
-            print("VRVideo + \(self.videoURL)");
+            //print("VRVideo + \(self.videoURL)");
         }else{
             //Rotate video to full screen
             guard let videoPlayer = videoController.moviePlayerController else { return }
             videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
-            print("NormalVideo + \(self.videoURL)");
+            //print("NormalVideo + \(self.videoURL)");
             
         }
         

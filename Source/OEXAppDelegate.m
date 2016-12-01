@@ -173,7 +173,7 @@
             [schemaDictionary setObject:value forKey:key];
         }
         
-        NSLog(@"The Schema dictionary is:%@", schemaDictionary);
+        //NSLog(@"The Schema dictionary is:%@", schemaDictionary);
         
         NSDictionary *customAccessToken = [[NSDictionary alloc] initWithObjectsAndKeys:schemaDictionary[@"oauth"],@"access_token",
                                            @"", @"expires_in",
@@ -235,7 +235,7 @@
         [self stopRotatingActivityIndicator];
     }
     else{
-        NSLog(@"%s - YES INTERNET ",__FUNCTION__);
+        //NSLog(@"%s - YES INTERNET ",__FUNCTION__);
         if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count] &&  [NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"OEXLoginSplashViewController"]) {
             
             NSLog(@"%@",[[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]);
@@ -261,14 +261,18 @@
 - (void) performVPNAvailability
 {
     [self rotateActivityIndicator];
+    [self performSelector:@selector(checkDoWeNeedToCallSSO) withObject:nil afterDelay:1.0f];
+
+    /*
     
     NSURL *ceoURL = [NSURL URLWithString:[VPN_CHECK_URL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     
     vpnConnection = [[NSURLConnection alloc ]initWithRequest:[NSURLRequest requestWithURL:ceoURL] delegate:self startImmediately:YES];
     [vpnConnection start];
+     */
 }
 
-#pragma mark SSO
+#pragma mark -  SSO
 -(void) checkDoWeNeedToCallSSO {
     
     [self stopRotatingActivityIndicator];
@@ -280,6 +284,31 @@
     }else{
         [self.environment.router openInWindow:self.window];
     }
+    
+    [self verifyVersionCheck];
+}
+-(void) verifyVersionCheck{
+    
+    NSDate *oldDate = [[NSUserDefaults standardUserDefaults] objectForKey:@"BackgroundDate"];
+    NSDate* enddate = oldDate;
+    NSDate* currentdate = [NSDate date];
+    NSTimeInterval distanceBetweenDates = [currentdate timeIntervalSinceDate:enddate];
+    
+    if (distanceBetweenDates >= 172800 || isFirstVersionCheck) {
+        isFirstVersionCheck = NO;
+        
+        NSURL *versionChkUrl = [NSURL URLWithString:VERSION_CHECK_URL];
+        versionChkConnection = [[NSURLConnection alloc] initWithRequest:[NSURLRequest requestWithURL:versionChkUrl] delegate:self];
+        [versionChkConnection start];
+        
+        versionData = [[NSMutableData alloc] initWithCapacity:0];
+        if (!versionChkConnection)
+        {
+            versionChkConnection = nil;
+            versionData = nil;
+        }
+    }
+    
 }
 - (void)OpenSsoUrlInSafari{
     

@@ -263,7 +263,6 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
     }
     func searchBarSearchButtonClicked(searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
-        
         self.loadController.state = .Initial
         data_request(kFILTER_COURSES+"?search_string="+searchBar.text!,hasLoadMore: false)
         

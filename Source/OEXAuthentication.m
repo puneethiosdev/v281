@@ -277,7 +277,7 @@ didCompleteWithError:(NSError *)error{
     kAMAT_CHANGES;
     //NSURLSession* session = [NSURLSession sessionWithConfiguration:sessionConfig];
     NSURLSession* session = [NSURLSession sessionWithConfiguration:sessionConfig delegate:self delegateQueue:nil];
-    NSLog(@"%@ - Request - Login - %@",kAMAT_DEBUG,request.URL.absoluteString);
+    //NSLog(@"%@ - Request - Login - %@",kAMAT_DEBUG,request.URL.absoluteString);
     
     [[session dataTaskWithRequest:request completionHandler:^(NSData* data, NSURLResponse* response, NSError* error) {
         NSHTTPURLResponse* httpResp = (NSHTTPURLResponse*) response;

@@ -550,8 +550,8 @@ static NSURLSession* videosBackgroundSession = nil;
     if (responseData != nil) {
         
         NSString *response = [[NSString alloc] initWithData:responseData encoding:NSASCIIStringEncoding];
-        NSLog(@"%s -- Signed URL -%@",__FUNCTION__,response);
-        NSLog(@"%s -- Signed URL After replacing spaces -%@",__FUNCTION__,[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
+        //NSLog(@"%s -- Signed URL -%@",__FUNCTION__,response);
+        //NSLog(@"%s -- Signed URL After replacing spaces -%@",__FUNCTION__,[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]);
         if (response) {
             
             //NSURLRequest *urlRequest = [NSURLRequest requestWithURL:[NSURL URLWithString:[response  stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]] cachePolicy:NSURLRequestReloadIgnoringLocalCacheData timeoutInterval:600.0];
@@ -578,7 +578,7 @@ static NSURLSession* videosBackgroundSession = nil;
     
     _videoObject = video;
     NSMutableURLRequest *signingRequest = [[NSMutableURLRequest alloc] initWithURL:[NSURL URLWithString:[NSString stringWithFormat:@"%@%@%@", SERVER_URL, VIDEO_SIGNED_URL, [video.video_url stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]]]];
-    NSLog(@"%s -- Unsigned URL -%@",__FUNCTION__,signingRequest);
+    //NSLog(@"%s -- Unsigned URL -%@",__FUNCTION__,signingRequest);
     [signingRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
     //[signingRequest addValue:bearerToken forHTTPHeaderField:@"Autherization"];
     [NSURLConnection connectionWithRequest:signingRequest delegate:self];

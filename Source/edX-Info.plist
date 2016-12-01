@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Vappliedx</string>
+	<string>appliedx</string>
 	<key>CFBundleExecutable</key>
 	<string>${EXECUTABLE_NAME}</string>
 	<key>CFBundleIdentifier</key>
@@ -17,7 +17,7 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.6.13</string>
+	<string>2.6.0</string>
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleSpokenName</key>
@@ -31,12 +31,12 @@
 			<string>org.edx.mobile</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
-				<string>appliedx</string>
+				<string>appliedxproduction</string>
 			</array>
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>2.6.13</string>
+	<string>2.6.0</string>
 	<key>FacebookDisplayName</key>
 	<string>edX</string>
 	<key>ITSAppUsesNonExemptEncryption</key>
@@ -55,6 +55,8 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Used to scan QR codes</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>FontAwesome.otf</string>
@@ -80,7 +82,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>Used to scan QR codes</string>
 </dict>
 </plist>
