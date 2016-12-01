@@ -40,6 +40,8 @@
     GVRVideoView *_videoView;
     BOOL _isPaused;
     BOOL isVRVideo;
+    NSURLConnection *signingConnection;
+
 }
 
 @property(nonatomic, assign) CGRect defaultFrame;
@@ -235,7 +237,9 @@
             //NSLog(@"%s -- Unsigned URL -%@",__FUNCTION__,signingRequest);
             [signingRequest addValue:@"application/json" forHTTPHeaderField:@"Accept"];
             //            [signingRequest addValue:bearerToken forHTTPHeaderField:@"Autherization"];
-            [NSURLConnection connectionWithRequest:signingRequest delegate:self];
+            signingConnection = [[NSURLConnection alloc] initWithRequest:signingRequest delegate:self];
+            [signingConnection start];
+            //[NSURLConnection connectionWithRequest:signingRequest delegate:self];
         } else {
             [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval videoURL:video.summary.videoURL];
         }
@@ -433,6 +437,8 @@
     [super viewWillDisappear:animated];
     [NSObject cancelPreviousPerformRequestsWithTarget:self];
     [_moviePlayerController setShouldAutoplay:NO];
+    [signingConnection cancel];
+    [_moviePlayerController stop];
     
     // There appears to be an OS bug on iOS 8
     // where if you don't call "stop" before a movie player view disappears
