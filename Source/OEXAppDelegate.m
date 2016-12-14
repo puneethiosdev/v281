@@ -222,7 +222,7 @@
 #pragma - Auto Connect VPN
 - (void)applicationDidBecomeActive:(UIApplication *)application
 {
-    /*! If VR Viodes are playing then should not call version web service & display alerts */
+    /*! If VR Videos are playing then should not call version web service & display alerts */
     if (self.isVRVideosPlaying) {
         return;
     }
@@ -238,13 +238,13 @@
         //NSLog(@"%s - YES INTERNET ",__FUNCTION__);
         if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count] &&  [NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"OEXLoginSplashViewController"]) {
             
-            NSLog(@"%@",[[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]);
-            NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
+            //NSLog(@"%@",[[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]);
+            //NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
             
             if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count]) {
                 [(OEXLoginSplashViewController*)[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] rotateActivityIndicator];
                 [self performVPNAvailability];
-                NSLog(@"No Need of SSO because we are in signup,signin, eula");
+                //NSLog(@"No Need of SSO because we are in signup,signin, eula");
             }
             
         }else{

@@ -26,7 +26,7 @@
     
     self.vrPlayerVideoView = [[GVRVideoView alloc] initWithFrame:self.view.frame];
     self.vrPlayerVideoView.delegate = self;
-    self.vrPlayerVideoView.enableFullscreenButton = YES;
+    //self.vrPlayerVideoView.enableFullscreenButton = YES;
     self.vrPlayerVideoView.enableCardboardButton = YES;
     [self.view addSubview:self.vrPlayerVideoView];
     self.vrPlayerVideoView.displayMode = kGVRWidgetDisplayModeFullscreenVR;
