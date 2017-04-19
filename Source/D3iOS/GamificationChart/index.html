@@ -1,0 +1,100 @@
+<!doctype html>
+<html>
+    <head>
+        <style type="text/css">
+            
+            #scrolly {
+                width: 15em;
+                overflow: scroll;
+                overflow-x: hidden;
+            }
+        ::-webkit-scrollbar {
+            width: 0px;  /* remove scrollbar space */
+            background: transparent;  /* optional: just make scrollbar invisible */
+        }
+        /* optional: show position indicator in red */
+        ::-webkit-scrollbar-thumb {
+            background: #ffffff;
+        }
+        
+            </style>
+        <meta charset='utf-8'>
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+                <link href="nv.d3.css" rel="stylesheet">
+                    <script src="d3.js"></script>
+                    <script src="nv.d3.js"></script>
+                    <script src="dataGenerator.js"></script>
+                    <script src="jquery-2.2.4.js"></script>
+                    
+                    <script>
+                        //  Created by Puneet JR on 04/03/17.
+                        //  Copyright (c) 2014 edX. All rights reserved.
+                        var mod = DATAG_MOD();
+                        var width = 400,
+                        height = 300,
+                        radius = Math.min(width, height) / 2;
+                        var color = d3.scale.category10(); // var color = d3.scale.category20();
+                        
+                        var chart = nv.models.pieChart()
+                        .x(function(d) { return d.label; })
+                        .y(function(d) { return d.value; })
+                        .labelThreshold(0.5)
+                        .labelType("percent")
+                        .donut(true)
+                        .showLabels(true)
+                        .donutRatio(0.35)
+                        .height(350)
+                        .width(350);
+                        chart.pie
+                        .startAngle(function(d) { return d.startAngle/2 -Math.PI/2 })
+                        .endAngle(function(d) { return d.endAngle/2 -Math.PI/2 });
+                        
+                        function loadPieChart() {
+                            // $(".viji").html(location.search.split("username=")[1]);
+                           //$(".viji").html(location.pathname);
+                           var file_path= location.pathname;
+                           var username_start = file_path.search("username=");
+                           var username= file_path.slice(username_start+9) ;
+                           //$(".username").html(username)
+                           
+                            nv.addGraph(function(){
+                                        d3.select("#chart svg")
+                                        .attr("width", width)
+                                        .attr("height", height)
+                                        .datum(mod.newDataSet(username))
+                                        .transition().duration(350)
+                                        .call(chart);
+                                        
+                                        return chart;
+                            });
+                        }
+                    
+                    //Update the Graph
+                    function updateGraph() {
+                        //var data = mod.newDataSet("puneethkumarsrinivasvenkate");
+                        //var username = location.search.split('username')[1]
+                        var username = location.search.split("username=")[1]
+                        
+                        d3.select("#chart svg")
+                        .datum(mod.newDataSet(username))
+                        .transition().duration(350)
+                        .call(chart);
+                        
+                    }
+                    </script>
+                    </head>
+    <body onload="loadPieChart()" style="position:fixed">
+        <div id="chart" style="margin-top:-10px;margin-bottom:30px;height:50%">
+            <h2 align="center">Your Enlightenment Points</h2>
+            <svg width="100" height="50" style="margin-top:30px"></svg>
+            <h1 style="text-align:center; margin-top:-120px"> <b id="pointScore">   </b> </h1>
+        </div>
+        
+        <div style='overflow:hidden; width:370px;margin-left:5px;margin-top:50px'>
+            <h2 align="center">Your Badge Pack</h2>
+            <div class="badges" style='overflow:scroll;margin-top:30px'></div>
+        </div>
+        
+        
+    </body>
+</html>

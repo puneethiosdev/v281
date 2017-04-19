@@ -1,9 +1,9 @@
-API_HOST_URL: 'localhost'
+API_HOST_URL: 'https://appliedx.amat.com'
 COURSE_ENROLLMENT:
     ENABLED: true
-    TYPE: 'webview'
+    TYPE: 'native'
     WEBVIEW:
         SEARCH_BAR_ENABLED: true
-        COURSE_SEARCH_URL: 'localhost'
-ENVIRONMENT_DISPLAY_NAME: 'edX'
-FEEDBACK_EMAIL_ADDRESS: 'sample@example.com'
+        COURSE_SEARCH_URL: 'https://appliedx.amat.com/courses'
+ENVIRONMENT_DISPLAY_NAME: 'AMAT'
+FEEDBACK_EMAIL_ADDRESS: 'appliedx_ops@amat.com'

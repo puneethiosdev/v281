@@ -107,7 +107,7 @@ class UserProfileEditViewController: UITableViewController {
     
     private let toast = ErrorToastView()
     private let headerHeight: CGFloat = 72
-    private let spinner = SpinnerView(size: SpinnerView.Size.Large, color: SpinnerView.Color.Primary)
+    private let spinner = SpinnerView(size: SpinnerView.SpinSize.Large, color: SpinnerView.Color.Primary)
     
     private func makeHeader() -> UIView {
         banner = ProfileBanner(editable: true) { [weak self] in

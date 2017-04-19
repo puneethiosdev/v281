@@ -217,7 +217,6 @@
     
 }
 
-
 //kAMAT_CHANGES;
 #pragma - Auto Connect VPN
 - (void)applicationDidBecomeActive:(UIApplication *)application
@@ -233,8 +232,7 @@
         [noInternetAlert show];
         
         [self stopRotatingActivityIndicator];
-    }
-    else{
+    } else {
         //NSLog(@"%s - YES INTERNET ",__FUNCTION__);
         if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count] &&  [NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"OEXLoginSplashViewController"]) {
             
@@ -254,8 +252,6 @@
     }
 }
 
-
-
 //kAMAT_CHANGES
 #pragma - VPN Check
 - (void) performVPNAvailability
@@ -263,13 +259,10 @@
     [self rotateActivityIndicator];
     [self performSelector:@selector(checkDoWeNeedToCallSSO) withObject:nil afterDelay:1.0f];
 
-    /*
-    
+    //VPN Check & start
     NSURL *ceoURL = [NSURL URLWithString:[VPN_CHECK_URL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    
     vpnConnection = [[NSURLConnection alloc ]initWithRequest:[NSURLRequest requestWithURL:ceoURL] delegate:self startImmediately:YES];
     [vpnConnection start];
-     */
 }
 
 #pragma mark -  SSO
@@ -287,6 +280,7 @@
     
     [self verifyVersionCheck];
 }
+
 -(void) verifyVersionCheck{
     
     NSDate *oldDate = [[NSUserDefaults standardUserDefaults] objectForKey:@"BackgroundDate"];
@@ -308,7 +302,6 @@
             versionData = nil;
         }
     }
-    
 }
 - (void)OpenSsoUrlInSafari{
     
@@ -417,8 +410,8 @@
             if ([[UIApplication sharedApplication] canOpenURL:vpnUrlSchema]) {
                 [[UIApplication sharedApplication] openURL:vpnUrlSchema];
             }else{
-                UIAlertView *vpnAlert = [[UIAlertView alloc] initWithTitle:@"VPN Connection" message:@"Go to Settings->VPN->Switch ON" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
-                [vpnAlert show];
+//                UIAlertView *vpnAlert = [[UIAlertView alloc] initWithTitle:@"VPN Connection" message:@"Go to Settings->VPN->Switch ON" delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+//                [vpnAlert show];
             }
         } else if (SIGN_UP_ALERT_TAG == alertView.tag)
         {
@@ -459,6 +452,7 @@
         versionData = nil;
         
     }
+//    else if(vpnConnection != connection){
     else if(vpnConnection == connection){
         
         [self stopRotatingActivityIndicator];
@@ -563,12 +557,12 @@
         }
         
         //Comparing the versions
-        if(![currentVersion isEqualToString:nextVersion]){
-            UIAlertView *versionAlert = [[UIAlertView alloc] initWithTitle:@"AppliedX" message:[NSString stringWithFormat:@"%@ v%@ %@", kVERSION_ALERT_TEXT1, nextVersion, kVERSION_ALERT_TEXT2] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Update", nil];
-            [versionAlert setTag:VERSION_ALERT_TAG];
-            [versionAlert show];
-            
-        }
+//        if(![currentVersion isEqualToString:nextVersion]){
+//            UIAlertView *versionAlert = [[UIAlertView alloc] initWithTitle:@"AppliedX" message:[NSString stringWithFormat:@"%@ v%@ %@", kVERSION_ALERT_TEXT1, nextVersion, kVERSION_ALERT_TEXT2] delegate:self cancelButtonTitle:@"Cancel" otherButtonTitles:@"Update", nil];
+//            [versionAlert setTag:VERSION_ALERT_TAG];
+//            [versionAlert show];
+//            
+//        }
     }//version check
 }
 

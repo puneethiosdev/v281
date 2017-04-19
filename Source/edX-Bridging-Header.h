@@ -3,6 +3,7 @@
 //
 
 #import <SEGAnalytics.h>
+#import <MacTypes.h>
 
 #import "CLVideoPlayer.h"
 #import "CLButton.h"
@@ -69,3 +70,6 @@
 #import "NSJSONSerialization+OEXSafeAccess.h"
 #import "NSMutableDictionary+OEXSafeAccess.h"
 
+
+#import "WebKitController.h"
+#import "D3WKViewController.h"

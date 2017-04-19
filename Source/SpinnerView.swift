@@ -12,28 +12,93 @@ private var startTime : NSTimeInterval?
 
 private let animationKey = "org.edx.spin"
 
-public class SpinnerView : UIView {
-    
-    public enum Size {
+
+@objc public class SpinnerView : UIView {
+    @objc public enum SpinSize:Int, RawRepresentable {
         case Small
         case Medium
         case Large
+
+        public typealias RawValue = String
+        public var rawValue: RawValue {
+            switch self {
+            case .Small:
+                return "SMALL"
+            case .Medium:
+                return "MEDIUM"
+            case .Large:
+                return "LARGE"
+            }
+        }
+        public init?(rawValue: RawValue) {
+            switch rawValue {
+            case "SMALL":
+                self = .Small
+            case "MEDIUM":
+                self = .Medium
+            case "Large":
+                self = .Large
+            default:
+                self = .Large
+            }
+        }
     }
-    
-    public enum Color {
+
+    @objc public enum Color:Int, RawRepresentable {
         case Primary
         case White
-        
+
         private var value : UIColor {
             switch self {
             case Primary: return OEXStyles.sharedStyles().primaryBaseColor()
             case White: return OEXStyles.sharedStyles().neutralWhite()
             }
         }
+        public typealias RawValue = String
+        public var rawValue: RawValue {
+            switch self {
+            case .Primary:
+                return "PRIMARY"
+            case .White:
+                return "WHITE"
+            }
+        }
+        public init?(rawValue: RawValue) {
+            switch rawValue {
+            case "PRIMARY":
+                self = .Primary
+            case "WHITE":
+                self = .White
+            default:
+                self = .Primary
+            }
+        }
     }
-    
+
+
+
+//public class SpinnerView : UIView {
+//    
+//    public enum Size {
+//        case Small
+//        case Medium
+//        case Large
+//    }
+//    
+//    public enum Color {
+//        case Primary
+//        case White
+//        
+//        private var value : UIColor {
+//            switch self {
+//            case Primary: return OEXStyles.sharedStyles().primaryBaseColor()
+//            case White: return OEXStyles.sharedStyles().neutralWhite()
+//            }
+//        }
+//    }
+
     private let content = UIImageView()
-    private let size : Size
+    private let size : SpinSize
     private var stopped : Bool = false {
         didSet {
             if hidesWhenStopped {
@@ -44,7 +109,7 @@ public class SpinnerView : UIView {
     
     public var hidesWhenStopped = false
     
-    public init(size : Size, color : Color) {
+     public init(size : SpinSize, color : Color) {
         self.size = size
         super.init(frame : CGRectZero)
         addSubview(content)
@@ -61,7 +126,7 @@ public class SpinnerView : UIView {
         super.layoutSubviews()
         content.frame = self.bounds
     }
-
+    
     required public init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }

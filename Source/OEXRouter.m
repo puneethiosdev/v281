@@ -141,7 +141,8 @@ OEXRegistrationViewControllerDelegate
             [[NSUserDefaults standardUserDefaults] setObject:nil forKey:@"isDeepLink"];
             [[NSUserDefaults standardUserDefaults] synchronize];
         } else {
-            [self showMyCoursesAnimated:NO pushingCourseWithID:nil];
+            [self showMyPointsBadges:_currentContentController];
+//            [self showMyCoursesAnimated:NO pushingCourseWithID:nil];
         }
         
         UIViewController* rearController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"RearViewController"];

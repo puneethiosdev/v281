@@ -11,7 +11,7 @@ private let FilterViewFrame = CGRectMake(0, 0, 30, 30)
 private let PageSize = 20
 private let footerHeight = 30
 
-class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate,NSURLSessionTaskDelegate,UISearchBarDelegate,NSURLSessionDelegate {
+class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate,NSURLSessionTaskDelegate,UISearchBarDelegate,NSURLSessionDelegate, CourseFilterDelegate {
     typealias Environment = protocol<NetworkManagerProvider, OEXRouterProvider, OEXSessionProvider>
     
     private let environment : Environment
@@ -34,16 +34,47 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         filterRightBarButton()
         
     }
+    
     func filterRightBarButton() {
-        let allcoursesItem = UIBarButtonItem(title: "View all courses", style:.Plain, target: nil, action: nil)
+        let allcoursesItem = UIBarButtonItem(image: UIImage(named: "filterIcon") , style:.Plain, target: nil, action: nil)
         allcoursesItem.oex_setAction {
-            self.loadController.state = .Initial
-            self.searchBar.resignFirstResponder()
-            self.searchBar.text = nil
-            self.data_request(kFILTER_COURSES,hasLoadMore: false)
+            
+            let courseFilterVC:CourseFilterViewController = UIStoryboard(name: "Main", bundle: nil).instantiateViewControllerWithIdentifier("courseFilterVC") as! CourseFilterViewController
+            
+            courseFilterVC.delegate = self
+            
+            self.navigationController?.pushViewController(courseFilterVC, animated: true)
+
         }
         self.navigationItem.rightBarButtonItem = allcoursesItem
+        
     }
+    
+    
+    
+    func selectedCourseFilter(filterDict: [String : String]) {
+        
+        self.loadController.state = .Initial
+        data_requestMultiFilter(kFILTER_COURSES, hasLoadMore: false, paramDict: filterDict)
+    }
+    
+//    func selectedCourseFilter(section: String, coursesTerm: String) {
+//        
+//        self.loadController.state = .Initial
+//        data_request(kFILTER_COURSES+"?"+section+"="+coursesTerm,hasLoadMore: false)
+//    }
+    
+    
+//    func filterRightBarButton() {
+//        let allcoursesItem = UIBarButtonItem(title: "View all courses", style:.Plain, target: nil, action: nil)
+//        allcoursesItem.oex_setAction {
+//            self.loadController.state = .Initial
+//            self.searchBar.resignFirstResponder()
+//            self.searchBar.text = nil
+//            self.data_request(kFILTER_COURSES,hasLoadMore: false)
+//        }
+//        self.navigationItem.rightBarButtonItem = allcoursesItem
+//    }
 
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -169,14 +200,19 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         
         self.view.layoutIfNeeded()
     }
-    //Request to get filter courses
-    func data_request(filterCourseURL : String, hasLoadMore : Bool)
+    
+    //Parameter value url
+    func data_requestMultiFilter(filterCourseURL : String, hasLoadMore : Bool, paramDict:[String: String])
     {
+    
+        let parameterString = paramDict.stringFromHttpParameters()
+        let requestURL = String(UTF8String:"\(filterCourseURL)?\(parameterString)")!
+        
         //Is it required to display load more option at bottom
         if hasLoadMore {
             showLoadMoreOption()
         }
-        let escapedAddress : String = filterCourseURL.stringByAddingPercentEncodingWithAllowedCharacters(.URLQueryAllowedCharacterSet())!
+        let escapedAddress : String = requestURL.stringByAddingPercentEncodingWithAllowedCharacters(.URLQueryAllowedCharacterSet())!
         
         let url:NSURL = NSURL(string: escapedAddress)!
         
@@ -190,7 +226,7 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
             }
             do {
                 let filterCoursesJson = JSON.init(data: data!, options: NSJSONReadingOptions(), error: nil)
-                //print(filterCoursesJson)
+                //                print(filterCoursesJson)
                 let allEmails = filterCoursesJson["results"].array?.flatMap {item in
                     item.dictionaryObject.map { OEXCourse(dictionary: $0) }
                 }
@@ -199,23 +235,18 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
                 self.filterCoursesCount = filterCoursesJson["total"].int16!
                 
                 dispatch_async(dispatch_get_main_queue()) {
-                    
                     if(courses.count == 0){
                         self.loadController.state = .Loaded
                         self.tableController.courses = courses
                         self.tableController.tableView.reloadData()
                         
-                        
                         self.showOverlayMessage("We couldn't find any results for " + self.searchBar.text!+".")
                         self.searchBar.text = nil;
                         self.data_request(kFILTER_COURSES,hasLoadMore: false)
-                        
-                        
                     }else{
                         self.loadController.state = .Loaded
                         self.tableController.courses = courses
                         self.tableController.tableView.reloadData()
-                        
                     }
                     self.hideLoadMoreOption()
                 }
@@ -224,12 +255,60 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         })
         dataTask.resume()
     }
+    
+    //Request to get filter courses
+    func data_request(filterCourseURL : String, hasLoadMore : Bool)
+    {
+        //Is it required to display load more option at bottom
+        if hasLoadMore {
+            showLoadMoreOption()
+        }
+        let escapedAddress : String = filterCourseURL.stringByAddingPercentEncodingWithAllowedCharacters(.URLQueryAllowedCharacterSet())!
+        let url:NSURL = NSURL(string: escapedAddress)!
+        let session = NSURLSession(configuration: NSURLSessionConfiguration.defaultSessionConfiguration(), delegate: self, delegateQueue: nil)
+        let dataTask = session.dataTaskWithRequest(NSURLRequest.init(URL: url), completionHandler: { (let data, let response, let error) in
+            
+            guard let _:NSData = data, let _:NSURLResponse = response  where error == nil else {
+                print("error")
+                return
+            }
+            do {
+                let filterCoursesJson = JSON.init(data: data!, options: NSJSONReadingOptions(), error: nil)
+//                print(filterCoursesJson)
+                let allEmails = filterCoursesJson["results"].array?.flatMap {item in
+                    item.dictionaryObject.map { OEXCourse(dictionary: $0) }
+                }
+
+                let courses : [OEXCourse] = allEmails!
+                self.filterCoursesCount = filterCoursesJson["total"].int16!
+                
+                dispatch_async(dispatch_get_main_queue()) {
+                    if(courses.count == 0){
+                        self.loadController.state = .Loaded
+                        self.tableController.courses = courses
+                        self.tableController.tableView.reloadData()
+                        
+                        self.showOverlayMessage("We couldn't find any results for " + self.searchBar.text!+".")
+                        self.searchBar.text = nil;
+                        self.data_request(kFILTER_COURSES,hasLoadMore: false)
+                        
+                    }else{
+                        self.loadController.state = .Loaded
+                        self.tableController.courses = courses
+                        self.tableController.tableView.reloadData()
+                    }
+                    self.hideLoadMoreOption()
+                }
+            }
+        })
+        dataTask.resume()
+    }
+ 
     // MARK: NSURLSessionDelegate methods
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didReceiveChallenge challenge: NSURLAuthenticationChallenge, completionHandler: (NSURLSessionAuthChallengeDisposition, NSURLCredential?) -> Void){
         
         let credential = NSURLCredential(forTrust: challenge.protectionSpace.serverTrust!)
         completionHandler(.UseCredential, credential)
-        
         
     }
     func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?){
@@ -301,11 +380,12 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
                 if (searchBar.text != nil && searchBar.text?.characters.count != 0) {
                     searchBar.resignFirstResponder()
                     //self.loadController.state = .Initial
-                    data_request(kFILTER_COURSES+"?search_string="+searchBar.text!+"&page_size=\(pageNumber*PageSize)",hasLoadMore: true)
+                    data_request(kFILTER_COURSES+"?search_string="+searchBar.text!+"&page_size=\(pageNumber*PageSize)"+"&page_index=1"+"&mobile=True",hasLoadMore: true)
+                    
                 }else{
                     searchBar.resignFirstResponder()
                     //self.loadController.state = .Initial
-                    data_request(kFILTER_COURSES+"?page_size=\(pageNumber*PageSize)",hasLoadMore: true)
+                    data_request(kFILTER_COURSES+"?page_size=\(pageNumber*PageSize)"+"&page_index=1"+"&mobile=True",hasLoadMore: true)
                 }
             }
         }
@@ -325,3 +405,44 @@ extension CourseCatalogViewController {
     
 }
 
+extension String {
+    
+    /// Percent escapes values to be added to a URL query as specified in RFC 3986
+    ///
+    /// This percent-escapes all characters besides the alphanumeric character set and "-", ".", "_", and "~".
+    ///
+    /// http://www.ietf.org/rfc/rfc3986.txt
+    ///
+    /// :returns: Returns percent-escaped string.
+    
+    func stringByAddingPercentEncodingForURLQueryValue() -> String? {
+        let allowedCharacters = NSCharacterSet(charactersInString: "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._~")
+        
+        return self.stringByAddingPercentEncodingWithAllowedCharacters(allowedCharacters)
+    }
+    
+}
+
+
+
+extension Dictionary {
+    
+    /// Build string representation of HTTP parameter dictionary of keys and objects
+    ///
+    /// This percent escapes in compliance with RFC 3986
+    ///
+    /// http://www.ietf.org/rfc/rfc3986.txt
+    ///
+    /// :returns: String representation in the form of key1=value1&key2=value2 where the keys and values are percent escaped
+    
+    func stringFromHttpParameters() -> String {
+        let parameterArray = self.map { (key, value) -> String in
+            let percentEscapedKey = (key as! String).stringByAddingPercentEncodingForURLQueryValue()!
+            let percentEscapedValue = (value as! String).stringByAddingPercentEncodingForURLQueryValue()!
+            return "\(percentEscapedKey)=\(percentEscapedValue)"
+        }
+        
+        return parameterArray.joinWithSeparator("&")
+    }
+    
+}

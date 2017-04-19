@@ -13,7 +13,7 @@ import edXCore
 
 private enum OEXRearViewOptions: Int {
     //kAMAT_Changes
-    case UserProfile, MyCourse, MyVideos, FindCourses, /*MySettings,*/ SubmitFeedback, Debug, Logout
+    case UserProfile, MyCourse, MyVideos, FindCourses, PointsBadges,ScanQRCode,/*MySettings,*/ SubmitFeedback, Debug, Logout
 }
 
 private let LogoutCellDefaultHeight: CGFloat = 130.0
@@ -174,6 +174,12 @@ class OEXRearTableViewController : UITableViewController {
                  case .MySettings:
                  environment.router?.showMySettings()
                  */
+            case .PointsBadges:
+                environment.router?.showMyPointsBadges(self)
+                
+            case .ScanQRCode:
+                environment.router?.scanMyQRCode(self)
+                
             case .SubmitFeedback:
                 launchEmailComposer()
             case .Debug:

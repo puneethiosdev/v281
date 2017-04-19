@@ -22,8 +22,9 @@ pod 'GVRSDK', '~> 1.0.1'
 end
 
 target 'edXTests' do
-    pod 'FBSnapshotTestCase', '~> 1.8.1'
+    pod 'FBSnapshotTestCase', '~> 2.0.1’
     pod 'OCMock', '~> 3.1'
     pod 'OHHTTPStubs', '~> 4.0'
 end 
+
 

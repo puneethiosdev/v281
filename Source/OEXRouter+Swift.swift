@@ -14,6 +14,7 @@ import Foundation
 // We should gradually migrate the existing router class here and then
 // get rid of the objc version
 
+
 enum CourseHTMLBlockSubkind {
     case Base
     case Problem
@@ -53,7 +54,7 @@ extension CourseBlock {
 
 extension OEXRouter {
     func showCoursewareForCourseWithID(courseID : String, fromController controller : UIViewController) {
-        showContainerForBlockWithID(nil, type: CourseBlockDisplayType.Outline, parentID: nil, courseID : courseID, fromController: controller)
+        showContainerForBlockWithID(nil, type: CourseBlockDisplayType.Outline, parentID:nil, courseID : courseID, fromController: controller)
     }
     
     func unitControllerForCourseID(courseID : String, blockID : CourseBlockID?, initialChildID : CourseBlockID?) -> CourseContentPageViewController {
@@ -64,7 +65,9 @@ extension OEXRouter {
     func showContainerForBlockWithID(blockID : CourseBlockID?, type : CourseBlockDisplayType, parentID : CourseBlockID?, courseID : CourseBlockID, fromController controller: UIViewController) {
         switch type {
         case .Outline:
-            fallthrough
+            let outlineController = controllerForBlockWithID(blockID, type: type, courseID: courseID)
+            controller.navigationController?.pushViewController(outlineController, animated: false)
+//            fallthrough
         case .Unit:
             let outlineController = controllerForBlockWithID(blockID, type: type, courseID: courseID)
             controller.navigationController?.pushViewController(outlineController, animated: true)
@@ -113,12 +116,102 @@ extension OEXRouter {
         return controllerForBlockWithID(block.blockID, type: block.displayType, courseID: courseID)
     }
     
+    //without uiviewcontroller argument & with return value
+//    func controllerForBlockIDString(block : String, courseID : String, type : CourseBlockDisplayType) -> UIViewController {
+//        return controllerForBlockWithID(block, type: type, courseID: courseID)
+//    }
+    
+    
+    //with uiviewcontroller argument & not return value( main)
+    func controllerForBlockIDString(block : String, courseID : String, fromController controller: UIViewController, type : CourseBlockDisplayType) {
+        
+        let notEnrolled = environment.dataManager.enrollmentManager.enrolledCourseWithID(courseID) == nil
+        
+        guard notEnrolled else {
+            let navigateController = controllerForBlockWithID(block, type: type, courseID: courseID)
+            controller.navigationController?.pushViewController(navigateController, animated: true)
+            return
+        }
+        
+        let courseID = courseID
+        let request = CourseCatalogAPI.enroll(courseID)
+        environment.networkManager.taskForRequest(request) {[weak self] response in
+            if response.response?.httpStatusCode.is2xx ?? false {
+                self?.environment.analytics.trackUserEnrolledInCourse(courseID)
+                
+            }
+            else {
+            }
+            let navigateController = self!.controllerForBlockWithID(block, type: type, courseID: courseID)
+            controller.navigationController?.pushViewController(navigateController, animated: true)
+        }
+    }
+    
+//    
+    
+//    //with uiviewcontroller argument & with return value
+//    func controllerForBlockIDString(block : String, courseID : String, fromController controller: UIViewController, type : CourseBlockDisplayType) -> UIViewController {
+//        
+//        
+//        //showCoursewareForCourseWithID
+//        showCoursewareForCourseWithID(courseID, fromController: controller)
+//        
+//        //extra for testing inside UIviewcontrollers
+//        showContainerForBlockWithID(block, type: CourseBlockDisplayType.Outline, parentID:block, courseID : courseID, fromController: controller)
+//        
+//        return controllerForBlockWithID(block, type: type, courseID: courseID)
+//    }
+//    
+
+    
+    
+
+    
     @objc(showMyCoursesAnimated:pushingCourseWithID:) func showMyCourses(animated animated: Bool = true, pushingCourseWithID courseID: String? = nil) {
         let controller = EnrolledCoursesViewController(environment: self.environment)
         showContentStackWithRootController(controller, animated: animated)
         if let courseID = courseID {
             self.showCourseWithID(courseID, fromController: controller, animated: false)
         }
+    }
+    
+    @objc(showMyActivityIndicator:)func showMyActivityIndicator(controller:UIViewController) -> SpinnerView{
+        let activityIndicator = SpinnerView(size: SpinnerView.SpinSize.Large, color: SpinnerView.Color.Primary)
+        
+        activityIndicator.frame = CGRectMake(0.0, 0.0, 25.0, 25.0)
+        activityIndicator.center = controller.view.center
+        controller.view.addSubview(activityIndicator)
+        activityIndicator.bringSubviewToFront(controller.view)
+        activityIndicator.startAnimating()
+        
+        return activityIndicator
+        
+    }
+    
+    @objc(hideMyActivityIndicator:)func hideMyActivityIndicator(alert:SpinnerView) {
+        alert.stopAnimating()
+        alert.removeFromSuperview()
+        
+        
+    }
+    
+    func showMyPointsBadges(controller: UIViewController) {
+        let wkcontroller = WebKitController.sharedInstance()
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let pointsBadgescontroller = storyboard.instantiateViewControllerWithIdentifier("WK_View_Controller") as! D3WKViewController
+        
+        pointsBadgescontroller.currentUsername = self.environment.session.currentUser?.username;
+        showContentStackWithRootController(pointsBadgescontroller, animated: true);
+        
+//        controller.navigationController?.pushViewController(pointsBadgescontroller, animated: true)
+//        self.navigationController?.pushViewController(controller, animated: true)
+    }
+    
+    func scanMyQRCode(controller: UIViewController) {
+        let storyboard = UIStoryboard(name: "Main", bundle: nil)
+        let qrCodeController = storyboard.instantiateViewControllerWithIdentifier("QRCodeVC") as! QRCViewController
+        
+        showContentStackWithRootController(qrCodeController, animated: true);
     }
     
     func showFullScreenMessageViewControllerFromViewController(controller : UIViewController, message : String, bottomButtonTitle: String?) {
