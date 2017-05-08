@@ -10,12 +10,11 @@ import Foundation
 import MediaPlayer
 import UIKit
 
-private let StandardVideoAspectRatio : CGFloat = 0.6
+class VideoBlockViewController : UIViewController, CourseBlockViewController, OEXVideoPlayerInterfaceDelegate, StatusBarOverriding, InterfaceOrientationOverriding, VideoTranscriptDelegate {
 
-class VideoBlockViewController : UIViewController, CourseBlockViewController, OEXVideoPlayerInterfaceDelegate, StatusBarOverriding, InterfaceOrientationOverriding {
-    
-    typealias Environment = protocol<DataManagerProvider, OEXInterfaceProvider, ReachabilityProvider>
-    
+//    typealias Environment = protocol<DataManagerProvider, OEXInterfaceProvider, ReachabilityProvider>
+    typealias Environment = protocol<DataManagerProvider, OEXInterfaceProvider, ReachabilityProvider, OEXConfigProvider, OEXRouterProvider>
+
     let environment : Environment
     let blockID : CourseBlockID?
     let courseQuerier : CourseOutlineQuerier
@@ -24,6 +23,8 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     let loader = BackedStream<CourseBlock>()
     
     var rotateDeviceMessageView : IconMessageView?
+    var videoTranscriptView : VideoTranscript?
+    var subtitleTimer = NSTimer()
     var contentView : UIView?
     //kAMAT_CHANGES
     var videoURL : String = ""
@@ -55,15 +56,47 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     }
     
     func addLoadListener() {
+        
         loader.listen (self,
                        success : { [weak self] block in
-                        if let video = block.type.asVideo,
+                        if let video = block.type.asVideo where video.isYoutubeVideo,
+                            let url = block.blockURL
+                        {
+                            self?.showYoutubeMessage(url)
+                        }
+                        else if
+                            let video = self?.environment.interface?.stateForVideoWithID(self?.blockID, courseID : self?.courseID)
+                            where block.type.asVideo?.preferredEncoding != nil
+                        {
+                            self?.showLoadedBlock(block, forVideo: video)
+                        }
+                        else {
+                            self?.showError(nil)
+                        }
+            }, failure : {[weak self] error in
+                self?.showError(error)
+            }
+        )
+
+        
+        
+/*        loader.listen (self,
+                       success : { [weak self] block in
+
+/*                        if let video = block.type.asVideo,
                             let encoding = video.preferredEncoding where encoding.isYoutube,
                             let URL = encoding.URL
                         {
                             //kAMAT_CHANGES
                             self!.videoURL = URL
                             self?.showYoutubeMessage(URL)
+*/
+                    
+                        if let video = block.type.asVideo where video.isYoutubeVideo,
+                            let url = block.blockURL
+                        {
+                            self?.showYoutubeMessage(url)
+
                         }
                         else if
                             let video = self?.environment.interface?.stateForVideoWithID(self?.blockID, courseID : self?.courseID)
@@ -80,6 +113,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
                 self?.showError(error)
             }
         )
+ */
     }
     
     override func viewDidLoad() {
@@ -90,18 +124,23 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         
         loadController.setupInController(self, contentView : contentView!)
         
-        contentView!.addSubview(videoController.view)
+        contentView?.addSubview(videoController.view)
         videoController.view.translatesAutoresizingMaskIntoConstraints = false
         videoController.fadeInOnLoad = false
         
         rotateDeviceMessageView = IconMessageView(icon: .RotateDevice, message: Strings.rotateDevice)
-        contentView!.addSubview(rotateDeviceMessageView!)
+        contentView?.addSubview(rotateDeviceMessageView!)
+        
+        if environment.config.isVideoTranscriptEnabled {
+            videoTranscriptView = VideoTranscript(environment: environment)
+            videoTranscriptView?.delegate = self
+            contentView?.addSubview(videoTranscriptView!.transcriptTableView)
+        }
         
         
         view.backgroundColor = OEXStyles.sharedStyles().standardBackgroundColor()
         view.setNeedsUpdateConstraints()
         
-        videoController.hidesNextPrev = true
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -119,25 +158,37 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         self.view.layoutIfNeeded()
         super.viewDidAppear(animated)
         
-        guard canDownloadVideo() else {
+        validateSubtitleTimer()
+        
+        if !canDownloadVideo() {
             guard let video = self.environment.interface?.stateForVideoWithID(self.blockID, courseID : self.courseID) where video.downloadState == .Complete else {
                 self.showOverlayMessage(Strings.noWifiMessage)
                 return
             }
-            
-            return
         }
+        
+        guard let videoPlayer = videoController.moviePlayerController else { return }
+        if currentOrientation() == .LandscapeLeft || currentOrientation() == .LandscapeRight {
+            videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
+        }
+        
     }
     
     override func viewDidDisappear(animated: Bool) {
         super.viewDidDisappear(animated)
         videoController.setAutoPlaying(false)
+        self.subtitleTimer.invalidate()
     }
     
     private func loadVideoIfNecessary() {
         if !loader.hasBacking {
             loader.backWithStream(courseQuerier.blockWithID(self.blockID).firstSuccess())
         }
+    }
+    
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        updateViewConstraints()
     }
     
     override func updateViewConstraints() {
@@ -158,7 +209,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
             make.edges.equalTo(view)
         }
         
-        videoController.height = view.bounds.size.width * StandardVideoAspectRatio
+        videoController.height = view.bounds.size.width * CGFloat(STANDARD_VIDEO_ASPECT_RATIO)
         videoController.width = view.bounds.size.width
         
         videoController.view.snp_remakeConstraints {make in
@@ -171,7 +222,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
                 make.top.equalTo(self.snp_topLayoutGuideBottom)
             }
             
-            make.height.equalTo(view.bounds.size.width * StandardVideoAspectRatio)
+            make.height.equalTo(view.bounds.size.width * CGFloat(STANDARD_VIDEO_ASPECT_RATIO))
         }
         
         rotateDeviceMessageView?.snp_remakeConstraints {make in
@@ -186,6 +237,14 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
             else {
                 make.bottom.equalTo(self.snp_bottomLayoutGuideTop)
             }
+        }
+        
+        videoTranscriptView?.transcriptTableView.snp_remakeConstraints { make in
+            make.top.equalTo(videoController.view.snp_bottom)
+            make.leading.equalTo(contentView!)
+            make.trailing.equalTo(contentView!)
+            let barHeight = navigationController?.toolbar.frame.size.height ?? 0.0
+            make.bottom.equalTo(view.snp_bottom).offset(-barHeight)
         }
     }
     
@@ -242,10 +301,10 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         loadController.state = LoadState.failed(error, icon: .UnknownError, message: Strings.videoContentNotAvailable)
     }
     
-    private func showYoutubeMessage(URL: String) {
+    private func showYoutubeMessage(url: NSURL) {
         let buttonInfo = MessageButtonInfo(title: Strings.Video.viewOnYoutube) {
-            if let URL = NSURL(string: URL) {
-                UIApplication.sharedApplication().openURL(URL)
+            if UIApplication.sharedApplication().canOpenURL(url){
+                UIApplication.sharedApplication().openURL(url)
             }
         }
         loadController.state = LoadState.empty(icon: .CourseModeVideo, message: Strings.Video.onlyOnYoutube, attributedMessage: nil, accessibilityMessage: nil, buttonInfo: buttonInfo)
@@ -277,6 +336,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
     
     override func willTransitionToTraitCollection(newCollection: UITraitCollection, withTransitionCoordinator coordinator: UIViewControllerTransitionCoordinator) {
         
+        
         guard let videoPlayer = videoController.moviePlayerController else { return }
         
         if videoPlayer.fullscreen {
@@ -288,13 +348,45 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
                 videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
             }
         }
+        else if videoController.shouldRotate && newCollection.verticalSizeClass == .Compact {
+            videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
+        }
     }
     
+    func validateSubtitleTimer() {
+        if !subtitleTimer.valid && videoController.moviePlayerController?.controls != nil {
+            subtitleTimer = NSTimer.scheduledTimerWithTimeInterval(1.0,
+                                                                   target: self,
+                                                                   selector: #selector(highlightSubtitle),
+                                                                   userInfo: nil,
+                                                                   repeats: true)
+        }
+    }
+    
+    func highlightSubtitle() {
+        videoTranscriptView?.highlightSubtitleForTime(videoController.moviePlayerController?.controls?.moviePlayer?.currentPlaybackTime)
+    }
+    
+    //MARK: - OEXVideoPlayerInterfaceDelegate methods
     func videoPlayerTapped(sender: UIGestureRecognizer) {
         guard let videoPlayer = videoController.moviePlayerController else { return }
         
         if self.isVerticallyCompact() && !videoPlayer.fullscreen{
-            videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
+            videoPlayer.setFullscreen(true, withOrientation: currentOrientation())
         }
+    }
+    
+    func transcriptLoaded(transcript: [AnyObject]) {
+        videoTranscriptView?.updateTranscript(transcript)
+        validateSubtitleTimer()
+    }
+    
+    func didFinishVideoPlaying() {
+        environment.router?.showAppReviewIfNeeded(self)
+    }
+    
+    //MARK: - VideoTranscriptDelegate methods
+    func didSelectSubtitleAtInterval(time: NSTimeInterval) {
+        videoController.moviePlayerController?.controls?.setCurrentPlaybackTimeFromTranscript(time)
     }
 }

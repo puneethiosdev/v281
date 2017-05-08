@@ -27,7 +27,7 @@ private class CircleView: UIView {
     }
     
     private override func drawRect(rect: CGRect) {
-        let context = UIGraphicsGetCurrentContext()
+        guard let context = UIGraphicsGetCurrentContext() else { return }
         CGContextSaveGState(context)
         
         let hole = circleBounds
@@ -160,8 +160,8 @@ class CropViewController: UIViewController {
         navigationController?.setNavigationBarHidden(true, animated: animated)
     }
     
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
         
         let scrollFrame = scrollView.frame
         let hole = circleView.circleBounds

@@ -28,7 +28,6 @@ extern NSString* const OEXVideoStateChangedNotification;
 extern NSString* const OEXDownloadProgressChangedNotification;
 extern NSString* const OEXDownloadEndedNotification;
 
-
 // This class requires significant refactoring
 // Think very hard before adding anything to it
 @interface OEXInterface : NSObject <OEXNetworkInterfaceDelegate, UIAlertViewDelegate,NSURLSessionDelegate>
@@ -78,7 +77,7 @@ extern NSString* const OEXDownloadEndedNotification;
 + (float) getOEXVideoSpeed:(OEXVideoSpeed) speed;
 
 #pragma mark Last Accessed
-- (OEXHelperVideoDownload*)lastAccessedSubsectionForCourseID:(NSString*)courseID;
+- (OEXHelperVideoDownload* _Nullable)lastAccessedSubsectionForCourseID:(NSString*)courseID;
 
 #pragma mark Video Management
 /// videos is an array of OEXVideoSummary
@@ -86,7 +85,7 @@ extern NSString* const OEXDownloadEndedNotification;
 /// videos is an array of OEXHelperVideoDownload
 /// This should really take a courseID not the outline URL, but that will require more serious refactoring
 - (void)setVideos:(NSArray*)videos forURL:(NSString*)URLString;
-- (NSString*)URLStringForType:(NSString*)type;
+- (NSString* _Nullable)URLStringForType:(NSString*)type;
 - (NSMutableArray*)videosForChapterID:(NSString*)chapter
                             sectionID:(nullable NSString*)section
                                   URL:(NSString*)URLString;
@@ -132,7 +131,7 @@ extern NSString* const OEXDownloadEndedNotification;
 - (void)deleteUnregisteredItems;
 
 #pragma mark Video Management
-- (OEXHelperVideoDownload*)stateForVideoWithID:(nullable NSString*)videoID courseID:(nullable NSString*)courseID;
+- (OEXHelperVideoDownload* _Nullable)stateForVideoWithID:(nullable NSString*)videoID courseID:(nullable NSString*)courseID;
 - (OEXDownloadState)downloadStateForVideoWithID:(nullable NSString*)videoID;
 - (OEXPlayedState)watchedStateForVideoWithID:(nullable NSString*)videoID;
 - (float)lastPlayedIntervalForVideo:(OEXHelperVideoDownload*)video;
@@ -163,6 +162,10 @@ extern NSString* const OEXDownloadEndedNotification;
 #pragma mark - Course Enrollments
 /** Finds the user's enrollment for a course */
 - (nullable UserCourseEnrollment*)enrollmentForCourseWithID:(nullable NSString*)courseID;
+
+#pragma mark - App Version
+/* Return saved version of app */
+- (nullable NSString*) getSavedAppVersion;
 
 @end
 

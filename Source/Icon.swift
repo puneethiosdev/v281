@@ -92,6 +92,7 @@ public enum Icon {
     case ArrowUp
     case ArrowDown
     case Camera
+    case Close
     case CircleO
     case CheckCircleO
     case Closed
@@ -130,6 +131,8 @@ public enum Icon {
     case Settings
     case Sort
     case Spinner
+    case StarEmpty
+    case StarFilled
     case Transcript
     case UnknownError
     case UpVote
@@ -153,6 +156,8 @@ public enum Icon {
             return FontAwesomeRenderer(icon: .LongArrowDown)
         case .Camera:
             return FontAwesomeRenderer(icon: .Camera)
+        case .Close:
+            return FontAwesomeRenderer(icon: .Close)
         case .Comment:
             return FontAwesomeRenderer(icon: .Comment)
         case .Comments:
@@ -218,7 +223,7 @@ public enum Icon {
         case .Dropdown:
             return FontAwesomeRenderer(icon: .CaretDown)
         case .Graded:
-            return FontAwesomeRenderer(icon: .Check)
+            return FontAwesomeRenderer(icon: .Edit)
         case .Handouts:
             return FontAwesomeRenderer(icon: .FileTextO)
         case .InternetError:
@@ -229,6 +234,10 @@ public enum Icon {
             return FontAwesomeRenderer(icon: .Cog)
         case .Spinner:
             return FontAwesomeRenderer(icon: .Spinner)
+        case .StarEmpty:
+            return FontAwesomeRenderer(icon: .StarO)
+        case .StarFilled:
+            return FontAwesomeRenderer(icon: .Star)
         case .UnknownError:
             return FontAwesomeRenderer(icon: .ExclamationCircle)
         case .NoTopics:
@@ -282,15 +291,15 @@ public enum Icon {
 
         if renderer.shouldFlip {
             let context = UIGraphicsGetCurrentContext()
-            CGContextTranslateCTM(context, imageSize.width, 0)
-            CGContextScaleCTM(context, -1, 1)
+            CGContextTranslateCTM(context!, imageSize.width, 0)
+            CGContextScaleCTM(context!, -1, 1)
         }
         
         renderer.drawWithAttributes(attributes, inContext: UIGraphicsGetCurrentContext()!)
         
         let image = UIGraphicsGetImageFromCurrentImageContext()
         UIGraphicsEndImageContext()
-        return image.imageWithRenderingMode(.AlwaysTemplate)
+        return image!.imageWithRenderingMode(.AlwaysTemplate)
     }
 
     public func attributedTextWithStyle(style : OEXTextStyle, inline : Bool = false) -> NSAttributedString {

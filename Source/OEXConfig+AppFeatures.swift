@@ -41,4 +41,29 @@ extension OEXConfig {
         return boolForKey("DISCUSSIONS_ENABLE_PROFILE_PICTURE_PARAM")
     }
     
+    var isRegistrationEnabled: Bool {
+        // By default registration is enabled
+        if let _ = properties["REGISTRATION_ENABLED"] {
+            return boolForKey("REGISTRATION_ENABLED")
+        }
+        return true
+    }
+    
+    var isFirebaseEnabled: Bool {
+        let filePath = NSBundle.mainBundle().pathForResource("GoogleService-Info", ofType: "plist") ?? ""
+        if NSFileManager.defaultManager().fileExistsAtPath(filePath) {
+            return boolForKey("FIREBASE_ENABLED")
+        }
+        
+        return false
+    }
+    
+    var isVideoTranscriptEnabled : Bool {
+        return boolForKey("VIDEO_TRANSCRIPT_ENABLED")
+    }
+    
+    var isAppReviewsEnabled : Bool {
+        return boolForKey("APP_REVIEWS_ENABLED")
+    }
+    
 }

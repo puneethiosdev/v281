@@ -1,10 +1,10 @@
-    //
-    //  CLVideoPlayerControls.m
-    //  CLMoviePlayer
-    //
-    //  Created by Jotiram Bhagat on 24/06/14.
-    //  Copyright (c) 2014 Jotiram Bhagat. All rights reserved.
-    //
+//
+//  CLVideoPlayerControls.m
+//  CLMoviePlayer
+//
+//  Created by Jotiram Bhagat on 24/06/14.
+//  Copyright (c) 2014 Jotiram Bhagat. All rights reserved.
+//
 
 #import "CLVideoPlayerControls.h"
 
@@ -26,15 +26,11 @@
 #import "OEXAuthentication.h"
 #import "OEXUserDetails.h"
 #import "OEXVideoSummary.h"
-    //kAMAT_CHANGES 2.0
-#import "OEXClosedCaptionTableViewCell.h"
-#import "OEXConstants.h"
 
-
-static NSString* const kIndex = @"kIndex";
-static NSString* const kStart = @"kStart";
-static NSString* const kEnd = @"kEnd";
-static NSString* const kText = @"kText";
+NSString* const CLVideoPlayerkIndex = @"kIndex";
+NSString* const CLVideoPlayerkStart = @"kStart";
+NSString* const CLVideoPlayerkEnd = @"kEnd";
+NSString* const CLVideoPlayerkText = @"kText";
 
 static const NSTimeInterval CLVideoSkipBackwardsDuration = 30;
 static const NSTimeInterval OEXVideoControlsFadeDelay = 3.0;
@@ -99,7 +95,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 @property (nonatomic, strong) UITableView* tableSettings;
 @property (nonatomic, strong) CLButton* btnPrevious;
 @property (nonatomic, strong) CLButton* btnNext;
-@property (nonatomic, strong) CLButton* btnLMS;
 @property (nonatomic, weak, nullable) OEXInterface* dataInterface;
 @property (strong, nonatomic) OEXVideoPlayerSettings* settings;
 
@@ -109,14 +104,16 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 
 @property (nonatomic, strong) CLButton* scaleButton;
 @property (nonatomic, strong) NSTimer* bufferedTimer;
+@property (nonatomic, strong) UIButton *tapButton;
 
 @property (nonatomic, strong) UISwipeGestureRecognizer* leftSwipeGestureRecognizer;
 @property (nonatomic, strong) UISwipeGestureRecognizer* rightSwipeGestureRecognizer;
 
 #pragma mark - Properties
-@property (strong, nonatomic) NSMutableDictionary* subtitlesParts;
+@property (strong, nonatomic) NSMutableArray* subtitlesParts;
 @property (strong, nonatomic) NSTimer* subtitleTimer;
 @property (strong, nonatomic) UILabel* subtitleLabel;
+@property (nonatomic, assign) BOOL subtitleActivated;
 
 #pragma mark - Private methods
 - (void)showSubtitles:(BOOL)show;
@@ -140,8 +137,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _rewindButton.accessibilityHint = [Strings accessibilityRewindHint];
     [_playPauseButton setAccessibilityLabelsForStateNormalWithNormalStateLabel:[Strings accessibilityPause] selectedStateLabel:[Strings accessibilityPlay]];
     _btnSettings.accessibilityLabel = [Strings accessibilitySettings];
-    _btnLMS.accessibilityLabel = [Strings openInBrowser];
     _fullscreenButton.accessibilityLabel = [Strings accessibilityFullscreen];
+    _tapButton.isAccessibilityElement = NO;
 }
 
 #pragma mark - OEXPlayerSettings
@@ -162,14 +159,18 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 #pragma mark Closed Captions
 
 - (void)activateSubTitles:(NSString*)URLString {
-        // Look up the transcript on disk and load if not present
+    // Look up the transcript on disk and load if not present
     
     [self getClosedCaptioningFileAtURL:URLString
                             completion:^(BOOL finished) {
-                                    // Activate subtitles
-                                [self showSubtitles];
-                                
-                                    // Analytics SHOW TRANSCRIPT
+                                // Activate subtitles
+                                if (self.subtitleActivated) {
+                                    [self showSubtitles];
+                                }
+                                else{
+                                    [self hideSubtitles];
+                                }
+                                // Analytics SHOW TRANSCRIPT
                                 [self analyticsShowTranscript];
                             } failure:^(NSError* error) {
                             }];
@@ -180,21 +181,22 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     NSURLSessionDownloadTask* task = note.userInfo[DL_COMPLETE_N_TASK];
     NSURL* taskURL = task.response.URL;
     NSString* captionURL = self.video.summary.transcripts[[OEXInterface getCCSelectedLanguage]];
+    if (!captionURL) {
+        captionURL = self.video.summary.transcripts.allValues.firstObject;
+    }
     BOOL downloadedCaption = [taskURL.absoluteString isEqualToString:captionURL];
     if (downloadedCaption) {
         [self activateSubTitles:captionURL];
     }
-    
 }
 
-- (void) setCaption:(NSString*)language {
+- (void) setCaption:(NSString*)language{
     [self hideTables];
+    [OEXInterface setCCSelectedLanguage:language];
     
-    if ([language isEqualToString:[OEXInterface getCCSelectedLanguage]]) {
-            //Cancel by selecting the same language again
+    if ([language isEqualToString:@""]) {
         
-        [OEXInterface setCCSelectedLanguage:@""];
-            // Analytics HIDE TRANSCRIPT
+        // Analytics HIDE TRANSCRIPT
         if(self.video.summary.videoID) {
             [[OEXAnalytics sharedAnalytics] trackHideTranscript:self.video.summary.videoID
                                                     CurrentTime:[self getMoviePlayerCurrentTime]
@@ -209,8 +211,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     
     NSString* captionURL = self.video.summary.transcripts[language];
     if (captionURL) {
+        self.subtitleActivated = YES;
         [self activateSubTitles:captionURL];
-            // Set the language to persist
+        // Set the language to persist
         [OEXInterface setCCSelectedLanguage:language];
         
         if(self.video.summary.videoID) {
@@ -264,13 +267,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     
     NSString* localFile = [OEXFileUtility filePathForRequestKey:URLString];
     
-        // Error
+    // Error
     NSError* error = nil;
     NSString* subtitleString = @"";
     
-        // File to string
+    // File to string
     if([[NSFileManager defaultManager] fileExistsAtPath:localFile]) {
-            // File to string
+        // File to string
         subtitleString = [NSString stringWithContentsOfFile:localFile
                                                    encoding:NSUTF8StringEncoding
                                                       error:&error];
@@ -286,7 +289,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         return;
     }
     
-        // Parse and show text
+    // Parse and show text
     [self readClosedCaptioningString:subtitleString completion:success failure:failure];
 }
 
@@ -307,7 +310,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)showSubtitles:(BOOL)show {
-        // Hide label
+    // Hide label
     self.subtitleLabel.hidden = !show;
 }
 
@@ -322,15 +325,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 #pragma mark - CC Private methods
 
 - (void)parseClosedCaptioningString:(NSString*)string parsed:(void (^)(BOOL parsed, NSError* error))completion {
-        // Create Scanner
+    // Create Scanner
     NSScanner* scanner = [NSScanner scannerWithString:string];
     
-        // Subtitles parts
-    self.subtitlesParts = [NSMutableDictionary dictionary];
+    // Subtitles parts
+    self.subtitlesParts = [NSMutableArray array];
     
-        // Search for members
+    // Search for members
     while(!scanner.isAtEnd) {
-            // Variables
+        // Variables
         NSString* indexString;
         [scanner scanUpToCharactersFromSet:[NSCharacterSet newlineCharacterSet]
                                 intoString:&indexString];
@@ -348,13 +351,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [scanner scanUpToString:@"\n\n" intoString:&textString];
         textString = [textString stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         
-            //RAHUL
+        //RAHUL
         if([textString rangeOfString:@" --> "].location != NSNotFound) {
             NSArray* arrParse = [textString componentsSeparatedByString:@"\n"];
             textString = [arrParse lastObject];
         }
         
-            // Regular expression to replace tags
+        // Regular expression to replace tags
         NSError* error = nil;
         NSRegularExpression* regExp = [NSRegularExpression regularExpressionWithPattern:@"[<|\\{][^>|\\^}]*[>|\\}]"
                                                                                 options:NSRegularExpressionCaseInsensitive
@@ -369,21 +372,28 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
                                                         range:NSMakeRange(0, textString.length)
                                                  withTemplate:@""];
         
+        //To ensure that the object created is valid. Inconsistent objects tend to have nil start or end strings
+        if(startString || endString) {
             // Temp object
-        NSTimeInterval startInterval = [self getTimeFromString:startString];
-        NSTimeInterval endInterval = [self getTimeFromString:endString];
-        NSDictionary* tempInterval = @{
-                                       kIndex : indexString,
-                                       kStart : @(startInterval),
-                                       kEnd : @(endInterval),
-                                       kText : textString ? textString : @""
-                                       };
-        [self.subtitlesParts setObject:tempInterval
-                                forKey:indexString];
+            NSTimeInterval startInterval = [self getTimeFromString:startString];
+            NSTimeInterval endInterval = [self getTimeFromString:endString];
+            NSDictionary* tempInterval = @{
+                                           CLVideoPlayerkIndex : indexString,
+                                           CLVideoPlayerkStart : @(startInterval),
+                                           CLVideoPlayerkEnd : @(endInterval),
+                                           CLVideoPlayerkText : textString ? textString : @""
+                                           };
+            
+            NSInteger index = self.subtitlesParts.count == [indexString integerValue] ? [indexString integerValue] : self.subtitlesParts.count;
+            [self.subtitlesParts insertObject:tempInterval atIndex:index];
+        }
     }
     
     if(completion != NULL) {
         completion(YES, nil);
+        if([self.delegate respondsToSelector:@selector(transcriptLoaded:)]){
+            [self.delegate transcriptLoaded:self.subtitlesParts];
+        }
     }
 }
 
@@ -403,29 +413,28 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)searchAndDisplaySubtitle {
-    if(![OEXInterface getCCSelectedLanguage]) {
+    if(!self.subtitleActivated || ![OEXInterface getCCSelectedLanguage]) {
         return;
     }
     
-        // Search for timeInterval
+    // Search for timeInterval
     @autoreleasepool {
-        NSPredicate* initialPredicate = [NSPredicate predicateWithFormat:@"(%@ >= %K) AND (%@ <= %K)", @(self.moviePlayer.currentPlaybackTime), kStart, @(self.moviePlayer.currentPlaybackTime), kEnd];
-        
-        NSArray* objectsFound = [[self.subtitlesParts allValues] filteredArrayUsingPredicate:initialPredicate];
+        NSPredicate* initialPredicate = [NSPredicate predicateWithFormat:@"(%@ >= %K) AND (%@ <= %K)", @(self.moviePlayer.currentPlaybackTime), CLVideoPlayerkStart, @(self.moviePlayer.currentPlaybackTime), CLVideoPlayerkEnd];
+        NSArray* objectsFound = [self.subtitlesParts filteredArrayUsingPredicate:initialPredicate];
         NSDictionary* lastFounded = (NSDictionary*)[objectsFound lastObject];
-            // Show text
+        // Show text
         if(lastFounded) {
-                // If the text contains the --> this means the previous time slot has no text to it
-                // so to resolve that check --> and make the string blank.
-            if([[lastFounded objectForKey:kText] rangeOfString:@"-->"].location != NSNotFound) {
+            // If the text contains the --> this means the previous time slot has no text to it
+            // so to resolve that check --> and make the string blank.
+            if([[lastFounded objectForKey:CLVideoPlayerkText] rangeOfString:@"-->"].location != NSNotFound) {
                 self.subtitleLabel.text = @"";
                 self.subtitleLabel.hidden = YES;
             }
             else {
-                    // Get text
-                self.subtitleLabel.text = [lastFounded objectForKey:kText];
+                // Get text
+                self.subtitleLabel.text = [lastFounded objectForKey:CLVideoPlayerkText];
                 self.subtitleLabel.hidden = NO;
-                    // Label position
+                // Label position
                 [self setSubtitleLabelFrame];
             }
         }
@@ -467,7 +476,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)initializeSubtitleWithTimer {
-        // Start timer
+    // Start timer
     
     if(!self.subtitleTimer.isValid) {
         self.subtitleTimer = [NSTimer scheduledTimerWithTimeInterval:1.0
@@ -478,7 +487,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [self.subtitleTimer fire];
     }
     
-        // Add label
+    // Add label
     if(!self.subtitleLabel) {
         self.subtitleLabel = [[UILabel alloc] initWithFrame:CGRectMake(0.0, 0.0, CGRectGetWidth(self.bounds) - 30.0, self.frame.size.height)];
         self.subtitleLabel.center = CGPointMake(CGRectGetWidth(self.bounds) / 2.0, CGRectGetHeight(self.bounds) - (CGRectGetHeight(self.subtitleLabel.bounds) / 2.0) - 15.0);
@@ -490,6 +499,22 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.subtitleLabel.layer.rasterizationScale = [[UIScreen mainScreen] scale];
         self.subtitleLabel.layer.cornerRadius = 5;
         [self addSubview:self.subtitleLabel];
+        
+        NSString *ccSelectedLanguage = [OEXInterface getCCSelectedLanguage];
+        NSString* captionURL = self.video.summary.transcripts[ccSelectedLanguage];
+        if(ccSelectedLanguage && ![ccSelectedLanguage isEqualToString:@""] && captionURL) {
+            self.subtitleActivated = YES;
+            [self setCaption:ccSelectedLanguage];
+        }
+        else{
+            if (captionURL == nil) {
+                captionURL = self.video.summary.transcripts.allValues.firstObject;
+            }
+            if (captionURL) {
+                self.subtitleActivated = NO;
+                [self activateSubTitles:captionURL];
+            }
+        }
     }
     
     CGFloat fontSize = 0.0;
@@ -501,7 +526,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         fontSize = 12.0;
     }
     
-    self.subtitleLabel.font = [UIFont fontWithName:@"OpenSans" size:fontSize];
+    self.subtitleLabel.font = [[OEXStyles sharedStyles] sansSerifOfSize:fontSize];
 }
 
 - (void)updateComponentsOriginOnOrientation {
@@ -515,17 +540,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     }
     else if(self.style == CLVideoPlayerControlsStyleEmbedded || (self.style == CLVideoPlayerControlsStyleDefault && !self.moviePlayer.isFullscreen)) {
         fontSize = 12.0;
-            //kAMAT_Changes 3.0
-        self.topBar.hidden = NO;
-            //        self.topBar.hidden = YES;
+        self.topBar.hidden = YES;
     }
     
-    self.subtitleLabel.font = [UIFont fontWithName:@"OpenSans" size:fontSize];
+    self.subtitleLabel.font = [[OEXStyles sharedStyles] sansSerifOfSize:fontSize];
     
-        // Label position
+    // Label position
     [self setSubtitleLabelFrame];
     
-        // UnHidden label
+    // UnHidden label
     self.subtitleLabel.hidden = NO;
     
     if([self.subtitleLabel.text length] > 0) {
@@ -538,11 +561,11 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 
 #pragma mark - Others
 
-- (void)setSubtitlesParts:(NSMutableDictionary*)subtitlesParts {
+- (void)setSubtitlesParts:(NSMutableArray*)subtitlesParts {
     objc_setAssociatedObject(self, @"subtitlesParts", subtitlesParts, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
 }
 
-- (NSMutableDictionary*)subtitlesParts {
+- (NSMutableArray*)subtitlesParts {
     return objc_getAssociatedObject(self, @"subtitlesParts");
 }
 
@@ -573,7 +596,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     self = [super init];
     if(self) {
         self.seeking = NO;
-            // Initialize the interface
+        // Initialize the interface
         self.dataInterface = [OEXInterface sharedInterface];
         self.backgroundColor = [UIColor clearColor];
         _moviePlayer = moviePlayer;
@@ -582,13 +605,10 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         _fadeDelay = OEXVideoControlsFadeDelay;
         _timeRemainingDecrements = NO;
         _barColor = [[UIColor blackColor] colorWithAlphaComponent:0.5];
-            //in fullscreen mode, move controls away from top status bar and bottom screen bezel. I think the iOS7 control center gestures interfere with the uibutton touch events. this will alleviate that a little (correct me if I'm wrong and/or adjust if necessary).
+        //in fullscreen mode, move controls away from top status bar and bottom screen bezel. I think the iOS7 control center gestures interfere with the uibutton touch events. this will alleviate that a little (correct me if I'm wrong and/or adjust if necessary).
         _barHeight = [UIDevice iOSVersion] >= 7.0 ? 50.f : 48.f;
         _seekRate = 3.f;
         _state = CLVideoPlayerControlsStateIdle;
-        
-        _hideNext = YES;
-        _hidePrevious = YES;
         
         _stateBeforeSeek = MPMoviePlaybackStatePlaying;
         
@@ -642,13 +662,21 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     
     [[CLButton appearanceWhenContainedIn:[self class], nil] setTintColor:[UIColor whiteColor]];
     
-        //top bar
+    self.tapButton = [[UIButton alloc] initWithFrame:self.frame];
+    self.tapButton.backgroundColor = [UIColor clearColor];
+    [self addSubview:self.tapButton];
+    
+    [self.tapButton oex_addAction:^(id  _Nonnull control) {
+        [self contentTapped:control];
+    } forEvents:UIControlEventTouchUpInside];
+    
+    //top bar
     _topBar = [[CLMoviePlayerControlsBar alloc] init];
     _topBar.color = _barColor;
     _topBar.alpha = 0.f;
     [self addSubview:_topBar];
     
-        //bottom bar
+    //bottom bar
     _bottomBar = [[CLMoviePlayerControlsBar alloc] init];
     _bottomBar.color = _barColor;
     _bottomBar.alpha = 0.f;
@@ -656,7 +684,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     
     _videoTitleLabel = [[UILabel alloc] init];
     _videoTitleLabel.backgroundColor = [UIColor clearColor];
-    _videoTitleLabel.font = [UIFont fontWithName:@"OpenSans-Semibold" size:16.f];
+    _videoTitleLabel.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:16.f];
     _videoTitleLabel.textColor = [UIColor whiteColor];
     _videoTitleLabel.textAlignment = NSTextAlignmentLeft;
     _videoTitleLabel.text = @"Untitled";
@@ -697,7 +725,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _timeRemainingLabel.layer.shadowRadius = 1.f;
     _timeRemainingLabel.layer.shadowOffset = CGSizeMake(1.f, 1.f);
     _timeRemainingLabel.layer.shadowOpacity = 0.8f;
-    _timeRemainingLabel.font = [UIFont fontWithName:@"OpenSans-Semibold" size:12.f];
+    _timeRemainingLabel.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:12.f];
     
     self.btnPrevious = [[CLButton alloc] init];
     [self.btnPrevious setImage:[UIImage imageNamed:@"ic_previous.png"] forState:UIControlStateNormal];
@@ -722,15 +750,17 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [_bottomBar addSubview:_timeRemainingLabel];
     }
     
-        ///Rewind  button
+    ///Rewind  button
     _rewindButton = [[CLButton alloc] init];
     [_rewindButton setImage:[UIImage RewindIcon] forState:UIControlStateNormal];
     _rewindButton.delegate = self;
     [_rewindButton addTarget:self action:@selector(seekBackwardPressed:) forControlEvents:UIControlEventTouchUpInside];
     [_bottomBar addSubview:_rewindButton];
     
-        //static stuff
-    _playPauseButton = [[AccessibilityCLButton alloc] init];
+    //static stuff
+    if (!_playPauseButton) {
+        _playPauseButton = [[AccessibilityCLButton alloc] init];
+    }
     [_playPauseButton setAttributedTitle:[UIImage PauseTitle] forState:UIControlStateNormal];
     [_playPauseButton setAttributedTitle:[UIImage PlayTitle] forState:UIControlStateSelected];
     
@@ -766,13 +796,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [_btnSettings addTarget:self action:@selector(settingsBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
     [_bottomBar addSubview:_btnSettings];
     
-    self.btnLMS = [[CLButton alloc] init];
-    [self.btnLMS setImage:[UIImage imageNamed:@"ic_captions.png"] forState:UIControlStateNormal];
-        //    [self.btnLMS setImage:[UIImage OpenURL] forState:UIControlStateNormal];
-    [self.btnLMS addTarget:self action:@selector(LMSBtnClicked:) forControlEvents:UIControlEventTouchUpInside];
-    self.btnLMS.delegate = self;
-    [_topBar addSubview:self.btnLMS];
-    
     _fullscreenButton = [[CLButton alloc] init];
     [_fullscreenButton setImage:[UIImage ExpandIcon] forState:UIControlStateNormal];
     [_fullscreenButton addTarget:self action:@selector(fullscreenPressed:) forControlEvents:UIControlEventTouchUpInside];
@@ -787,7 +810,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _activityIndicator.alpha = 0.f;
     _activityIndicator.hidesWhenStopped = YES;
     
-        // SWIPE GESTURE
+    // SWIPE GESTURE
     
     if(_style == CLVideoPlayerControlsStyleFullscreen || (_style == CLVideoPlayerControlsStyleDefault && _moviePlayer.isFullscreen)) {
         if(self.video.summary.videoID) {
@@ -819,13 +842,10 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [self.moviePlayer.view removeGestureRecognizer:self.leftSwipeGestureRecognizer];
     }
     
-        // hide tables initially
+    // hide tables initially
     [self hideTables];
     [self setPlayerControlAccessibilityID];
     
-    UITapGestureRecognizer* tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(contentTapped:)];
-    tapGesture.delegate = self;
-    [self addGestureRecognizer:tapGesture];
 }
 
 - (void)resetViews {
@@ -849,7 +869,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _btnSettings.delegate = nil;
     _btnPrevious.delegate = nil;
     _btnNext.delegate = nil;
-    _btnLMS.delegate = nil;
     _scaleButton.delegate = nil;
 }
 
@@ -886,7 +905,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             }
             else {
                 if(flag) {
-                        //put style back to default
+                    //put style back to default
                     _style = CLVideoPlayerControlsStyleDefault;
                 }
             }
@@ -900,18 +919,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         
         switch(state) {
             case CLVideoPlayerControlsStateLoading :
-            {
-            [self showLoadingIndicators];
-            NSString *captionURL = self.video.summary.transcripts[[OEXInterface getCCSelectedLanguage]];
-            [self activateSubTitles:captionURL];
-            }
+                [self showLoadingIndicators];
                 break;
             case CLVideoPlayerControlsStateReady:
-                    //Commented hide login indicators
+                //Commented hide login indicators
                 [self hideLoadingIndicators];
                 break;
             case CLVideoPlayerControlsStateIdle:
-                break;
             default:
                 break;
         }
@@ -929,15 +943,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 #pragma BUTTTON ACTION METHOD
 
 - (void)hideUnhidePreviousNextButton:(NSNotification*)notif {
-        // Disable the subtitle when any new video is played.
-        // This is played from the portrait mode.
+    // Disable the subtitle when any new video is played.
+    // This is played from the portrait mode.
     
     self.subtitlesParts = nil;
     [self hideSubtitles];
     
     NSDictionary* dict = notif.userInfo;
     
-        // Check for previous button
+    // Check for previous button
     if([[dict objectForKey:KEY_DISABLE_NEXT] isEqualToString:@"YES"]) {
         self.hideNext = YES;
     }
@@ -945,7 +959,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.hideNext = NO;
     }
     
-        // Check for previous button
+    // Check for previous button
     if([[dict objectForKey:KEY_DISABLE_PREVIOUS] isEqualToString:@"YES"]) {
         self.hidePrevious = YES;
     }
@@ -966,7 +980,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.rightSwipeGestureRecognizer.direction = UISwipeGestureRecognizerDirectionRight;
     }
     
-        // Hide unhide the next button
+    // Hide unhide the next button
     if(self.hideNext || self.hidesNextPrev) {
         self.btnNext.hidden = YES;
         self.btnNext.enabled = NO;
@@ -978,7 +992,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [self.moviePlayer.view addGestureRecognizer:self.leftSwipeGestureRecognizer];
     }
     
-        // Hide unhide the previous button
+    // Hide unhide the previous button
     if(self.hidePrevious || self.hidesNextPrev) {
         self.btnPrevious.hidden = YES;
         self.btnPrevious.enabled = NO;
@@ -998,14 +1012,12 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 
 - (void)settingsBtnClicked:(id)sender {
     
-        // Hide unhide the option tableview
+    // Hide unhide the option tableview
     self.view_OptionsOverlay.hidden = NO;
-        //kAMAT_CHANGES 2.0
-    self.tableSettings.hidden = YES;
+    self.tableSettings.hidden = NO;
     self.view_OptionsInner.hidden = YES;
     
-//    [self bringSubviewToFront:self.tableSettings];
-    [self.settings showVideoSpeed];
+    [self bringSubviewToFront:self.tableSettings];
 }
 
 - (void)analyticsShowTranscript {
@@ -1013,13 +1025,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
                                             CurrentTime:[self getMoviePlayerCurrentTime]
                                                CourseID:self.video.course_id
                                                 UnitURL:self.video.summary.unitURL];
-}
-
-#pragma CC methods
-
-- (void)LMSBtnClicked:(id)sender {
-        //    [[UIApplication sharedApplication] openURL:[NSURL URLWithString:self.video.summary.unitURL]];
-    [self.settings showCloasedCaptions];
 }
 
 # pragma mark - UIControl/Touch Events
@@ -1033,7 +1038,10 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _dataInterface.selectedCCIndex = -1;
     _dataInterface.selectedVideoSpeedIndex = -1;
     [self hideSubtitles];
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_PREVIOUS_VIDEO object:self userInfo:nil];
+    if (!_isShownOnMyVideos) {
+        [self.moviePlayer setFullscreen:NO];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_VIDEO_PLAYER_PREVIOUS object:self userInfo:nil];
 }
 
 - (void)nextBtnClicked:(id)sender {
@@ -1047,21 +1055,24 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     _dataInterface.selectedCCIndex = -1;
     _dataInterface.selectedVideoSpeedIndex = -1;
     [self hideSubtitles];
-    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_NEXT_VIDEO object:self userInfo:nil];
+    if (!_isShownOnMyVideos) {
+        [self.moviePlayer setFullscreen:NO];
+    }
+    [[NSNotificationCenter defaultCenter] postNotificationName:NOTIFICATION_VIDEO_PLAYER_NEXT object:self userInfo:nil];
 }
 
 - (void)durationSliderTouchBegan:(UISlider*)slider {
     [self hideOptionsAndValues];
     
-        //Fix semantics - MOB -1232
+    //Fix semantics - MOB -1232
     self.startTime = [self getMoviePlayerCurrentTime];
     OEXLogInfo(@"VIDEO", @"self.startTime : %f", self.startTime);
     
     [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
-        // Pause player
+    // Pause player
     self.seeking = YES;
     [self.moviePlayer pause];
-        //[self stopDurationTimer];
+    //[self stopDurationTimer];
 }
 
 - (void)durationSliderTouchEnded:(UISlider*)slider {
@@ -1070,7 +1081,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     self.seeking = NO;
     [self.moviePlayer setCurrentPlaybackTime:floor(slider.value)];
     
-        //Fix semantics - MOB -1232
+    //Fix semantics - MOB -1232
     self.stopTime = [self getMoviePlayerCurrentTime];
     OEXLogInfo(@"VIDEO", @"self.stopTime : %f", self.stopTime);
     
@@ -1101,16 +1112,29 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [self setTimeLabelValues:currentTime totalTime:totalTime];
 }
 
+- (void)setCurrentPlaybackTimeFromTranscript:(NSTimeInterval )time {
+    [self.moviePlayer pause];
+    [self.moviePlayer setCurrentPlaybackTime:time];
+    self.durationSlider.value = time;
+    [self setTimeLabelValues:(double)time totalTime:(double)self.moviePlayer.duration];
+    
+    if(self.stateBeforeSeek == MPMoviePlaybackStatePlaying && self.moviePlayer
+       .loadState != MPMovieLoadStateStalled) {
+        [self.moviePlayer setCurrentPlaybackRate:_playbackRate];
+        [self.moviePlayer play];
+    }
+}
+
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
-        // The toggle controls tap gesture recognizer
-        // conflicts with the timeline slider drag.
-        // Here we explicitly filter out attempts to start the tap if we're over
-        // the timeline.
-        // ignore gesture in case of menu options (Closed Caption, Video Speed)
+    // The toggle controls tap gesture recognizer
+    // conflicts with the timeline slider drag.
+    // Here we explicitly filter out attempts to start the tap if we're over
+    // the timeline.
+    // ignore gesture in case of menu options (Closed Caption, Video Speed)
     if ([touch.view isDescendantOfView:self.tableSettings] || [touch.view isDescendantOfView:_durationSlider]) {
         
-            //ignore gesture recognizer
+        //ignore gesture recognizer
         return NO;
     }
     
@@ -1163,7 +1187,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.style = self.moviePlayer.isFullscreen ? CLVideoPlayerControlsStyleEmbedded : CLVideoPlayerControlsStyleFullscreen;
     }
     
-        //showing forcefully full screen of player in landscape when user click on full screen in Portrait
+    //showing forcefully full screen of player in landscape when user click on full screen in Portrait
     UIInterfaceOrientation currentOrientation = [[UIApplication sharedApplication] statusBarOrientation];
     if (UIInterfaceOrientationIsPortrait(currentOrientation)) {
         [self.moviePlayer setFullscreen:!self.moviePlayer.isFullscreen animated:YES forceRotate:YES];
@@ -1172,7 +1196,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         [self.moviePlayer setFullscreen:!self.moviePlayer.isFullscreen animated:YES forceRotate:NO];
     }
     
-        // For the self.subtitleLabel font.
+    // For the self.subtitleLabel font.
     [self updateComponentsOriginOnOrientation];
     
     [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
@@ -1203,9 +1227,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     
     OEXLogInfo(@"VIDEO", @"Current playback time %lf and after 30sec rewind %lf ", self.moviePlayer.currentPlaybackTime, currentTime);
     [self.moviePlayer pause];
-        //Dont delete commented code
-        ////self.durationSlider.value=currentTime;
-        // [self setTimeLabelValues:(double)currentTime totalTime:(double)self.moviePlayer.duration];
+    //Dont delete commented code
+    ////self.durationSlider.value=currentTime;
+    // [self setTimeLabelValues:(double)currentTime totalTime:(double)self.moviePlayer.duration];
     
     [self.moviePlayer setCurrentPlaybackTime:floor(currentTime)];
     self.durationSlider.value = currentTime;
@@ -1220,10 +1244,9 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [self performSelector:@selector(hideControls:) withObject:nil afterDelay:self.fadeDelay];
 }
 
-- (void)contentTapped:(UIGestureRecognizer*)sender {
+- (void)contentTapped:(id)sender {
     
-    
-    if(self.style == CLVideoPlayerControlsStyleNone || self.state == CLVideoPlayerControlsStateLoading) {
+    if(self.style == CLVideoPlayerControlsStyleNone || self.state == CLVideoPlayerControlsStateLoading || (self.isShowing && UIAccessibilityIsVoiceOverRunning())) {
         return;
     }
     
@@ -1274,7 +1297,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             self.playPauseButton.userInteractionEnabled = YES;
             [self.topBar setNeedsDisplay];
             [self.bottomBar setNeedsDisplay];
-                // MOB - 499
+            // MOB - 499
             if(!self.hideNext) {
                 self.btnNext.enabled = YES;
             }
@@ -1287,7 +1310,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             if(completion) {
                 completion();
             }
-                //Hide controls only when player is in fullscreen mode
+            //Hide controls only when player is in fullscreen mode
             [weakself performSelector:@selector(hideControls:) withObject:nil afterDelay:weakself.fadeDelay];
         }];
     }
@@ -1299,7 +1322,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
 }
 
 - (void)hideControls:(void (^)(void))completion {
-    if(self.isShowing) {
+    if(self.isShowing && !UIAccessibilityIsVoiceOverRunning()) {
         [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(hideControls:) object:nil];
         [UIView animateWithDuration:0.3 delay:0.0 options:0 animations:^{
             if(self.style == CLVideoPlayerControlsStyleFullscreen || (self.style == CLVideoPlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
@@ -1310,11 +1333,11 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
             self.btnPrevious.alpha = 0.f;
             self.btnNext.alpha = 0.f;
             self.playPauseButton.userInteractionEnabled = NO;
-                // MOB - 499
+            // MOB - 499
             self.btnNext.enabled = NO;
             self.btnPrevious.enabled = NO;
             
-                // Hide tables with all the other control fades.
+            // Hide tables with all the other control fades.
             [self hideTables];
             self.btnSettings.selected = NO;
         } completion:^(BOOL finished) {
@@ -1429,8 +1452,10 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieContentURLDidChange:) name:CLVideoPlayerContentURLDidChangeNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieDurationAvailable:) name:MPMovieDurationAvailableNotification object:nil];
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(movieLoadStateDidChange:) name:MPMoviePlayerLoadStateDidChangeNotification object:nil];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(voiceOverStatusChanged) name:UIAccessibilityVoiceOverStatusChanged object:nil];
     
-        // Used For CC
+    
+    // Used For CC
     
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(hideUnhidePreviousNextButton:)
@@ -1439,6 +1464,15 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
                                                object:nil];
     
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(downloadedTranscript:) name:DL_COMPLETE object:nil];
+}
+
+- (void)voiceOverStatusChanged {
+    if(!UIAccessibilityIsVoiceOverRunning()) {
+        [self hideControls:nil];
+    }
+    else {
+        [self showControls:nil];
+    }
 }
 
 - (void)movieFinished:(NSNotification*)notification {
@@ -1454,9 +1488,13 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.state = CLVideoPlayerControlsStateIdle;
         OEXLogInfo(@"VIDEO", @"Movie Finished Playing: Ended");
         
-            // Fix semantics - MOB 1232
+        // Fix semantics - MOB 1232
         if(self.video.summary.videoID) {
             [_dataInterface sendAnalyticsEvents:OEXVideoStateStop withCurrentTime:[weakSelf getMoviePlayerCurrentTime] forVideo:self.video];
+        }
+        
+        if([self.delegate respondsToSelector:@selector(didFinishVideoPlaying)]) {
+            [self.delegate didFinishVideoPlaying];
         }
     }
     else if(reason == MPMovieFinishReasonUserExited) {
@@ -1466,51 +1504,56 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         OEXLogInfo(@"VIDEO", @"Movie Finished Playing: Playback Error");
         [self.activityIndicator stopAnimating];
     }
+    
 }
 
 - (void)movieLoadStateDidChange:(NSNotification*)note {
     switch(self.moviePlayer.loadState)
     {
         case MPMovieLoadStatePlayable:
-        OEXLogInfo(@"VIDEO", @"Load state ==> MPMovieLoadStatePlayable");
-        
+            OEXLogInfo(@"VIDEO", @"Load state ==> MPMovieLoadStatePlayable");
+            
         case MPMovieLoadStatePlaythroughOK:
-        if(self.loadingContentUrl) {
-            self.loadingContentUrl = NO;
-        }
-        if(self.moviePlayer.lastPlayedTime > 3) {
-            [self.moviePlayer setCurrentPlaybackTime:self.moviePlayer.lastPlayedTime];
-            self.moviePlayer.lastPlayedTime = 0;
-        }
-        
-        if(self.video.summary.videoID) {
-            [_dataInterface sendAnalyticsEvents:OEXVideoStateLoading withCurrentTime:0 forVideo:self.video];
-        }
-        
-        [self showControls:nil];
-        [self hideLoadingIndicators];
-        if(self.stateBeforeSeek == MPMoviePlaybackStatePlaying) {
-            [self.moviePlayer setCurrentPlaybackRate:_playbackRate];
-            [self.moviePlayer play];
-        }
-        if(self.moviePlayer.autoPlaying == NO) {
-            [self.moviePlayer pause];
-        }
-        self.state = CLVideoPlayerControlsStateReady;
-        OEXLogInfo(@"VIDEO", @"Load state ==> MPMovieLoadStatePlaythroughOK");
-        break;
-        
+            if(self.loadingContentUrl) {
+                self.loadingContentUrl = NO;
+            }
+            if(self.moviePlayer.lastPlayedTime > 3) {
+                [self.moviePlayer setCurrentPlaybackTime:self.moviePlayer.lastPlayedTime];
+                self.moviePlayer.lastPlayedTime = 0;
+            }
+            
+            if(!self.isVisibile) {
+                break;
+            }
+            
+            if(self.video.summary.videoID) {
+                [_dataInterface sendAnalyticsEvents:OEXVideoStateLoading withCurrentTime:0 forVideo:self.video];
+            }
+            
+            [self showControls:nil];
+            [self hideLoadingIndicators];
+            if(self.stateBeforeSeek == MPMoviePlaybackStatePlaying) {
+                [self.moviePlayer setCurrentPlaybackRate:_playbackRate];
+                [self.moviePlayer play];
+            }
+            if(self.moviePlayer.autoPlaying == NO) {
+                [self.moviePlayer pause];
+            }
+            self.state = CLVideoPlayerControlsStateReady;
+            OEXLogInfo(@"VIDEO", @"Load state ==> MPMovieLoadStatePlaythroughOK");
+            break;
+            
         case MPMovieLoadStateStalled:
-        OEXLogInfo(@"VIDEO", @"Load state ==> MovieStalled");
-        self.state = CLVideoPlayerControlsStateLoading;
-        [self showLoadingIndicators];
-        break;
+            OEXLogInfo(@"VIDEO", @"Load state ==> MovieStalled");
+            self.state = CLVideoPlayerControlsStateLoading;
+            [self showLoadingIndicators];
+            break;
         case MPMovieLoadStateUnknown:
-        OEXLogInfo(@"VIDEO", @"Load state ==> Unknown");
-        
-        break;
+            OEXLogInfo(@"VIDEO", @"Load state ==> Unknown");
+            
+            break;
         default:
-        break;
+            break;
     }
 }
 
@@ -1526,68 +1569,68 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     switch(weakSelf.moviePlayer.playbackState)
     {
         case MPMoviePlaybackStateStopped:
-        OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateStopped");
-        
+            OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateStopped");
+            
             // Hide tables if video is stopped or ended
-        [self hideTables];
+            [self hideTables];
             // CC implementation
             // Stop
-        if(weakSelf.subtitleTimer.isValid) {
-            [weakSelf.subtitleTimer invalidate];
-        }
-            // MOB -505
-        
-        weakSelf.state = CLVideoPlayerControlsStateIdle;
-        weakSelf.playPauseButton.selected = YES;
-        [weakSelf stopDurationTimer];
-        [weakSelf stopBufferedTimer];
-        break;
-        
-        case MPMoviePlaybackStatePlaying:
-        OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStatePlaying");
-        self.playPauseButton.selected = NO;
-        [weakSelf startDurationTimer];
-        [weakSelf startBufferedTimer];
-        
-            // Local file
-        if([weakSelf.moviePlayer.contentURL.scheme isEqualToString:@"file"]) {
-            [weakSelf setDurationSliderMaxMinValues];
-            [weakSelf showControls:nil];
-        }
-        [weakSelf setUserInteractionEnabled:YES];
-            // CC Implementaion
-        [self initializeSubtitleWithTimer];
-        break;
-        
-        case MPMoviePlaybackStatePaused:
-        OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStatePaused");
-        _playPauseButton.selected = YES;
-            ///TODO REVIEW CONDITION
-        if(weakSelf.moviePlayer.loadState == MPMovieLoadStatePlaythroughOK ||
-           weakSelf.moviePlayer.loadState == MPMovieLoadStateUnknown) {
-            if(weakSelf.stateBeforeSeek == MPMoviePlaybackStatePlaying && !self.seeking) {
-                [weakSelf hideLoadingIndicators];
-                [weakSelf.moviePlayer play];
+            if(weakSelf.subtitleTimer.isValid) {
+                [weakSelf.subtitleTimer invalidate];
             }
-        }
-        break;
-        
+            // MOB -505
+            
+            weakSelf.state = CLVideoPlayerControlsStateIdle;
+            weakSelf.playPauseButton.selected = YES;
+            [weakSelf stopDurationTimer];
+            [weakSelf stopBufferedTimer];
+            break;
+            
+        case MPMoviePlaybackStatePlaying:
+            OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStatePlaying");
+            self.playPauseButton.selected = NO;
+            [weakSelf startDurationTimer];
+            [weakSelf startBufferedTimer];
+            
+            // Local file
+            if([weakSelf.moviePlayer.contentURL.scheme isEqualToString:@"file"]) {
+                [weakSelf setDurationSliderMaxMinValues];
+                [weakSelf showControls:nil];
+            }
+            [weakSelf setUserInteractionEnabled:YES];
+            // CC Implementaion
+            [self initializeSubtitleWithTimer];
+            break;
+            
+        case MPMoviePlaybackStatePaused:
+            OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStatePaused");
+            _playPauseButton.selected = YES;
+            ///TODO REVIEW CONDITION
+            if(weakSelf.moviePlayer.loadState == MPMovieLoadStatePlaythroughOK ||
+               weakSelf.moviePlayer.loadState == MPMovieLoadStateUnknown) {
+                if(weakSelf.stateBeforeSeek == MPMoviePlaybackStatePlaying && !self.seeking) {
+                    [weakSelf hideLoadingIndicators];
+                    [weakSelf.moviePlayer play];
+                }
+            }
+            break;
+            
         case MPMoviePlaybackStateInterrupted:
-        OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateInterrupted");
-        [weakSelf.moviePlayer pause];
-        break;
-        
+            OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateInterrupted");
+            [weakSelf.moviePlayer pause];
+            break;
+            
         case MPMoviePlaybackStateSeekingForward:
-        OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateSeekingForward");
-        [weakSelf stopDurationTimer];
-        break;
-        
+            OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateSeekingForward");
+            [weakSelf stopDurationTimer];
+            break;
+            
         case MPMoviePlaybackStateSeekingBackward:
-        OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateSeekingBackward");
-        [weakSelf stopDurationTimer];
-        break;
+            OEXLogInfo(@"VIDEO", @"Playing state ==>> MPMoviePlaybackStateSeekingBackward");
+            [weakSelf stopDurationTimer];
+            break;
         default:
-        break;
+            break;
     }
     
     if(weakSelf.moviePlayer.playbackState == MPMoviePlaybackStatePlaying) {
@@ -1607,7 +1650,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.loadingContentUrl = YES;
     }
     [self hideControls:^{
-            //don't show loading indicator for local files
+        //don't show loading indicator for local files
         if([self.moviePlayer.contentURL.scheme isEqualToString:@"file"]) {
             self.state = CLVideoPlayerControlsStateReady;
             self.stateBeforeSeek = MPMoviePlaybackStatePlaying;
@@ -1625,7 +1668,7 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         return;
     }
     
-        //common sizes
+    //common sizes
     CGFloat paddingFromBezel = self.frame.size.width <= iPhoneScreenPortraitWidth ? 8.f : 10.f;
     
     CGFloat paddingBetweenLabelsAndSlider = 10.f;
@@ -1635,28 +1678,26 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     CGFloat rewindHeightWidth = 25.f;
     CGFloat settingsbtnSize = 24.f;
     CGFloat tableOptionWidth = 120.f;
-        //kAMAT_CHANGES changed from 88 to 44 as removed ClosedCaptions from the table
-    CGFloat tableOptionHeight = 44.f;
+    CGFloat tableOptionHeight = 88.f;
     CGFloat viewInnerWidth = 200.f;
     CGFloat viewInnerHeight = 240.f;
     CGFloat PrevNextButtonSize = 30.f;
-        //kAMAT_CHANGES 2.0 //Changed from 15.0f to 30.0f
-    CGFloat LMSButtonSize = 30.0f;
+    CGFloat LMSButtonSize = 15.f;
     
     CGFloat fullscreenBtnSize = 20.f;
     
     if(self.style == CLVideoPlayerControlsStyleFullscreen || (self.style == CLVideoPlayerControlsStyleDefault && self.moviePlayer.isFullscreen)) {
-            //top bar
+        //top bar
         self.topBar.frame = CGRectMake(0, 0, self.frame.size.width, self.barHeight);
         _videoTitleLabel.frame = CGRectMake(paddingFromBezel, 0, self.frame.size.width - (paddingFromBezel * 2) - LMSButtonSize, self.barHeight);
         
-            //bottom bar
+        //bottom bar
         self.bottomBar.frame = CGRectMake(0, self.frame.size.height - self.barHeight, self.frame.size.width, self.barHeight);
         self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingforFullscreen - fullscreenBtnSize, self.barHeight / 2 - fullscreenBtnSize / 2, fullscreenBtnSize, fullscreenBtnSize);
         
-            // RAHUL
-            // For adjusting the option button
-            // component position for CC , Next/Prev and Playbackspeed.
+        // RAHUL
+        // For adjusting the option button
+        // component position for CC , Next/Prev and Playbackspeed.
         
         self.btnSettings.frame = CGRectMake(self.fullscreenButton.frame.origin.x - settingsbtnSize - 15, self.barHeight / 2 - settingsbtnSize / 2, settingsbtnSize, settingsbtnSize);
         
@@ -1669,8 +1710,6 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.btnPrevious.frame = CGRectMake(paddingFromBezel, (self.frame.size.height / 2) - (PrevNextButtonSize / 2), PrevNextButtonSize, PrevNextButtonSize);
         
         self.btnNext.frame = CGRectMake(self.frame.size.width - paddingFromBezel - PrevNextButtonSize, (self.frame.size.height / 2) - (PrevNextButtonSize / 2), PrevNextButtonSize, PrevNextButtonSize);
-            //kAMAT_Change 13 from 18
-        self.btnLMS.frame = CGRectMake(self.frame.size.width - paddingFromBezel - LMSButtonSize, 13 /*18*/, LMSButtonSize, LMSButtonSize);
         
         self.timeRemainingLabel.frame = CGRectMake(self.btnSettings.frame.origin.x - labelWidth, 0, labelWidth, self.barHeight);
         
@@ -1679,6 +1718,8 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         self.playPauseButton.frame = CGRectMake((self.frame.size.width / 2) - (playWidth / 2), (self.frame.size.height / 2) - (playHeight / 2), playWidth, playHeight);
         
         [_fullscreenButton setImage:[UIImage ShrinkIcon] forState:UIControlStateNormal];
+        _fullscreenButton.accessibilityLabel = [Strings accessibilityExitFullscreen];
+        [self voiceOverOnSettings];
     }
     else if(self.style == CLVideoPlayerControlsStyleEmbedded || (self.style == CLVideoPlayerControlsStyleDefault && !self.moviePlayer.isFullscreen)) {
         self.topBar.frame = CGRectMake(0, 0, self.frame.size.width, self.barHeight);
@@ -1687,12 +1728,12 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         
         self.bottomBar.frame = CGRectMake(0, self.frame.size.height - self.barHeight, self.frame.size.width, self.barHeight);
         
-            //right side of bottom bar
+        //right side of bottom bar
         
         self.fullscreenButton.frame = CGRectMake(self.bottomBar.frame.size.width - paddingforFullscreen - fullscreenBtnSize, self.barHeight / 2 - fullscreenBtnSize / 2, fullscreenBtnSize, fullscreenBtnSize);
         
-            // RAHUL
-            // For adjusting the option button
+        // RAHUL
+        // For adjusting the option button
         self.btnSettings.frame = CGRectMake(self.fullscreenButton.frame.origin.x - settingsbtnSize - 15, self.barHeight / 2 - settingsbtnSize / 2, settingsbtnSize, settingsbtnSize);
         
         self.view_OptionsOverlay.frame = self.frame;
@@ -1701,18 +1742,19 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
         
         self.timeRemainingLabel.frame = CGRectMake(self.btnSettings.frame.origin.x - labelWidth, 0, labelWidth, self.barHeight);
         
-        self.btnLMS.frame = CGRectMake(self.frame.size.width - paddingFromBezel - LMSButtonSize, 18, LMSButtonSize, LMSButtonSize);
-        
         CGFloat playWidth = 35.f;
         CGFloat playHeight = 35.f;
         self.playPauseButton.frame = CGRectMake((self.frame.size.width / 2) - (playWidth / 2), (self.frame.size.height / 2) - (playHeight / 2), playWidth, playHeight);
         
         [_fullscreenButton setImage:[UIImage ExpandIcon] forState:UIControlStateNormal];
+        _fullscreenButton.accessibilityLabel = [Strings accessibilityFullscreen];
+        [self voiceOverOnSettings];
+        [self didHidePrevNext];
     }
     
     self.rewindButton.frame = CGRectMake(paddingFromBezel, self.barHeight / 2 - rewindHeightWidth / 2 + 1.f, rewindHeightWidth, rewindHeightWidth);
     
-        //duration slider
+    //duration slider
     CGFloat timeRemainingX = self.timeRemainingLabel.frame.origin.x;
     
     CGFloat backwordbtnX = self.rewindButton.frame.origin.x;
@@ -1728,7 +1770,17 @@ static const CGFloat iPhoneScreenPortraitWidth = 320.f;
     [_activityBackgroundView setFrame:CGRectMake(0, 0, self.frame.size.width, self.frame.size.height)];
     [_activityIndicator setFrame:CGRectMake((self.frame.size.width / 2) - (activityIndicatorSize / 2), (self.frame.size.height / 2) - (activityIndicatorSize / 2), activityIndicatorSize, activityIndicatorSize)];
     
-    [self didHidePrevNext];
+    self.tapButton.frame = self.frame;
+}
+
+- (void) voiceOverOnSettings {
+    if (UIAccessibilityIsVoiceOverRunning()) {
+        _showing = NO;
+        [self showControls:nil];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification,  _playPauseButton);
+        });
+    }
 }
 
 @end

@@ -17,7 +17,10 @@ NS_ASSUME_NONNULL_BEGIN
 
 - (void)movieTimedOut;
 
+@optional
 - (void) videoPlayerTapped:(UIGestureRecognizer *) sender;
+- (void)transcriptLoaded:(NSArray *)transcript;
+- (void)didFinishVideoPlaying;
 
 @end
 
@@ -45,8 +48,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)setAutoPlaying:(BOOL)playing;
 // Add orientation observer for my videos, will remove this when enable landscape mode for my videos section
 - (void) enableFullscreenAutorotation;
-- (void) rotateVRPlayerInLandscape;
-- (void) stopVRPlayer;
+
 // Disable moving directly from one video to the next
 @property (assign, nonatomic) BOOL hidesNextPrev;
 

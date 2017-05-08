@@ -12,6 +12,7 @@ import Foundation
 public enum AnalyticsCategory : String {
     case Conversion = "conversion"
     case Discovery = "discovery"
+    case AppReviews = "app-reviews"
 }
 
 public enum AnalyticsEventName: String {
@@ -20,6 +21,16 @@ public enum AnalyticsEventName: String {
     case ExploreSubjects = "edx.bi.app.discover.explore.tapped"
     case UserLogin = "edx.bi.app.user.login"
     case UserRegistration = "edx.bi.app.user.register.clicked"
+    case ViewRating = "edx.bi.app.app_reviews.view_rating"
+    case DismissRating = "edx.bi.app.app_reviews.dismiss_rating"
+    case SubmitRating = "edx.bi.app.app_reviews.submit_rating"
+    case SendFeedback = "edx.bi.app.app_reviews.send_feedback"
+    case MaybeLater = "edx.bi.app.app_reviews.maybe_later"
+    case RateTheApp = "edx.bi.app.app_reviews.rate_the_app"
+}
+
+public enum AnalyticsScreenName: String {
+    case AppReviews = "AppReviews: View Rating"
 }
 
 extension OEXAnalytics {
@@ -64,25 +75,4 @@ extension OEXAnalytics {
         event.label = courseId
         return event
     }
-
-    func trackOutlineModeChanged(mode : CourseOutlineMode) {
-        let event = OEXAnalyticsEvent()
-        event.name = OEXAnalyticsEventOutlineModeChanged
-        event.displayName = "Switch outline mode"
-        event.category = OEXAnalyticsCategoryNavigation
-        
-        let modeValue : String
-        
-        switch mode {
-        case .Full:
-            modeValue = OEXAnalyticsValueNavigationModeFull
-            event.label = "Switch to Full Mode"
-        case .Video:
-            modeValue = OEXAnalyticsValueNavigationModeVideo
-            event.label = "Switch to Video Mode"
-        }
-        let info = [OEXAnalyticsKeyNavigationMode : modeValue]
-        self.trackEvent(event, forComponent: nil, withInfo: info)
-    }
-    
 }

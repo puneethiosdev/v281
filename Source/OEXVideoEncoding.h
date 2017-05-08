@@ -10,7 +10,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+extern NSString* const OEXVideoEncodingYoutube;
 extern NSString* const OEXVideoEncodingFallback;
+extern NSString* const OEXVideoEncodingMobileHigh;
+extern NSString* const OEXVideoEncodingMobileLow;
 
 @interface OEXVideoEncoding : NSObject
 
@@ -20,7 +23,6 @@ extern NSString* const OEXVideoEncodingFallback;
 @property (readonly, nonatomic, copy, nullable) NSString* name;
 @property (readonly, nonatomic, copy, nullable) NSString* URL;
 @property (readonly, nonatomic, strong, nullable) NSNumber* size;
-@property (readonly, nonatomic) BOOL isYoutube;
 
 /// [String], ordered by preference
 + (NSArray*)knownEncodingNames;

@@ -1,3 +1,4 @@
+
 //
 //  OEXCourse+TestData.swift
 //  edX
@@ -12,6 +13,7 @@ public extension OEXCourse {
     
     public static func testData(
         courseHasDiscussions hasDiscussions : Bool = true,
+        hasHandoutsUrl : Bool = true,
         accessible : Bool = true,
         overview: String? = nil,
         shortDescription : String? = nil,
@@ -22,13 +24,13 @@ public extension OEXCourse {
         aboutUrl: String? = nil) -> [String : AnyObject]
     {
         let courseID = NSUUID().UUIDString
-        let imagePath = NSBundle.mainBundle().URLForResource("Splash_map", withExtension: "png")
+        let imagePath = NSBundle.mainBundle().URLForResource("placeholderCourseCardImage", withExtension: "png")
         
         var courseDictionary : [String : AnyObject] = [
             "id" : courseID ?? "someID",
             "subscription_id" : courseID ?? "someSubscriptionID",
             "name" : "A Great Course",
-            "course_image" : imagePath!.absoluteString,
+            "course_image" : imagePath!.absoluteString ?? imagePath!.URLString,
             "org" : "edX",
             "courseware_access" : ["has_access" : accessible]
         ]
@@ -37,6 +39,10 @@ public extension OEXCourse {
         }
         if hasDiscussions {
             courseDictionary["discussion_url"] = "http://www.url.com"
+        }
+        
+        if hasHandoutsUrl {
+            courseDictionary["course_handouts"] = "http://www.url.com"
         }
         
         var unparsedMediaInfos : [String:AnyObject] = [:]
@@ -66,6 +72,7 @@ public extension OEXCourse {
 
     public static func freshCourse(
         discussionsEnabled hasDiscussions: Bool = true,
+                           hasHandoutsUrl: Bool = true,
         accessible : Bool = true,
         shortDescription: String? = nil,
         overview: String? = nil,
@@ -77,6 +84,7 @@ public extension OEXCourse {
     {
         let courseData = OEXCourse.testData(
             courseHasDiscussions: hasDiscussions,
+            hasHandoutsUrl: hasHandoutsUrl,
             accessible: accessible,
             shortDescription: shortDescription,
             overview: overview,

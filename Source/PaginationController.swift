@@ -45,9 +45,11 @@ public class PaginationController<A> : NSObject, Paginator {
         super.init()
         manipulator.setFooter(self.footer, visible: false)
 
-        manipulator.scrollView?.oex_addObserver(self, forKeyPath: "bounds") { (controller, tableView, newValue) -> Void in
+        //Uncomment Later
+/*        manipulator.scrollView?.oex_addObserver(self, forKeyPath: "bounds") { (controller, tableView, newValue) -> Void in
             controller.viewScrolled()
         }
+ */
     }
 
     var stream : Stream<[A]> {

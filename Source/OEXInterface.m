@@ -43,6 +43,7 @@ NSString* const OEXCourseListKey = @"OEXCourseListKey";
 NSString* const OEXVideoStateChangedNotification = @"OEXVideoStateChangedNotification";
 NSString* const OEXDownloadProgressChangedNotification = @"OEXDownloadProgressChangedNotification";
 NSString* const OEXDownloadEndedNotification = @"OEXDownloadEndedNotification";
+NSString* const OEXSavedAppVersionKey = @"OEXSavedAppVersionKey";
 
 @interface OEXInterface () <OEXDownloadManagerProtocol>
 
@@ -102,6 +103,8 @@ static OEXInterface* _sharedInterface = nil;
     }];
     
     [self firstLaunchWifiSetting];
+    [self saveAppVersion];
+    
     return self;
 }
 
@@ -366,7 +369,7 @@ static OEXInterface* _sharedInterface = nil;
         totalSpaceRequired += [video.summary.size doubleValue];
     }
     totalSpaceRequired = totalSpaceRequired / 1024 / 1024 / 1024;
-    OEXAppDelegate* appD = [[UIApplication sharedApplication] delegate];
+    OEXAppDelegate* appD = (OEXAppDelegate *)[[UIApplication sharedApplication] delegate];
     if([OEXInterface shouldDownloadOnlyOnWifi]) {
         if(![appD.reachability isReachableViaWiFi]) {
             return NO;
@@ -906,6 +909,7 @@ static OEXInterface* _sharedInterface = nil;
             // TODO: Short term: Update the video summary in the new API to get all its properties from block
             // TODO: Long term: Get the video module to take a block as its input
             helper.summary.duration = summary.duration;
+            helper.summary.encodings = summary.encodings;
             
             return nil;
         }
@@ -969,7 +973,7 @@ static OEXInterface* _sharedInterface = nil;
                 [videosArray addObject:video];
             }
             else if(video.downloadState == OEXDownloadStateNew && OEXDownloadStateNew) {
-                [videosArray addObject:video];
+//                [videosArray addObjectr:video];
             }
         }
         
@@ -1164,7 +1168,7 @@ static OEXInterface* _sharedInterface = nil;
 #pragma mark - Download Video
 
 - (void)startDownloadForVideo:(OEXHelperVideoDownload*)video completionHandler:(void (^)(BOOL sucess))completionHandler {
-    OEXAppDelegate* appD = [[UIApplication sharedApplication] delegate];
+    OEXAppDelegate* appD = (OEXAppDelegate *)[[UIApplication sharedApplication] delegate];
     if([OEXInterface isURLForVideo:video.summary.videoURL]) {
         if([OEXInterface shouldDownloadOnlyOnWifi]) {
             if(![appD.reachability isReachableViaWiFi]) {
@@ -1537,10 +1541,23 @@ static OEXInterface* _sharedInterface = nil;
     }
     return nil;
 }
+
 //kAMAT_CHANGES
 #pragma mark - NSURLSessionDelegate Methods
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didReceiveChallenge:(NSURLAuthenticationChallenge *)challenge completionHandler:(void (^)(NSURLSessionAuthChallengeDisposition disposition, NSURLCredential *credential))completionHandler
 {
     completionHandler(NSURLSessionAuthChallengeUseCredential, [NSURLCredential credentialForTrust:challenge.protectionSpace.serverTrust]);
 }
+
+#pragma mark - App Version
+
+- (void) saveAppVersion {
+    [[NSUserDefaults standardUserDefaults] setObject:[NSBundle mainBundle].oex_buildVersionString forKey:OEXSavedAppVersionKey];
+    [[NSUserDefaults standardUserDefaults] synchronize];
+}
+
+- (nullable NSString*) getSavedAppVersion {
+    return [[NSUserDefaults standardUserDefaults] objectForKey:OEXSavedAppVersionKey];
+}
+
 @end

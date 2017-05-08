@@ -5,6 +5,9 @@
 #import <SEGAnalytics.h>
 #import <MacTypes.h>
 
+#import <FirebaseCore/FirebaseCore.h>
+#import <FirebaseAnalytics/FirebaseAnalytics.h>
+
 #import "CLVideoPlayer.h"
 #import "CLButton.h"
 #import "DACircularProgressView.h"
@@ -57,6 +60,7 @@
 #import "OEXVideoPlayerInterface.h"
 #import "UIAppearance+Swift.h"
 #import "OEXCourseInfoViewController.h"
+#import "OEXRegistrationDescription.h"
 
 #import "Reachability.h"
 #import "SWRevealViewController.h"

@@ -8,6 +8,8 @@
 
 import Foundation
 
+var isActionTakenOnUpgradeSnackBar: Bool = false
+
 class EnrolledCoursesViewController : OfflineSupportViewController, CoursesTableViewControllerDelegate, PullRefreshControllerDelegate {
     
     typealias Environment = protocol<OEXAnalyticsProvider, OEXConfigProvider, DataManagerProvider, NetworkManagerProvider, ReachabilityProvider, OEXRouterProvider>
@@ -117,9 +119,6 @@ class EnrolledCoursesViewController : OfflineSupportViewController, CoursesTable
             footer.findCoursesAction = {[weak self] in
                 self?.environment.router?.showCourseCatalog(nil)
             }
-            footer.missingCoursesAction = {[weak self] in
-                self?.showCourseNotListedScreen()
-            }
             
             footer.sizeToFit()
             self.tableController.tableView.tableFooterView = footer
@@ -159,17 +158,16 @@ class EnrolledCoursesViewController : OfflineSupportViewController, CoursesTable
         }
     }
     
-    private func showCourseNotListedScreen() {
-        environment.router?.showFullScreenMessageViewControllerFromViewController(self, message: Strings.courseNotListed, bottomButtonTitle: Strings.close)
-    }
-    
     private func showVersionUpgradeSnackBarIfNecessary() {
         if let _ = VersionUpgradeInfoController.sharedController.latestVersion {
             var infoString = Strings.VersionUpgrade.newVersionAvailable
             if let _ = VersionUpgradeInfoController.sharedController.lastSupportedDateString {
                 infoString = Strings.VersionUpgrade.deprecatedMessage
             }
-            showVersionUpgradeSnackBar(infoString)
+            
+            if !isActionTakenOnUpgradeSnackBar {
+                showVersionUpgradeSnackBar(infoString)
+            }
         }
         else {
             hideSnackBar()

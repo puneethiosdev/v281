@@ -20,6 +20,8 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface OEXConfig : NSObject
 
+@property (strong, nonatomic) NSDictionary* properties;
+
 /// Note that this is not thread safe. The expectation is that this only happens
 /// immediately when the app launches or synchronously at the start of a test.
 + (void)setSharedConfig:(OEXConfig*)config;
@@ -47,6 +49,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (NSString*)platformName;
 /// User facing platform web destination, like "edx.org"
 - (NSString*)platformDestinationName;
+- (nullable NSString*)organizationCode;
 // Network
 - (nullable NSURL*)apiHostURL;
 - (nullable NSString*)feedbackEmailAddress;

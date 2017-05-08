@@ -25,7 +25,6 @@ private struct OEXVideoPlayerSetting {
     func videoInfo() -> OEXVideoSummary
 }
 
-
 private func setupTable(table: UITableView) {
     table.layer.cornerRadius = 10
     table.layer.shadowColor = UIColor.blackColor().CGColor
@@ -121,7 +120,6 @@ private func setupTable(table: UITableView) {
                 rows.append(item)
             }
             
-            
             let cc = OEXVideoPlayerSetting(title: "Closed Captions", rows: rows, isSelected: { (row) -> Bool in
                 var selected = false
                 if let selectedLanguage:String = OEXInterface.getCCSelectedLanguage() {
@@ -129,8 +127,16 @@ private func setupTable(table: UITableView) {
                     selected = selectedLanguage == lang
                 }
                 return selected
+
                 }) {[weak self] value in
                     self?.delegate?.setCaption(value as! String)
+
+//            }) {[weak self] value in
+//                var language : String = value as! String
+//                if language == OEXInterface.getCCSelectedLanguage() && language != "" {
+//                    language = ""
+//                }
+//                self?.delegate?.setCaption(language)
             }
             return [cc]
         }

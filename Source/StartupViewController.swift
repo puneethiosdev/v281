@@ -10,7 +10,7 @@ import Foundation
 
 class StartupViewController: UIViewController, InterfaceOrientationOverriding {
 
-    typealias Environment = protocol<OEXRouterProvider, OEXConfigProvider>
+    typealias Environment = protocol<OEXRouterProvider, OEXConfigProvider, OEXAnalyticsProvider>
 
     private let logoImageView = UIImageView()
 
@@ -37,7 +37,7 @@ class StartupViewController: UIViewController, InterfaceOrientationOverriding {
 
     override func viewDidAppear(animated: Bool) {
         super.viewDidAppear(animated)
-        OEXAnalytics.sharedAnalytics().trackScreenWithName("launch")
+        environment.analytics.trackScreenWithName(OEXAnalyticsScreenLaunch)
     }
 
     override func shouldAutorotate() -> Bool {
@@ -51,7 +51,7 @@ class StartupViewController: UIViewController, InterfaceOrientationOverriding {
     // MARK: - View Setup
 
     private func setupBackground() {
-        let backgroundImage = UIImage(named: "splash-start-lg")
+        let backgroundImage = UIImage(named: "launchBackground")
         let backgroundImageView = UIImageView(image: backgroundImage)
         backgroundImageView.contentMode = .ScaleAspectFill
         view.addSubview(backgroundImageView)
@@ -65,7 +65,9 @@ class StartupViewController: UIViewController, InterfaceOrientationOverriding {
         let logo = UIImage(named: "logo")
         logoImageView.image = logo
         logoImageView.contentMode = .ScaleAspectFit
-
+        logoImageView.accessibilityLabel = environment.config.platformName()
+        logoImageView.isAccessibilityElement = true
+        logoImageView.accessibilityTraits = UIAccessibilityTraitImage
         view.addSubview(logoImageView)
 
         logoImageView.snp_makeConstraints { (make) in
@@ -164,13 +166,13 @@ private class BottomBarView: UIView, NSCopying {
         let line = UIView()
         bottomBar.backgroundColor = UIColor.blackColor().colorWithAlphaComponent(0.90)
         
-        signInButton.setTitle(Strings.signInButtonText, forState: .Normal)
+        signInButton.setTitle(Strings.signInText, forState: .Normal)
         let signInEvent = OEXAnalytics.loginEvent()
         signInButton.oex_addAction({ [weak self] _ in
             self?.showLogin()
             }, forEvents: .TouchUpInside, analyticsEvent: signInEvent)
         
-        registerButton.setTitle(Strings.signUpButtonText, forState: .Normal)
+        registerButton.setTitle(Strings.registerText, forState: .Normal)
         let signUpEvent = OEXAnalytics.registerEvent()
         registerButton.oex_addAction({ [weak self] _ in
             self?.showRegistration()

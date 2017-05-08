@@ -30,6 +30,7 @@ public struct CourseCatalogAPI {
         case CourseID = "course_id"
         case EmailOptIn = "email_opt_in"
         case Mobile = "mobile"
+        case Org = "org"
     }
     
     //kAMAT_Changes
@@ -55,6 +56,19 @@ public struct CourseCatalogAPI {
             query : [
                 Params.Mobile.rawValue: JSON(true),
             ],
+
+//    public static func getCourseCatalog(userID: String, page : Int, organizationCode: String?) -> NetworkRequest<Paginated<[OEXCourse]>> {
+//        var query = [Params.Mobile.rawValue: JSON(true), Params.User.rawValue: JSON(userID)]
+//        
+//        if let orgCode = organizationCode {
+//            query[Params.Org.rawValue] = JSON(orgCode)
+//        }
+//        
+//        return NetworkRequest(
+//            method: .GET,
+//            path : "api/courses/v1/courses/",
+//            query : query,
+
             requiresAuth : true,
             deserializer: .JSONResponse(coursesDeserializer)
             ).paginated(page: page)

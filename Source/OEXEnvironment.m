@@ -68,6 +68,13 @@
             if(segmentConfig.apiKey != nil && segmentConfig.isEnabled) {
                 [[SEGAnalyticsConfiguration configurationWithWriteKey:segmentConfig.apiKey] use:[SEGGoogleAnalyticsIntegrationFactory instance]];
                 [analytics addTracker:[[SegmentAnalyticsTracker alloc] init]];
+            }
+            
+            if (env.config.isFirebaseEnabled) {
+                [analytics addTracker:[[FirebaseAnalyticsTracker alloc] init]];
+            }
+            
+            if((segmentConfig.apiKey != nil && segmentConfig.isEnabled) || env.config.isFirebaseEnabled) {
                 [analytics addTracker:[[LoggingAnalyticsTracker alloc] init]];
             }
             return analytics;
@@ -98,7 +105,7 @@
             OEXPushSettingsManager* pushSettingsManager = [[OEXPushSettingsManager alloc] init];
             EnrollmentManager* enrollmentManager =
             [[EnrollmentManager alloc] initWithInterface:[OEXInterface sharedInterface]
-                                          networkManager:env.networkManager];
+                                          networkManager:env.networkManager config:env.config];
             UserProfileManager* userProfileManager =
             [[UserProfileManager alloc]
              initWithNetworkManager:env.networkManager

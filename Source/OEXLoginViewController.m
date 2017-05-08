@@ -19,7 +19,6 @@
 
 #import "OEXAnalytics.h"
 #import "OEXAppDelegate.h"
-#import "OEXConfig.h"
 #import "OEXCustomButton.h"
 #import "OEXCustomLabel.h"
 #import "OEXAuthentication.h"
@@ -34,7 +33,6 @@
 #import "OEXInterface.h"
 #import "OEXNetworkConstants.h"
 #import "OEXNetworkUtility.h"
-#import "OEXRouter.h"
 #import "OEXSession.h"
 #import "OEXUserDetails.h"
 #import "OEXUserLicenseAgreementViewController.h"
@@ -165,21 +163,17 @@
     [self.view setUserInteractionEnabled:NO];
 }
 - (BOOL)isFacebookEnabled {
-    OEXConfig* config = [OEXConfig sharedConfig];
-    OEXFacebookConfig* facebookConfig = [config facebookConfig];
-    return ![OEXNetworkUtility isOnZeroRatedNetwork] && facebookConfig.enabled;
+    return ![OEXNetworkUtility isOnZeroRatedNetwork] && [self.environment.config facebookConfig].enabled;
 }
 
 - (BOOL)isGoogleEnabled {
-    OEXConfig* config = [OEXConfig sharedConfig];
-    OEXGoogleConfig* googleConfig = [config googleConfig];
-    return ![OEXNetworkUtility isOnZeroRatedNetwork] && googleConfig.enabled;
+    return ![OEXNetworkUtility isOnZeroRatedNetwork] && [self.environment.config googleConfig].enabled;
 }
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    [self setTitle:[Strings loginSignInToPlatformWithPlatformName:[[OEXConfig sharedConfig] platformName]]];
+    [self setTitle:[Strings signInText]];
 
     NSMutableArray* providers = [[NSMutableArray alloc] init];
     if([self isGoogleEnabled]) {
@@ -201,9 +195,11 @@
     [self.lbl_OrSignIn setText:[Strings orSignInWith]];
     [self.lbl_OrSignIn setTextColor:[UIColor colorWithRed:60.0 / 255.0 green:64.0 / 255.0 blue:69.0 / 255.0 alpha:1.0]];
     
-    UIBarButtonItem *closeButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ic_cancel"] style:UIBarButtonItemStylePlain target:self action:@selector(navigateBack)];
-    closeButton.accessibilityLabel = [Strings close];
-    self.navigationItem.leftBarButtonItem = closeButton;
+    if (self.environment.config.isRegistrationEnabled) {
+        UIBarButtonItem *closeButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ic_cancel"] style:UIBarButtonItemStylePlain target:self action:@selector(navigateBack)];
+        closeButton.accessibilityLabel = [Strings close];
+        self.navigationItem.leftBarButtonItem = closeButton;
+    }
     
     [self setExclusiveTouch];
 
@@ -213,8 +209,10 @@
     
     self.tf_EmailID.textAlignment = NSTextAlignmentNatural;
     self.tf_Password.textAlignment = NSTextAlignmentNatural;
+    self.img_Logo.isAccessibilityElement = YES;
+    self.img_Logo.accessibilityLabel = [[OEXConfig sharedConfig] platformName];
 
-    NSString* environmentName = [OEXConfig sharedConfig].environmentName;
+    NSString* environmentName = self.environment.config.environmentName;
     if(environmentName.length > 0) {
         NSString* appVersion = [NSBundle mainBundle].oex_buildVersionString;
         self.versionLabel.text = [Strings versionDisplayWithNumber:appVersion environment:environmentName];
@@ -252,7 +250,7 @@
     //Analytics Screen record
     [[OEXAnalytics sharedAnalytics] trackScreenWithName:@"Login"];
 
-    OEXAppDelegate* appD = [[UIApplication sharedApplication] delegate];
+    OEXAppDelegate* appD = (OEXAppDelegate *)[[UIApplication sharedApplication] delegate];
     self.reachable = [appD.reachability isReachable];
 
     [self.view setUserInteractionEnabled:YES];
@@ -285,12 +283,12 @@
 }
 
 - (NSString*)signInButtonText {
-    return [Strings signInButtonText];
+    return [Strings signInText];
 }
 
 - (void)handleActivationDuringLogin {
     if(self.authProvider != nil) {
-        [self.btn_Login applyButtonStyle:[[OEXStyles sharedStyles] filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
+        [self.btn_Login applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
         [self.activityIndicator stopAnimating];
         [self.view setUserInteractionEnabled:YES];
 
@@ -323,15 +321,21 @@
     self.tf_Password.accessibilityLabel = nil;
 
     self.lbl_Redirect.text = [Strings redirectText];
+    self.lbl_Redirect.isAccessibilityElement = NO;
     [self.btn_TroubleLogging setAttributedTitle:[_buttonsTitleStyle attributedStringWithText:[Strings troubleInLoginButton]] forState:UIControlStateNormal];
     [self.btn_TroubleLogging setTitleColor:[[OEXStyles sharedStyles] primaryBaseColor] forState:UIControlStateNormal];
     [self.btn_OpenEULA setTitleColor:[[OEXStyles sharedStyles] primaryBaseColor] forState:UIControlStateNormal];
     _buttonsTitleStyle.weight = OEXTextWeightNormal;
     _buttonsTitleStyle.size = OEXTextSizeXXSmall;
-    [self.btn_OpenEULA setAttributedTitle:[_buttonsTitleStyle attributedStringWithText:[Strings registrationAgreementButtonTitleWithPlatformName:[[OEXConfig sharedConfig] platformName]]] forState:UIControlStateNormal];
+
+    NSString *termsText = [Strings registrationAgreementButtonTitleWithPlatformName:self.environment.config.platformName];
+    [self.btn_OpenEULA setAttributedTitle:[_buttonsTitleStyle attributedStringWithText:termsText] forState:UIControlStateNormal];
+    self.btn_OpenEULA.titleLabel.adjustsFontSizeToFitWidth = YES;
+
     self.btn_OpenEULA.accessibilityTraits = UIAccessibilityTraitLink;
+    self.btn_OpenEULA.accessibilityLabel = [NSString stringWithFormat:@"%@,%@",[Strings redirectText], termsText];
     
-    [self.btn_Login applyButtonStyle:[[OEXStyles sharedStyles] filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
+    [self.btn_Login applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
     [self.activityIndicator stopAnimating];
 
     NSString* username = [[NSUserDefaults standardUserDefaults] objectForKey:USER_EMAIL];
@@ -354,7 +358,7 @@
         dispatch_async(dispatch_get_main_queue(), ^{
             [self.view setUserInteractionEnabled:YES];
         });
-        [self.btn_Login applyButtonStyle:[[OEXStyles sharedStyles] filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
+        [self.btn_Login applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
 
         [self.activityIndicator stopAnimating];
     }
@@ -442,7 +446,7 @@
 
         [self.view setUserInteractionEnabled:NO];
         [self.activityIndicator startAnimating];
-        [self.btn_Login applyButtonStyle:[[OEXStyles sharedStyles] filledPrimaryButtonStyle] withTitle:[Strings signInButtonTextOnSignIn]];
+        [self.btn_Login applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[Strings signInButtonTextOnSignIn]];
     }
 }
 
@@ -455,6 +459,9 @@
         NSHTTPURLResponse* httpResp = (NSHTTPURLResponse*) response;
         if(httpResp.statusCode == 200) {
             [self loginSuccessful];
+        }
+        else if(httpResp.statusCode == OEXHTTPStatusCode426UpgradeRequired) {
+            [self showUpdateRequiredMessage];
         }
         else if(httpResp.statusCode >= 400 && httpResp.statusCode <= 500) {
             NSString* errorStr = [Strings invalidUsernamePassword];
@@ -506,7 +513,7 @@
 
     [self.view setUserInteractionEnabled:NO];
     [self.activityIndicator startAnimating];
-    [self.btn_Login applyButtonStyle:[[OEXStyles sharedStyles] filledPrimaryButtonStyle] withTitle:[[Strings signInButtonTextOnSignIn] oex_uppercaseStringInCurrentLocale]];
+    [self.btn_Login applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[[Strings signInButtonTextOnSignIn] oex_uppercaseStringInCurrentLocale]];
 }
 
 - (void)loginHandleLoginError:(NSError*)error {
@@ -529,8 +536,8 @@
 }
 
 - (void)loginFailedWithServiceName:(NSString*)serviceName {
-    NSString* platform = [[OEXConfig sharedConfig] platformName];
-    NSString* destination = [[OEXConfig sharedConfig] platformDestinationName];
+    NSString* platform = self.environment.config.platformName;
+    NSString* destination = self.environment.config.platformDestinationName;
     NSString* title = [Strings serviceAccountNotAssociatedTitleWithService:serviceName platformName:platform];
     NSString* message = [Strings serviceAccountNotAssociatedMessageWithService:serviceName platformName:platform destinationName:destination];
     [self loginFailedWithErrorMessage:message title:title];
@@ -551,11 +558,28 @@
     }
 
     [self.activityIndicator stopAnimating];
-    [self.btn_Login applyButtonStyle:[[OEXStyles sharedStyles] filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
+    [self.btn_Login applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
 
     [self.view setUserInteractionEnabled:YES];
 
     [self tappedToDismiss];
+}
+
+- (void) showUpdateRequiredMessage {
+    [UIApplication sharedApplication].networkActivityIndicatorVisible = NO;
+    [self.activityIndicator stopAnimating];
+    [self.btn_Login applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[self signInButtonText]];
+    [self.view setUserInteractionEnabled:YES];
+    [self tappedToDismiss];
+    
+    UIAlertController *alertController = [[UIAlertController alloc] showAlertWithTitle:nil message:[VersionUpgrade outDatedLoginMessage] cancelButtonTitle:[Strings cancel] onViewController:self];
+    
+    [alertController addButtonWithTitle:[VersionUpgrade update] actionBlock:^(UIAlertAction * _Nonnull action) {
+        NSURL *url = _environment.config.appUpgradeConfig.iOSAppStoreURL;
+        if (url && [[UIApplication sharedApplication] canOpenURL:url]) {
+            [[UIApplication sharedApplication] openURL:url];
+        }
+    }];
 }
 
 - (void)loginSuccessful {
@@ -638,7 +662,7 @@
                          showAlertWithTitle:[Strings floatingErrorTitle]
                                     message:responseStr onViewController:self.navigationController];
                     }
-                    else if(httpResp.statusCode > 500) {
+                    else if(httpResp.statusCode >= 500) {
                         NSString* responseStr = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
                         [[UIAlertController alloc] showAlertWithTitle:[Strings floatingErrorTitle] message:responseStr onViewController:self.navigationController];
                         
@@ -667,6 +691,7 @@
         [self.tf_Password becomeFirstResponder];
     }
     else {
+        UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, self.btn_Login);
         [textField resignFirstResponder];
     }
 

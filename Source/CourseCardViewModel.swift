@@ -12,13 +12,15 @@ class CourseCardViewModel : NSObject {
     private let detailText: String
     private let bottomTrailingText: String?
     private let persistImage: Bool
+    private let wrapTitle: Bool
     private let course: OEXCourse
     
-    private init(course: OEXCourse, detailText: String, bottomTrailingText: String?, persistImage: Bool) {
+    private init(course: OEXCourse, detailText: String, bottomTrailingText: String?, persistImage: Bool, wrapTitle: Bool = false) {
         self.detailText = detailText
         self.bottomTrailingText = bottomTrailingText
         self.persistImage = persistImage
         self.course = course
+        self.wrapTitle = wrapTitle
     }
     
     var title : String? {
@@ -38,11 +40,11 @@ class CourseCardViewModel : NSObject {
     }
     
     static func onDashboard(course: OEXCourse) -> CourseCardViewModel {
-        return CourseCardViewModel(course: course, detailText: course.courseRunIncludingNextDate, bottomTrailingText: nil, persistImage: true)
+        return CourseCardViewModel(course: course, detailText: course.courseRunIncludingNextDate, bottomTrailingText: nil, persistImage: true, wrapTitle: true)
     }
     
-    static func onCourseCatalog(course: OEXCourse) -> CourseCardViewModel {
-        return CourseCardViewModel(course: course, detailText: course.courseRun, bottomTrailingText: course.nextRelevantDateUpperCaseString, persistImage: false)
+    static func onCourseCatalog(course: OEXCourse, wrapTitle: Bool = false) -> CourseCardViewModel {
+        return CourseCardViewModel(course: course, detailText: course.courseRun, bottomTrailingText: course.nextRelevantDateUpperCaseString, persistImage: false, wrapTitle: wrapTitle)
     }
     
     func apply(card : CourseCardView, networkManager: NetworkManager) {
@@ -51,13 +53,17 @@ class CourseCardViewModel : NSObject {
         card.bottomTrailingText = bottomTrailingText
         card.course = self.course
         
+        if wrapTitle {
+            card.wrapTitleLabel()
+        }
+        
         let remoteImage : RemoteImage
-        let placeholder = UIImage(named: "Splash_map")
+        let placeholder = UIImage(named: "placeholderCourseCardImage")
         if let relativeImageURL = courseImageURL,
             imageURL = NSURL(string: relativeImageURL, relativeToURL: networkManager.baseURL)
         {
             remoteImage = RemoteImageImpl(
-                url: imageURL.absoluteString,
+                url: imageURL.absoluteString!,
                 networkManager: networkManager,
                 placeholder: placeholder,
                 persist: persistImage)

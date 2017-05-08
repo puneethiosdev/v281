@@ -22,9 +22,8 @@
 @property (nonatomic, copy) NSString* label;
 @property (nonatomic, copy) NSString* type;
 
-@property (nonatomic, assign) OEXRegistrationFieldType fieldType;
+@property (nonatomic) OEXRegistrationFieldType fieldType;
 @property (nonatomic, strong) OEXRegistrationOption* defaultOption;
-@property (nonatomic, strong) OEXRegistrationAgreement* agreement;
 @property (nonatomic, strong) OEXRegistrationRestriction* restriction;
 @property (nonatomic, strong) OEXRegistrationErrorMessage* errorMessage;
 
@@ -43,9 +42,15 @@
         self.defaultValue = dictionary[@"defaultValue"];
         self.instructions = dictionary[@"instructions"];
         self.label = dictionary[@"label"];
-        NSString *platformName = [[OEXConfig sharedConfig] platformName];
-        if (platformName) {
-            self.label = [self.label stringByReplacingOccurrencesOfString:@"edX" withString:platformName];
+        if (self.instructions.length > 0) {
+            dispatch_async(dispatch_get_main_queue(), ^{
+                NSAttributedString *attributedLabel = [[NSAttributedString alloc] initWithData:[self.instructions dataUsingEncoding:NSUTF8StringEncoding]
+                                                                                       options:@{NSDocumentTypeDocumentAttribute: NSHTMLTextDocumentType,
+                                                                                                 NSCharacterEncodingDocumentAttribute:@(NSUTF8StringEncoding)}
+                                                                            documentAttributes:nil
+                                                                                         error:nil];
+                self.instructions = attributedLabel.string;
+            });
         }
         self.type = dictionary[@"type"];
         self.fieldType = [self registrationFieldType:dictionary[@"type"]];
@@ -55,7 +60,9 @@
             self.fieldType = OEXRegistrationFieldTypeAgreement;
         }
         self.restriction = [[OEXRegistrationRestriction alloc] initWithDictionary:dictionary[@"restrictions"]];
-
+        if([dictionary[@"name"] isEqualToString:@"honor_code"]) {
+            self.fieldType = OEXRegistrationFieldTypeAgreement;
+        }
         NSArray* options = dictionary[@"options"];
         self.fieldOptions = [options oex_map:^id (NSDictionary* optionInfo) {
             OEXRegistrationOption* option = [[OEXRegistrationOption alloc] initWithDictionary:optionInfo];
@@ -85,7 +92,7 @@
         return OEXRegistrationFieldTypeSelect;
     }
     else if([strType isEqualToString:@"checkbox"]) {
-        return OEXRegistrationFieldTypeCheckbox;
+        return OEXRegistrationFieldTypeAgreement;
     }
     else {
         return OEXRegistrationFieldTypeUnknown;

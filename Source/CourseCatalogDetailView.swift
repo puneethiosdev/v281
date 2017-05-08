@@ -99,14 +99,16 @@ class CourseCatalogDetailView : UIView, UIWebViewDelegate {
         playButton.layer.shadowRadius = 3
         playButton.layer.shadowOffset = CGSizeZero
         courseCard.addCenteredOverlay(playButton)
-        
-        descriptionView.scrollView.oex_addObserver(self, forKeyPath: "bounds") { (observer, scrollView, _) -> Void in
+   
+//uncomment later 
+/*        descriptionView.scrollView.oex_addObserver(self, forKeyPath: "bounds") { (observer, scrollView, _) -> Void in
             let offset = scrollView.contentOffset.y + scrollView.contentInset.top
             // Even though it's in the webview's scrollview,
             // the container view doesn't offset when the content scrolls.
             // As such, we manually offset it here
             observer.container.transform = CGAffineTransformMakeTranslation(0, -offset)
         }
+ */
     }
     
     func setupInController(controller: UIViewController) {
@@ -221,7 +223,7 @@ extension CourseCatalogDetailView {
     }
     
     func applyCourse(course : OEXCourse) {
-        CourseCardViewModel.onCourseCatalog(course).apply(courseCard, networkManager: self.environment.networkManager)
+        CourseCardViewModel.onCourseCatalog(course, wrapTitle: true).apply(courseCard, networkManager: self.environment.networkManager)
         self.blurbText = course.short_description
         self.descriptionHTML = course.overview_html
         let fields = fieldsForCourse(course)

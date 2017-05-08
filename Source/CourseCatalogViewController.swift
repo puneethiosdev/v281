@@ -11,8 +11,9 @@ private let FilterViewFrame = CGRectMake(0, 0, 30, 30)
 private let PageSize = 20
 private let footerHeight = 30
 
-class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate,NSURLSessionTaskDelegate,UISearchBarDelegate,NSURLSessionDelegate, CourseFilterDelegate {
-    typealias Environment = protocol<NetworkManagerProvider, OEXRouterProvider, OEXSessionProvider>
+
+class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate, UISearchBarDelegate,CourseFilterDelegate, NSURLSessionDelegate {
+    typealias Environment = protocol<NetworkManagerProvider, OEXRouterProvider, OEXSessionProvider, OEXConfigProvider, OEXAnalyticsProvider>
     
     private let environment : Environment
     private let tableController : CoursesTableViewController
@@ -83,9 +84,11 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
     private lazy var paginationController : PaginationController<OEXCourse> = {
         let username = self.environment.session.currentUser?.username ?? ""
         precondition(username != "", "Shouldn't be showing course catalog without a logged in user")
+        let organizationCode =  self.environment.config.organizationCode()
         
         let paginator = WrappedPaginator(networkManager: self.environment.networkManager) { page in
             return CourseCatalogAPI.getCourseCatalog(username, page: 1)
+//            return CourseCatalogAPI.getCourseCatalog(username, page: page, organizationCode: organizationCode)
         }
         return PaginationController(paginator: paginator, tableView: self.tableController.tableView)
     }()
@@ -361,6 +364,11 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         searchBar.text = nil
     }
     // MARK: CoursesTableViewControllerDelegate methods
+    
+    override func viewWillAppear(animated: Bool) {
+        super.viewWillAppear(animated)
+        environment.analytics.trackScreenWithName(OEXAnalyticsScreenFindCourses)
+    }
     
     func coursesTableChoseCourse(course: OEXCourse) {
         //kAMAT Changes

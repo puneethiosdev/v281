@@ -35,15 +35,17 @@ class DiscussionHelper: NSObject {
     }
     
     class func styleAuthorProfileImageView(imageView: UIImageView) {
-        imageView.layer.cornerRadius = imageView.bounds.size.width / 2
-        imageView.layer.borderWidth = 1
-        imageView.layer.borderColor = OEXStyles.sharedStyles().primaryBaseColor().CGColor
-        imageView.clipsToBounds = true
-        imageView.layer.masksToBounds = true
+        dispatch_async(dispatch_get_main_queue(),{
+            imageView.layer.cornerRadius = imageView.bounds.size.width / 2
+            imageView.layer.borderWidth = 1
+            imageView.layer.borderColor = OEXStyles.sharedStyles().primaryBaseColor().CGColor
+            imageView.clipsToBounds = true
+            imageView.layer.masksToBounds = true
+        })
     }
     
     class func profileImage(hasProfileImage: Bool, imageURL: String?) ->RemoteImage {
-        let placeholder = UIImage(named: "avatarPlaceholder")
+        let placeholder = UIImage(named: "profilePhotoPlaceholder")
         if let URL = imageURL where hasProfileImage {
             return RemoteImageImpl(url: URL, networkManager: OEXRouter.sharedRouter().environment.networkManager, placeholder: placeholder, persist: true)
         }
@@ -53,7 +55,7 @@ class DiscussionHelper: NSObject {
     }
     
     class func styleAuthorDetails(author: String?, authorLabel: String?, createdAt: NSDate?, hasProfileImage: Bool, imageURL: String?, authoNameLabel: UILabel, dateLabel: UILabel, authorButton: UIButton, imageView: UIImageView, viewController: UIViewController, router: OEXRouter?) {
-        let textStyle = OEXTextStyle(weight:.Normal, size:.XSmall, color: OEXStyles.sharedStyles().neutralXDark())
+        let textStyle = OEXTextStyle(weight:.Normal, size:.Base, color: OEXStyles.sharedStyles().neutralXDark())
         // formate author name
         let highlightStyle = OEXMutableTextStyle(textStyle: textStyle)
         if let _ = author where OEXConfig.sharedConfig().profilesEnabled {
@@ -61,7 +63,7 @@ class DiscussionHelper: NSObject {
             highlightStyle.weight = .Bold
         }
         else {
-            highlightStyle.color = OEXStyles.sharedStyles().neutralBase()
+            highlightStyle.color = OEXStyles.sharedStyles().neutralXDark()
             highlightStyle.weight = textStyle.weight
         }
         let authorName = highlightStyle.attributedStringWithText(author ?? Strings.anonymous.oex_lowercaseStringInCurrentLocale())
@@ -92,6 +94,7 @@ class DiscussionHelper: NSObject {
             // if post is by anonymous user then disable author button (navigating to user profile)
             authorButton.enabled = false
         }
+        authorButton.isAccessibilityElement = authorButton.enabled
         
         imageView.remoteImage = profileImage(hasProfileImage, imageURL: imageURL)
         

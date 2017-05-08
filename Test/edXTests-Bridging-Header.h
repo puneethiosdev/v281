@@ -13,6 +13,7 @@
 #import "OEXMockUserDefaults.h"
 #import "NSString+OEXFormatting.h"
 #import "OEXUserDetails+OEXTestDataFactory.h"
+#import "OEXRegistrationFormField.h"
 
 // This is #defined as a command line preprocessor argument
 // so it can contain environment variables that get resolved

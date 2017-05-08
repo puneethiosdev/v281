@@ -46,7 +46,13 @@ NS_ASSUME_NONNULL_BEGIN
 @property (readonly, nonatomic, copy, nullable) NSNumber* size;   // in bytes
 @property (readonly, nonatomic, copy, nullable) NSString* unitURL;
 @property (readonly, nonatomic, assign) BOOL onlyOnWeb;
+
 @property (retain, nonatomic) NSString* videoURL_Signed;
+
+@property (readonly, nonatomic, assign) BOOL isYoutubeVideo;
+@property (readonly, nonatomic, assign) BOOL isSupportedVideo;
+@property (nonatomic, strong) NSDictionary* encodings;
+
 // For CC
 // de - German
 // en - English

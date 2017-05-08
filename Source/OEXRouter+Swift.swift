@@ -46,7 +46,7 @@ extension CourseBlock {
         case .Chapter: return .Outline
         case .Section: return .Outline
         case .Unit: return .Unit
-        case let .Video(summary): return summary.onlyOnWeb ? .Unknown : .Video
+        case let .Video(summary): return (summary.isSupportedVideo) ? .Video : .Unknown
         case let .Discussion(discussionModel): return .Discussion(discussionModel)
         }
     }
@@ -174,7 +174,7 @@ extension OEXRouter {
             self.showCourseWithID(courseID, fromController: controller, animated: false)
         }
     }
-    
+
     @objc(showMyActivityIndicator:)func showMyActivityIndicator(controller:UIViewController) -> SpinnerView{
         let activityIndicator = SpinnerView(size: SpinnerView.SpinSize.Large, color: SpinnerView.Color.Primary)
         
@@ -219,6 +219,7 @@ extension OEXRouter {
         controller.presentViewController(fullScreenViewController, animated: true, completion: nil)
     }
     
+
     func showDiscussionResponsesFromViewController(controller: UIViewController, courseID : String, threadID : String) {
         let storyboard = UIStoryboard(name: "DiscussionResponses", bundle: nil)
         let responsesViewController = storyboard.instantiateInitialViewController() as! DiscussionResponsesViewController
@@ -366,6 +367,18 @@ extension OEXRouter {
         let detailController = CourseCatalogDetailViewController(environment: environment, courseID: courseID)
         fromController.navigationController?.pushViewController(detailController, animated: true)
     }
+    
+    func showAppReviewIfNeeded(fromController: UIViewController) {
+        if RatingViewController.canShowAppReview(environment){
+            let reviewController = RatingViewController(environment: environment)
+            
+            reviewController.modalPresentationStyle = UIModalPresentationStyle.OverCurrentContext
+            reviewController.providesPresentationContextTransitionStyle = true
+            reviewController.definesPresentationContext = true
+            
+            fromController.presentViewController(reviewController, animated: false, completion: nil)
+        }
+    }
 
     // MARK: - LOGIN / LOGOUT
 
@@ -374,11 +387,14 @@ extension OEXRouter {
         removeCurrentContentController()
 
         let splashController: UIViewController
-        if environment.config.newLogistrationFlowEnabled {
+        
+        if !environment.config.isRegistrationEnabled {
+            splashController = loginViewController()
+        }
+        else if environment.config.newLogistrationFlowEnabled {
             splashController = StartupViewController(environment: environment)
         } else {
-            let splashEnvironment = OEXLoginSplashViewControllerEnvironment(router: self)
-            splashController = OEXLoginSplashViewController(environment: splashEnvironment)
+            splashController = OEXLoginSplashViewController(environment: environment)
         }
         
         makeContentControllerCurrent(splashController)

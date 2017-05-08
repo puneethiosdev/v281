@@ -78,6 +78,7 @@ EOM
 }
 if [[ "$CONFIGURATION" == "Debug" ]]; then
   install_resource "DateTools/DateTools/DateTools.bundle"
+  install_resource "FBSDKCoreKit/FacebookSDKStrings.bundle"
   install_resource "GVRSDK/Resources/CardboardSDK.bundle"
   install_resource "GVRSDK/Resources/GoogleKitCore.bundle"
   install_resource "GVRSDK/Resources/GoogleKitDialogs.bundle"
@@ -88,6 +89,7 @@ if [[ "$CONFIGURATION" == "Debug" ]]; then
 fi
 if [[ "$CONFIGURATION" == "Release" ]]; then
   install_resource "DateTools/DateTools/DateTools.bundle"
+  install_resource "FBSDKCoreKit/FacebookSDKStrings.bundle"
   install_resource "GVRSDK/Resources/CardboardSDK.bundle"
   install_resource "GVRSDK/Resources/GoogleKitCore.bundle"
   install_resource "GVRSDK/Resources/GoogleKitDialogs.bundle"
@@ -98,6 +100,7 @@ if [[ "$CONFIGURATION" == "Release" ]]; then
 fi
 if [[ "$CONFIGURATION" == "Profile" ]]; then
   install_resource "DateTools/DateTools/DateTools.bundle"
+  install_resource "FBSDKCoreKit/FacebookSDKStrings.bundle"
   install_resource "GVRSDK/Resources/CardboardSDK.bundle"
   install_resource "GVRSDK/Resources/GoogleKitCore.bundle"
   install_resource "GVRSDK/Resources/GoogleKitDialogs.bundle"

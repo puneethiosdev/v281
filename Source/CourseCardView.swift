@@ -54,7 +54,7 @@ class CourseCardView: UIView, UIGestureRecognizerDelegate {
         super.prepareForInterfaceBuilder()
         
         let bundle = NSBundle(forClass: self.dynamicType)
-        coverImageView.image = UIImage(named:"Splash_map", inBundle: bundle, compatibleWithTraitCollection: self.traitCollection)
+        coverImageView.image = UIImage(named:"placeholderCourseCardImage", inBundle: bundle, compatibleWithTraitCollection: self.traitCollection)
         titleLabel.attributedText = titleTextStyle.attributedStringWithText("Demo Course")
         detailLabel.attributedText = detailTextStyle.attributedStringWithText("edx | DemoX")
         bottomTrailingLabel.attributedText = detailTextStyle.attributedStringWithText("X Videos, 1.23 MB")
@@ -209,6 +209,14 @@ class CourseCardView: UIView, UIGestureRecognizerDelegate {
     
     private func cardTapped() {
         self.tapAction?(self)
+    }
+    
+    func wrapTitleLabel() {
+        self.titleLabel.numberOfLines = 3
+        self.titleLabel.lineBreakMode = NSLineBreakMode.ByWordWrapping
+        self.titleLabel.minimumScaleFactor = 0.5
+        self.titleLabel.adjustsFontSizeToFitWidth = true
+        self.layoutIfNeeded()
     }
     
     func updateAcessibilityLabel()-> String {

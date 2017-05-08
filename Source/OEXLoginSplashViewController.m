@@ -1,10 +1,10 @@
-    //
-    //  LoginSplashViewController.m
-    //  edXVideoLocker
-    //
-    //  Created by Jotiram Bhagat on 16/02/15.
-    //  Copyright (c) 2015 edX. All rights reserved.
-    //
+//
+//  LoginSplashViewController.m
+//  edXVideoLocker
+//
+//  Created by Jotiram Bhagat on 16/02/15.
+//  Copyright (c) 2015 edX. All rights reserved.
+//
 
 #import "OEXLoginSplashViewController.h"
 
@@ -13,33 +13,20 @@
 #import "OEXRouter.h"
 #import "OEXLoginViewController.h"
 #import "OEXSession.h"
-#import "OEXAppDelegate.h"
-
-@implementation OEXLoginSplashViewControllerEnvironment
-
-- (id)initWithRouter:(OEXRouter *)router {
-    self = [super init];
-    if(self != nil) {
-        _router = router;
-    }
-    return self;
-}
-
-@end
 
 @interface OEXLoginSplashViewController ()
 
 @property (strong, nonatomic) IBOutlet UIButton* signInButton;
 @property (strong, nonatomic) IBOutlet UIButton* signUpButton;
 
-@property (strong, nonatomic) OEXLoginSplashViewControllerEnvironment* environment;
+@property (strong, nonatomic) RouterEnvironment* environment;
 @property (strong, nonatomic) UIActivityIndicatorView* activityIndicator;
 
 @end
 
 @implementation OEXLoginSplashViewController
 
-- (id)initWithEnvironment:(OEXLoginSplashViewControllerEnvironment*)environment {
+- (id)initWithEnvironment:(RouterEnvironment*)environment {
     self = [super initWithNibName:nil bundle:nil];
     if(self != nil) {
         self.environment = environment;
@@ -51,41 +38,16 @@
     [super viewDidLoad];
     
     [self.signInButton setTitle:[Strings loginSplashSignIn] forState:UIControlStateNormal];
-    [self.signUpButton setTitle:[Strings loginSplashSignUp] forState:UIControlStateNormal];
-    
-        //kAMAT_CHANGES
-    [self.signUpButton setHidden:YES];
-    [self activateActivityIndictaor];
-    
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRotatingActivityIndicator) name:@"RemoveActivityIndicator" object:nil];
+    [self.signUpButton applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[Strings loginSplashSignUp]];
 }
--(void) activateActivityIndictaor{
-    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
-    
-    [self.activityIndicator setCenter:[[[[UIApplication sharedApplication] delegate]window] center]];
-    [self.view addSubview:self.activityIndicator];
-    
-}
--(void) rotateActivityIndicator{
-    [self.activityIndicator startAnimating];
-}
--(void) stopRotatingActivityIndicator{
-    [self.activityIndicator stopAnimating];
-    [self.activityIndicator hidesWhenStopped];
-    NSLog(@"%s--Stopped",__FUNCTION__);
-}
+
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
     [self.navigationController setNavigationBarHidden:YES animated:animated];
 }
 
 - (IBAction)showLogin:(id)sender {
-        //[self.environment.router showLoginScreenFromController:self completion:nil];
-    
-    [(OEXAppDelegate *)[[UIApplication sharedApplication] delegate] performVPNAvailability];
-    
-        //First we dispaly the activity indicator
-    [self rotateActivityIndicator];
+    [self.environment.router showLoginScreenFromController:self completion:nil];
 }
 
 - (IBAction)showRegistration:(id)sender {
@@ -95,6 +57,24 @@
 - (BOOL) shouldAutorotate {
     return false;
 }
+
+-(void) activateActivityIndictaor{
+    self.activityIndicator = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleGray];
+    
+    [self.activityIndicator setCenter:[[[[UIApplication sharedApplication] delegate]window] center]];
+    [self.view addSubview:self.activityIndicator];
+    
+}
+
+-(void) rotateActivityIndicator{
+    [self.activityIndicator startAnimating];
+}
+-(void) stopRotatingActivityIndicator{
+    [self.activityIndicator stopAnimating];
+    [self.activityIndicator hidesWhenStopped];
+    NSLog(@"%s--Stopped",__FUNCTION__);
+}
+
 
 - (UIInterfaceOrientationMask) supportedInterfaceOrientations {
     return UIInterfaceOrientationMaskPortrait;

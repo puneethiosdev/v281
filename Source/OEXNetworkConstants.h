@@ -65,6 +65,7 @@
 ////#define kDownloadURLForProduction @"https://devvsp01.amat.com/mifs/asfV3x/appstore?clientid=1073760408&vspver=7.5.0.0"
 //#define kDownloadURLForProduction @"https://portal.fei.msua01.manage.microsoft.com/Apps#All" //Intune download
 //#define kFILTER_COURSES @"https://appliedxvpcdev.amat.com/search_courses"
+//#define POINTS_BADGES_URL @"https://badges.appliedxvpcdev.amat.com/api/v0/"
 
 //Production
  #define kAppName @"appliedx"
@@ -75,6 +76,7 @@
 // #define kDownloadURLForProduction @"https://mivsp01.amat.com/mifs/asfV3x/appstore?clientid=1073760408&vspver=7.5.0.0" //MI
  #define kDownloadURLForProduction @"https://portal.fei.msua01.manage.microsoft.com/Apps#All" //Intune download
  #define kFILTER_COURSES @"https://appliedx.amat.com/search_courses"
+ #define POINTS_BADGES_URL @"https://badges.appliedx.amat.com/api/v0/"
 
 
 ////Production VR
@@ -86,6 +88,7 @@
 // #define kDownloadURLForProduction @"https://portal.fei.msua01.manage.microsoft.com/Apps#All" //Intune download
 //// #define kDownloadURLForProduction @"https://mivsp01.amat.com/mifs/asfV3x/appstore?clientid=1073760408&vspver=7.5.0.0"
 // #define kFILTER_COURSES @"https://appliedx.amat.com/search_courses?search_string=360"
+
 
 
 //CEO- Check -  To check the VPN Availability.

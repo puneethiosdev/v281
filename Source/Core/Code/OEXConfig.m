@@ -16,17 +16,12 @@ static NSString* const OEXEnvironmentDisplayName = @"ENVIRONMENT_DISPLAY_NAME";
 static NSString* const OEXPlatformName = @"PLATFORM_NAME";
 static NSString* const OEXPlatformDestinationName = @"PLATFORM_DESTINATION_NAME";
 static NSString* const OEXFeedbackEmailAddress = @"FEEDBACK_EMAIL_ADDRESS";
+static NSString* const OEXOrganizationCode = @"ORGANIZATION_CODE";
 
 static NSString* const OEXOAuthClientID = @"OAUTH_CLIENT_ID";
 
 // Debug
 static NSString* const OEXDebugEnabledKey = @"SHOW_DEBUG";
-
-@interface OEXConfig ()
-
-@property (strong, nonatomic) NSDictionary* properties;
-
-@end
 
 static OEXConfig* sSharedConfig;
 
@@ -106,6 +101,10 @@ static OEXConfig* sSharedConfig;
 
 - (NSString*)platformDestinationName {
     return [self stringForKey:OEXPlatformDestinationName] ?: @"example.com";
+}
+
+- (NSString*)organizationCode {
+    return [self stringForKey:OEXOrganizationCode];
 }
 
 - (NSString*)feedbackEmailAddress {

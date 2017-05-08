@@ -16,10 +16,7 @@
 #import "NSError+OEXKnownErrors.h"
 #import "NSJSONSerialization+OEXSafeAccess.h"
 #import "NSMutableDictionary+OEXSafeAccess.h"
-
-#import "OEXAnalytics.h"
 #import "OEXAuthentication.h"
-#import "OEXConfig.h"
 #import "OEXExternalAuthProvider.h"
 #import "OEXExternalRegistrationOptionsView.h"
 #import "OEXFacebookAuthProvider.h"
@@ -35,38 +32,19 @@
 #import "OEXRegistrationFormField.h"
 #import "OEXRegistrationStyles.h"
 #import "OEXRegisteringUserDetails.h"
-#import "OEXRouter.h"
-#import "OEXStyles.h"
 #import "OEXUserLicenseAgreementViewController.h"
 #import "OEXUsingExternalAuthHeadingView.h"
+#import "OEXRegistrationAgreement.h"
 
-@implementation OEXRegistrationViewControllerEnvironment
-
-- (id)initWithAnalytics:(OEXAnalytics *)analytics config:(OEXConfig *)config router:(OEXRouter *)router {
-    self = [super init];
-    if(self != nil) {
-        _analytics = analytics;
-        _config = config;
-        _router = router;
-    }
-    return self;
-}
-
-@end
 
 NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXExternalRegistrationWithExistingAccountNotification";
 
 @interface OEXRegistrationViewController () <OEXExternalRegistrationOptionsViewDelegate>
 
-@property (strong, nonatomic) OEXRegistrationDescription* registrationDescription;
-
 /// Contents are id <OEXRegistrationFieldController>
 @property (strong, nonatomic) NSArray* fieldControllers;
 
 @property (strong, nonatomic) IBOutlet UIScrollView* scrollView;
-@property (strong, nonatomic) IBOutlet UILabel* titleLabel;
-@property (strong, nonatomic) IBOutlet UIView *mockNavigationBarView;
-@property (strong, nonatomic) IBOutlet UIButton *closeButton;
 
 // Used in auth from an external provider
 @property (strong, nonatomic) UIView* currentHeadingView;
@@ -83,46 +61,50 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
 @property (assign, nonatomic) BOOL isShowingOptionalFields;
 
 @property (strong, nonatomic) OEXRegistrationStyles* styles;
-
-@property (strong, nonatomic) OEXRegistrationViewControllerEnvironment* environment;
+@property (nonatomic) OEXMutableTextStyle *buttonsTitleStyle;
 
 @end
 
 @implementation OEXRegistrationViewController
 
-- (id)initWithRegistrationDescription:(OEXRegistrationDescription*)description environment:(OEXRegistrationViewControllerEnvironment *)environment {
+- (id)initWithEnvironment:(RouterEnvironment *)environment {
     self = [super initWithNibName:nil bundle:nil];
     if(self != nil) {
-        self.registrationDescription = description;
         self.environment = environment;
         self.styles = [[OEXRegistrationStyles alloc] init];
     }
     return self;
 }
 
-- (id)initWithEnvironment:(OEXRegistrationViewControllerEnvironment *)environment {
-    return [self initWithRegistrationDescription: [[self class] registrationFormDescription] environment:environment];
-}
-
-+ (OEXRegistrationDescription*)registrationFormDescription {
-    NSString* filePath = [[NSBundle bundleForClass:[self class]] pathForResource:@"registration" ofType:@"json"];
-    NSData* data = [NSData dataWithContentsOfFile:filePath];
-    NSAssert(data != nil, @"Could not load registration.json");
-    NSError* error;
-    id json = [NSJSONSerialization oex_JSONObjectWithData:data error:&error];
-    NSAssert(error == nil, @"Could not parse registration.json");
-    return [[OEXRegistrationDescription alloc] initWithDictionary:json];
-}
-
 - (void)viewDidLoad {
     [super viewDidLoad];
-    [self makeFieldControllers];
-    [self initializeViews];
-    [self refreshFormFields];
+    self.loadController = [[LoadStateViewController alloc] init];
+    [self.loadController setupInController:self contentView:self.scrollView];
     
-    [[OEXStyles sharedStyles] applyMockNavigationBarStyleToView:self.mockNavigationBarView label:self.titleLabel leftIconButton:self.closeButton];
+    self.navigationController.navigationBarHidden = NO;
+    
+    [self setTitle:[Strings registerText]];
+    
+    UIBarButtonItem *closeButton = [[UIBarButtonItem alloc] initWithImage:[UIImage imageNamed:@"ic_cancel"] style:UIBarButtonItemStylePlain target:self action:@selector(navigateBack:)];
+    closeButton.accessibilityLabel = [Strings close];
+    self.navigationItem.leftBarButtonItem = closeButton;
+    
     //By default we only shows required fields
     self.isShowingOptionalFields = NO;
+    
+    _buttonsTitleStyle = [[OEXMutableTextStyle alloc] initWithWeight:OEXTextWeightBold size:OEXTextSizeBase color:[self.environment.styles primaryBaseColor]];
+    
+    [self getFormFields];
+}
+
+- (void)getFormFields {
+    
+    [self getRegistrationFormDescription:^(OEXRegistrationDescription * _Nonnull response) {
+        self.registrationDescription = response;
+        [self makeFieldControllers];
+        [self initializeViews];
+        [self refreshFormFields];
+    }];
 }
 
 //Currently using asset file only to get from description
@@ -131,7 +113,6 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
     self.fieldControllers = [fields oex_map:^id < OEXRegistrationFieldController > (OEXRegistrationFormField* formField)
                              {
                                  id <OEXRegistrationFieldController> fieldController = [OEXRegistrationFieldControllerFactory registrationFieldViewController:formField];
-                                 fieldController.accessibleInputField.accessibilityIdentifier = [NSString stringWithFormat:@"field-%@", formField.name];
                                  if(formField.fieldType == OEXRegistrationFieldTypeAgreement) {
                                      // These don't have explicit representations in the apps
                                      return nil;
@@ -143,25 +124,17 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
 // This method will set default ui.
 
 - (void)initializeViews {
-    NSString* regularFont = @"OpenSans";
-    NSString* semiboldFont = @"OpenSans-Semibold";
-
-    self.navigationController.navigationBarHidden = YES;
-    self.navigationController.navigationBar.topItem.title = @"";
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    // set the custom navigation view properties
 
     NSString* platform = self.environment.config.platformName;
-    self.titleLabel.text = [Strings registrationSignUpForPlatformWithPlatformName:platform];
-    [self.titleLabel setFont:[UIFont fontWithName:semiboldFont size:20.f]];
 
     ////Create and initalize 'btnCreateAccount' button
     self.registerButton = [[UIButton alloc] init];
     
-    [self.registerButton setTitleColor:[UIColor whiteColor] forState:UIControlStateNormal];
-    [self.registerButton setTitle:[Strings registrationCreateMyAccount] forState:UIControlStateNormal];
-    [self.registerButton addTarget:self action:@selector(createAccount:) forControlEvents:UIControlEventTouchUpInside];
-    [self.registerButton setBackgroundImage:[UIImage imageNamed:@"bt_signin_active.png"] forState:UIControlStateNormal];
+    [self.registerButton oex_addAction:^(id  _Nonnull control) {
+        [self createAccount:nil];
+    } forEvents:UIControlEventTouchUpInside];
+    
+    [self.registerButton applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[Strings registrationCreateMyAccount]];
     self.registerButton.accessibilityIdentifier = @"register";
 
     ////Create progrssIndicator as subview to btnCreateAccount
@@ -171,23 +144,31 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
     self.optionalFieldsSeparator = [[UIImageView alloc] initWithImage:[UIImage imageNamed:@"separator3"]];
     //Initialize label above agreement view
     self.agreementLabel = [[UILabel alloc] init];
-    self.agreementLabel.font = [UIFont fontWithName:regularFont size:10.f];
+    self.agreementLabel.font = [self.environment.styles sansSerifOfSize:10.f];
     self.agreementLabel.textAlignment = NSTextAlignmentCenter;
     self.agreementLabel.numberOfLines = 0;
     self.agreementLabel.lineBreakMode = NSLineBreakByWordWrapping;
-    self.agreementLabel.text = [Strings registrationAgreementMessageWithPlatformName:platform];
+    self.agreementLabel.isAccessibilityElement = NO;
+    self.agreementLabel.text = [Strings registrationAgreementMessage];
     self.agreementLink = [[UIButton alloc] init];
     [self.agreementLink setTitle:[Strings registrationAgreementButtonTitleWithPlatformName:platform] forState:UIControlStateNormal];
-    [self.agreementLink.titleLabel setFont:[UIFont fontWithName:semiboldFont size:10]];
+    [self.agreementLink.titleLabel setFont:[self.environment.styles semiBoldSansSerifOfSize:10]];
     [self.agreementLink setTitleColor:[UIColor colorWithRed:0.16 green:0.44 blue:0.84 alpha:1] forState:UIControlStateNormal];
-    [self.agreementLink addTarget:self action:@selector(agreementButtonTapped:) forControlEvents:UIControlEventTouchUpInside];
+    self.agreementLink.accessibilityTraits = UIAccessibilityTraitLink;
+    self.agreementLink.titleLabel.adjustsFontSizeToFitWidth = YES;
+    self.agreementLink.titleLabel.textAlignment = NSTextAlignmentCenter;
+    
+    [self.agreementLink oex_addAction:^(id  _Nonnull control) {
+        [self agreementButtonTapped:nil];
+    } forEvents:UIControlEventTouchUpInside];
+    self.agreementLink.accessibilityLabel = [NSString stringWithFormat:@"%@ %@",[Strings registrationAgreementMessage],[Strings registrationAgreementButtonTitleWithPlatformName:platform]];
 
     //This button will show and hide optional fields
     self.toggleOptionalFieldsButton = [[UIButton alloc] init];
     [self.toggleOptionalFieldsButton setBackgroundColor:[UIColor whiteColor]];
-    [self.toggleOptionalFieldsButton setTitleColor:[UIColor grayColor] forState:UIControlStateNormal];
+    [self.toggleOptionalFieldsButton setTitleColor:[UIColor darkGrayColor] forState:UIControlStateNormal];
     [self.toggleOptionalFieldsButton setTitle:[Strings registrationShowOptionalFields]  forState:UIControlStateNormal];
-    [self.toggleOptionalFieldsButton.titleLabel setFont:[UIFont fontWithName:semiboldFont size:14.0]];
+    [self.toggleOptionalFieldsButton.titleLabel setFont:[self.environment.styles semiBoldSansSerifOfSize:14.0]];
 
     [self.toggleOptionalFieldsButton addTarget:self action:@selector(toggleOptionalFields:) forControlEvents:UIControlEventTouchUpInside];
 
@@ -207,8 +188,6 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
         headingView.delegate = self;
         [self useHeadingView:headingView];
     }
-    
-    self.closeButton.accessibilityLabel = [Strings close];
 }
 
 - (void)useHeadingView:(UIView*)headingView {
@@ -226,10 +205,13 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
 
 - (void)viewWillAppear:(BOOL)animated {
     [super viewWillAppear:animated];
+    
     // Scrolling on keyboard hide and show
     [[NSNotificationCenter defaultCenter] addObserver:self
                                              selector:@selector(keyboardFrameChanged:)
                                                  name:UIKeyboardWillChangeFrameNotification object:nil];
+    //Analytics Screen record
+    [self.environment.analytics trackScreenWithName:OEXAnalyticsScreenRegister];
 }
 
 - (void)viewDidDisappear:(BOOL)animated {
@@ -269,6 +251,7 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
     }
     [self.view setNeedsLayout];
     [self.view layoutIfNeeded];
+    UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification, nil);
 }
 
 - (void)updateViewConstraints {
@@ -301,6 +284,8 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
     CGSize size = [self.currentHeadingView systemLayoutSizeFittingSize:UILayoutFittingCompressedSize];
     offset = topSpacing + size.height;
     
+    BOOL isOptionalFieldPresent = NO;
+    
     for(id <OEXRegistrationFieldController>fieldController in self.fieldControllers) {
         UIView* view = fieldController.view;
         // Add view to scroll view if field is not optional and it is not agreement field.
@@ -309,19 +294,23 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
             [view setFrame:CGRectMake(0, offset, width, view.frame.size.height)];
             offset = offset + view.frame.size.height;
         }
+        if(![fieldController field].isRequired) {
+            isOptionalFieldPresent = YES;
+        }
     }
     
-    //Add the optional field toggle
-    
-    CGFloat buttonWidth = 150;
-    CGFloat buttonHeight = 30;
-    [self.scrollView addSubview:self.optionalFieldsSeparator];
-    [self.toggleOptionalFieldsButton setFrame:CGRectMake(self.view.frame.size.width / 2 - buttonWidth / 2, offset, buttonWidth, buttonHeight)];
-    [self.scrollView addSubview:self.toggleOptionalFieldsButton];
-    self.optionalFieldsSeparator.frame = CGRectMake(horizontalSpacing, self.toggleOptionalFieldsButton.center.y, contentWidth, 1);
-    self.optionalFieldsSeparator.center = self.toggleOptionalFieldsButton.center;
-    
-    offset = offset + buttonHeight + 10;
+    if (isOptionalFieldPresent) {
+        //Add the optional field toggle
+        CGFloat buttonWidth = 150;
+        CGFloat buttonHeight = 30;
+        [self.scrollView addSubview:self.optionalFieldsSeparator];
+        [self.toggleOptionalFieldsButton setFrame:CGRectMake(self.view.frame.size.width / 2 - buttonWidth / 2, offset, buttonWidth, buttonHeight)];
+        [self.scrollView addSubview:self.toggleOptionalFieldsButton];
+        self.optionalFieldsSeparator.frame = CGRectMake(horizontalSpacing, self.toggleOptionalFieldsButton.center.y, contentWidth, 1);
+        self.optionalFieldsSeparator.center = self.toggleOptionalFieldsButton.center;
+        
+        offset = offset + buttonHeight + 10;
+    }
     
     // Actually show the optional fields if necessary
     for(id <OEXRegistrationFieldController>fieldController in self.fieldControllers) {
@@ -338,7 +327,7 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
 
     const int progressIndicatorCenterX = [self isRTL] ? 40 : self.registerButton.frame.size.width - 40;
 
-        self.progressIndicator.center = CGPointMake(progressIndicatorCenterX, self.registerButton.frame.size.height / 2);
+    self.progressIndicator.center = CGPointMake(progressIndicatorCenterX, self.registerButton.frame.size.height / 2);
     
     [self.scrollView addSubview:self.registerButton];
     offset = offset + 40;
@@ -545,18 +534,18 @@ NSString* const OEXExternalRegistrationWithExistingAccountNotification = @"OEXEx
 - (void)showProgress:(BOOL)status {
     if(status) {
         [self.progressIndicator startAnimating];
-        [self.registerButton setTitle:[Strings registrationCreatingAccount] forState:UIControlStateNormal];
+        [self.registerButton applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[Strings registrationCreatingAccount]];
         [[UIApplication sharedApplication] beginIgnoringInteractionEvents];
     }
     else {
         [self.progressIndicator stopAnimating];
-        [self.registerButton setTitle:[Strings registrationCreateMyAccount] forState:UIControlStateNormal];
+        [self.registerButton applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[Strings registrationCreateMyAccount]];
         [[UIApplication sharedApplication] endIgnoringInteractionEvents];
     }
 }
 
 - (UIStatusBarStyle)preferredStatusBarStyle {
-    return [OEXStyles sharedStyles].standardStatusBarStyle;
+    return self.environment.styles.standardStatusBarStyle;
 }
 
 - (BOOL) shouldAutorotate {

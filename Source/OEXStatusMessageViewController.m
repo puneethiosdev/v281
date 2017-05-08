@@ -92,7 +92,7 @@ CGFloat const OEXStatusMessagePadding = 20;
 #pragma mark Animation
 
 - (void)animationDrop {
-    [UIView animateWithDuration:ANI_DURATION
+    [UIView animateWithDuration: 1.0
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:0.1
@@ -103,12 +103,12 @@ CGFloat const OEXStatusMessagePadding = 20;
                                      self.view.frame.size.width,
                                      self.view.frame.size.height);
     } completion:^(BOOL finished) {
-        [self performSelector:@selector(animationUp) withObject:nil afterDelay:ANI_ERROR_TIMEOUT];
+        [self performSelector:@selector(animationUp) withObject:nil afterDelay:5.0];
     }];
 }
 
 - (void)animationUp {
-    [UIView animateWithDuration:ANI_DURATION
+    [UIView animateWithDuration:1.0
                           delay:0.0
          usingSpringWithDamping:1.0
           initialSpringVelocity:0.1

@@ -63,7 +63,7 @@
     BOOL emailOptIn = true;
     
     [courseInfoViewController parseURL:testEnrollURL getCourseID:&courseID emailOptIn:&emailOptIn];
-
+    
     XCTAssertEqualObjects(courseID, @"course-v1:BerkeleyX+GG101x-2+1T2015", @"Course ID incorrectly parsed");
     XCTAssertEqual(emailOptIn, false, @"Email Opt-In incorrectly parsed");
 }
@@ -78,7 +78,7 @@
 - (void) testSearchQueryBare {
     NSString* baseURL = @"http://www.fakex.com/course";
     NSString* queryString = @"mobile linux";
-
+    
     NSString* expected = @"http://www.fakex.com/course?search_query=mobile+linux";
     NSURL* expectedURL = [NSURL URLWithString:expected];
     NSURL* output = [FindCoursesWebViewHelper buildQuery:baseURL toolbarString:queryString];
@@ -88,7 +88,7 @@
 - (void) testSearchQueryAlreadyHasQuery {
     NSString* baseURL = @"http://www.fakex.com/course?type=mobile";
     NSString* queryString = @"mobile linux";
-
+    
     NSString* expected = @"http://www.fakex.com/course?type=mobile&search_query=mobile+linux";
     NSURL* expectedURL = [NSURL URLWithString:expected];
     NSURL* output = [FindCoursesWebViewHelper buildQuery:baseURL toolbarString:queryString];

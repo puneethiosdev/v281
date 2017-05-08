@@ -28,6 +28,24 @@
              };
 }
 
+- (NSDictionary*) summaryWithEncoding:(NSDictionary*) encoding andOnlyOnWeb:(BOOL) onlyOnWeb {
+    NSMutableDictionary *summary = [NSMutableDictionary new];
+    [summary setObject:[NSNumber numberWithBool:onlyOnWeb] forKey:@"only_on_web"];
+    
+    if (encoding) {
+        [summary setObject:encoding forKey:@"encoded_videos"];
+    }
+    
+    return @{@"summary": summary};
+}
+
+- (NSDictionary*) encodingWithName:(NSString*) name andUrl:(NSString*) url {
+    return @{name: @{
+                     @"file_size": @0,
+                     @"url": url
+                     }};
+}
+
 - (void)testParser {
     NSString* sectionURL = @"http://edx/some_section";
     NSString* category = @"video";
@@ -69,11 +87,9 @@
     XCTAssertEqualObjects(summary.sectionURL, sectionURL);
     XCTAssertEqualObjects(summary.category, category);
     XCTAssertEqualObjects(summary.name, name);
-    XCTAssertEqualObjects(summary.videoURL, videoURL);
     XCTAssertEqualObjects(summary.videoThumbnailURL, videoThumbnailURL);
     XCTAssertEqualObjects(@(summary.duration), duration);
     XCTAssertEqualObjects(summary.videoID, videoID);
-    XCTAssertEqualObjects(summary.size, size);
     XCTAssertEqualObjects(summary.unitURL, unitURL);
     XCTAssertEqual(summary.displayPath.count, 2);
     XCTAssertEqualObjects(summary.chapterPathEntry.name, chapterName);
@@ -106,20 +122,32 @@
     XCTAssertEqual(summary.displayPath.count, 0);
 }
 
-- (void)testUsesFallbackBeforeYoutube {
-    NSDictionary* info = @{@"summary":
-                                 @{@"encoded_videos": @{
-                                                       @"youtube": @{
-                                                               @"url": @"http://youtube.com/whatever",
-                                                               @"size": @(2)
-                                                               }
-                                                       },
-                                     @"video_url":@"http://example.com/whatever",
-                                     @"file_size":@(47)
-                                 }
-                           };
-    OEXVideoSummary* summary = [[OEXVideoSummary alloc] initWithDictionary:info];
-    XCTAssertEqualObjects(summary.preferredEncoding.name, @"fallback");
+- (void)testWebOnlyVideo {
+    OEXVideoSummary *summary = [[OEXVideoSummary alloc] initWithDictionary:[self summaryWithEncoding:nil andOnlyOnWeb:true]];
+    XCTAssertTrue(summary.onlyOnWeb);
+    XCTAssertFalse(summary.isSupportedVideo);
+}
+
+- (void)testSupportedFallbackEncoding {
+    NSDictionary *fallback = [self encodingWithName:OEXVideoEncodingMobileLow andUrl:@"https://www.example.com/video.mp4"];
+    OEXVideoSummary *summary = [[OEXVideoSummary alloc] initWithDictionary:[self summaryWithEncoding:fallback andOnlyOnWeb:false]];
+    
+    XCTAssertTrue(summary.isSupportedVideo);
+}
+
+- (void)testUnSupportedFallbackEncoding {
+    NSDictionary *fallback = [self encodingWithName:OEXVideoEncodingFallback andUrl:@"https://www.example.com/video.mp4"];
+    OEXVideoSummary *summary = [[OEXVideoSummary alloc] initWithDictionary:[self summaryWithEncoding:fallback andOnlyOnWeb:false]];
+    
+    XCTAssertFalse(summary.isSupportedVideo);
+}
+
+- (void)testYoutubeEncoding {
+    NSDictionary *youtube = [self encodingWithName:OEXVideoEncodingYoutube andUrl:@"https://www.youtube.com/watch?v=abc123"];
+    OEXVideoSummary *summary = [[OEXVideoSummary alloc] initWithDictionary:[self summaryWithEncoding:youtube andOnlyOnWeb:false]];
+    
+    XCTAssertFalse(summary.isSupportedVideo);
+    XCTAssertTrue(summary.isYoutubeVideo);
 }
 
 @end

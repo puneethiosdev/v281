@@ -387,6 +387,12 @@
         [SEGAnalytics setupWithConfiguration:[SEGAnalyticsConfiguration configurationWithWriteKey:segmentIO.apiKey]];
     }
     
+    //Initialize Firebase
+    if (config.isFirebaseEnabled) {
+        [FIRApp configure];
+        [[FIRAnalyticsConfiguration sharedInstance] setAnalyticsCollectionEnabled:YES];
+    }
+
     //NewRelic Initialization with edx key
     OEXNewRelicConfig* newrelic = [config newRelicConfig];
     if(newrelic.apiKey && newrelic.isEnabled) {

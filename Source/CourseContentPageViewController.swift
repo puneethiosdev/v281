@@ -22,7 +22,7 @@ extension CourseBlockDisplayType {
 }
 
 // Container for scrolling horizontally between different screens of course content
-public class CourseContentPageViewController : UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate, CourseBlockViewController, CourseOutlineModeControllerDelegate, StatusBarOverriding, InterfaceOrientationOverriding, OpenOnWebControllerDelegate {
+public class CourseContentPageViewController : UIPageViewController, UIPageViewControllerDataSource, UIPageViewControllerDelegate, CourseBlockViewController, StatusBarOverriding, InterfaceOrientationOverriding {
     
     public typealias Environment = protocol<OEXAnalyticsProvider, DataManagerProvider, OEXRouterProvider>
     
@@ -42,9 +42,6 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
     private var contentLoader = BackedStream<ListCursor<CourseOutlineQuerier.GroupItem>>()
     
     private let courseQuerier : CourseOutlineQuerier
-    private let modeController : CourseOutlineModeController
-    
-    private lazy var webController : OpenOnWebController = OpenOnWebController(delegate: self)
     weak var navigationDelegate : CourseContentPageViewControllerDelegate?
     
     ///Manages the caching of the viewControllers that have been viewed atleast once.
@@ -57,8 +54,6 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
         self.initialChildID = initialChildID
         
         courseQuerier = environment.dataManager.courseDataManager.querierForCourseWithID(courseID)
-        
-        modeController = environment.dataManager.courseDataManager.freshOutlineModeController()
         initialLoadController = LoadStateViewController()
         
         cacheManager = BlockViewControllerCacheManager()
@@ -66,14 +61,8 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
         super.init(transitionStyle: .Scroll, navigationOrientation: .Horizontal, options: nil)
         self.setViewControllers([initialLoadController], direction: .Forward, animated: false, completion: nil)
         
-        modeController.delegate = self
-        
         self.dataSource = self
         self.delegate = self
-        
-        let fixedSpace = UIBarButtonItem(barButtonSystemItem: .FixedSpace, target: nil, action: nil)
-        fixedSpace.width = barButtonFixedSpaceWidth
-        navigationItem.rightBarButtonItems = [webController.barButtonItem, fixedSpace, modeController.barItem]
         
         addStreamListeners()
     }
@@ -101,7 +90,8 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
     
     public override func viewWillDisappear(animated: Bool) {
         super.viewWillDisappear(animated)
-        self.navigationController?.setToolbarHidden(true, animated: animated)
+        navigationController?.setToolbarHidden(true, animated: animated)
+        removeObservers()
     }
     
     public override func viewDidLoad() {
@@ -118,6 +108,7 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
         if let scrollView = (self.view.subviews.flatMap { return $0 as? UIScrollView }).first {
             scrollView.delaysContentTouches = false
         }
+        addObservers()
     }
     
     private func addStreamListeners() {
@@ -141,9 +132,23 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
         )
     }
     
+    private func addObservers() {
+        NSNotificationCenter.defaultCenter().oex_addObserver(self, name: NOTIFICATION_VIDEO_PLAYER_NEXT) { (notification, observer, removable) in
+            observer.moveInDirection(.Forward)
+        }
+        NSNotificationCenter.defaultCenter().oex_addObserver(self, name: NOTIFICATION_VIDEO_PLAYER_PREVIOUS) { (notification, observer, removable) in
+            observer.moveInDirection(.Reverse)
+        }
+    }
+    
+    private func removeObservers() {
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: NOTIFICATION_VIDEO_PLAYER_NEXT, object: nil)
+        NSNotificationCenter.defaultCenter().removeObserver(self, name: NOTIFICATION_VIDEO_PLAYER_PREVIOUS, object: nil)
+    }
+    
     private func loadIfNecessary() {
         if !contentLoader.hasBacking {
-            let stream = courseQuerier.spanningCursorForBlockWithID(blockID, initialChildID: initialChildID, forMode: modeController.currentMode)
+            let stream = courseQuerier.spanningCursorForBlockWithID(blockID, initialChildID: initialChildID)
             contentLoader.backWithStream(stream.firstSuccess())
         }
     }
@@ -175,10 +180,6 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
         return barButtonItem
     }
     
-    private func openOnWebInfoForBlock(block : CourseBlock) -> OpenOnWebController.Info {
-        return OpenOnWebController.Info(courseID: courseID, blockID: block.blockID, supported: block.displayType.isUnknown, URL: block.webURL)
-    }
-    
     private func updateNavigationBars() {
         if let cursor = contentLoader.value {
             let item = cursor.current
@@ -192,7 +193,7 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
                     alert.show()
                     
                 }
-                self.webController.info = self.openOnWebInfoForBlock(item.block)
+                //self.webController.info = self.openOnWebInfoForBlock(item.block)
             }
             if let navigationBar = navigationController?.navigationBar where navigationItem.title != nil {
                 let animated = navigationItem.title != nil
@@ -242,7 +243,7 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
             cursor.updateCurrentToItemMatching {
                 blockController.blockID == $0.block.blockID
             }
-            environment.analytics.trackViewedComponentForCourseWithID(courseID, blockID: cursor.current.block.blockID)
+            environment.analytics.trackViewedComponentForCourseWithID(courseID, blockID: cursor.current.block.blockID, minifiedBlockID: cursor.current.block.minifiedBlockID ?? "")
             self.navigationDelegate?.courseContentPageViewController(self, enteredBlockWithID: cursor.current.block.blockID, parentID: cursor.current.parent)
         }
         self.updateNavigationBars()
@@ -267,26 +268,6 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
     
     public func pageViewController(pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
         self.updateNavigationForEnteredController(pageViewController.viewControllers?.first)
-    }
-    
-    // MARK: Course Outline Mode
-    
-    public func courseOutlineModeChanged(courseMode: CourseOutlineMode) {
-        // If we change mode we want to pop the screen since it may no longer make sense.
-        // It's easy if we're at the top of the controller stack, but we need to be careful if we're not
-        if self.navigationController?.topViewController == self {
-            self.navigationController?.popViewControllerAnimated(true)
-        }
-        else {
-            let controllers = self.navigationController?.viewControllers.filter {
-                return $0 != self
-            }
-            self.navigationController?.viewControllers = controllers ?? []
-        }
-    }
-    
-    public func viewControllerForCourseOutlineModeChange() -> UIViewController {
-        return self
     }
     
     func controllerForBlock(block : CourseBlock) -> UIViewController? {
@@ -380,10 +361,6 @@ public class CourseContentPageViewController : UIPageViewController, UIPageViewC
             preloadBlock(block)
         }
     }
-    
-    public func presentationControllerForOpenOnWebController(controller: OpenOnWebController) -> UIViewController {
-        return self
-    }
 }
 
 // MARK: Testing
@@ -411,9 +388,5 @@ extension CourseContentPageViewController {
     
     public func t_goBackward() {
         moveInDirection(.Reverse)
-    }
-    
-    public var t_isRightBarButtonEnabled : Bool {
-        return self.webController.barButtonItem.enabled
     }
 }

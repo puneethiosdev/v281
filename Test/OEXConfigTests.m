@@ -31,30 +31,30 @@
     OEXFabricConfig *fabricConfig=[config fabricConfig];
     XCTAssert(!fabricConfig.enabled,@"Fabric config should not be enabled");
     XCTAssertNil(fabricConfig.appKey,@"Fabric app key should be nil");
-   
+    
 }
 
 -(void)testFabricEmpty{
     NSDictionary *configDictionary=@{@"FABRIC":@{}
-                                           };
+                                     };
     OEXConfig *config=[[OEXConfig alloc] initWithDictionary:configDictionary];
     OEXFabricConfig *fabricConfig=[config fabricConfig];
     XCTAssert(!fabricConfig.enabled,@"Fabric config should not be enabled");
     XCTAssertNil(fabricConfig.appKey,@"Fabric app key should be nil");
-   
+    
 }
 
 
 -(void)testFabricEnabled{
     NSDictionary *configDictionary=@{@"FABRIC":@{@"ENABLED":@YES ,
-                                                       @"FABRIC_KEY":@"fabric_key" ,
-                                                       @"FABRIC_BUILD_SECRET":@"fabric_build_secret"}
-                                           };
+                                                 @"FABRIC_KEY":@"fabric_key" ,
+                                                 @"FABRIC_BUILD_SECRET":@"fabric_build_secret"}
+                                     };
     OEXConfig *config=[[OEXConfig alloc] initWithDictionary:configDictionary];
     OEXFabricConfig *fabricConfig=[config fabricConfig];
     XCTAssert(fabricConfig.enabled,@"Fabric config should be enabled");
     XCTAssertNotNil(fabricConfig.appKey,@"Fabric app key should not be nil");
-   
+    
 }
 
 
@@ -76,8 +76,8 @@
 
 -(void)testFacebookConfigEnabled{
     NSDictionary *configDictionary=@{@"FACEBOOK":@{@"ENABLED":@YES ,
-                                                           @"FACEBOOK_APP_ID":@"facebook_appID"}
-                                             };
+                                                   @"FACEBOOK_APP_ID":@"facebook_appID"}
+                                     };
     OEXConfig *config=[[OEXConfig alloc] initWithDictionary:configDictionary];
     OEXFacebookConfig *facebookConfig=[config facebookConfig];
     XCTAssert(facebookConfig.enabled,@"Facebook config should be enabled");
@@ -108,8 +108,8 @@
 
 -(void)testGoogleConfigEnabled{
     NSDictionary *configDictionary=@{@"GOOGLE":@{@"ENABLED":@YES ,
-                                                       @"GOOGLE_PLUS_KEY":@"google_plus_key"}
-                                           };
+                                                 @"GOOGLE_PLUS_KEY":@"google_plus_key"}
+                                     };
     OEXConfig *config=[[OEXConfig alloc] initWithDictionary:configDictionary];
     OEXGoogleConfig *googleConfig=[config googleConfig];
     XCTAssert(googleConfig.enabled,@"Google config should be enabled");
@@ -139,8 +139,8 @@
 
 -(void)testNewRelicConfigEnabled{
     NSDictionary *configDictionary=@{@"NEW_RELIC":@{@"ENABLED":@YES ,
-                                                         @"NEW_RELIC_KEY":@"New_Relic_key"}
-                                             };
+                                                    @"NEW_RELIC_KEY":@"New_Relic_key"}
+                                     };
     OEXConfig *config=[[OEXConfig alloc] initWithDictionary:configDictionary];
     OEXNewRelicConfig *newRelicConfig=[config newRelicConfig];
     XCTAssert(newRelicConfig.enabled,@"New Relic config should be enabled");
@@ -228,8 +228,8 @@
 
 -(void)testZeroRatingConfigEnabled{
     NSDictionary *configDictionary=@{@"ZERO_RATING":@{@"ENABLED":@YES ,
-                                                  @"CARRIERS":@[@"1234",
-                                                                @"3242"]} };
+                                                      @"CARRIERS":@[@"1234",
+                                                                    @"3242"]} };
     OEXConfig *config=[[OEXConfig alloc] initWithDictionary:configDictionary];
     OEXZeroRatingConfig *zeroRatingConfig=[config zeroRatingConfig];
     XCTAssert(zeroRatingConfig.enabled,@" Zero_Rating config should be enabled");
