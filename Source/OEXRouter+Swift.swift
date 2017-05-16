@@ -46,7 +46,8 @@ extension CourseBlock {
         case .Chapter: return .Outline
         case .Section: return .Outline
         case .Unit: return .Unit
-        case let .Video(summary): return (summary.isSupportedVideo) ? .Video : .Unknown
+        case let .Video(summary): return summary.onlyOnWeb ? .Unknown : .Video
+//        case let .Video(summary): return (summary.isSupportedVideo) ? .Video : .Unknown
         case let .Discussion(discussionModel): return .Discussion(discussionModel)
         }
     }
@@ -200,6 +201,8 @@ extension OEXRouter {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let pointsBadgescontroller = storyboard.instantiateViewControllerWithIdentifier("WK_View_Controller") as! D3WKViewController
         
+        print(wkcontroller)
+        
         pointsBadgescontroller.currentUsername = self.environment.session.currentUser?.username;
         showContentStackWithRootController(pointsBadgescontroller, animated: true);
         
@@ -207,7 +210,7 @@ extension OEXRouter {
 //        self.navigationController?.pushViewController(controller, animated: true)
     }
     
-    func scanMyQRCode(controller: UIViewController) {
+    public func scanMyQRCode(controller: UIViewController) {
         let storyboard = UIStoryboard(name: "Main", bundle: nil)
         let qrCodeController = storyboard.instantiateViewControllerWithIdentifier("QRCodeVC") as! QRCViewController
         
@@ -388,6 +391,15 @@ extension OEXRouter {
 
         let splashController: UIViewController
         
+        if environment.config.newLogistrationFlowEnabled {
+            splashController = StartupViewController(environment: environment)
+        } else {
+//            let splashEnvironment = OEXLoginSplashViewControllerEnvironment(router: self)
+//            splashController = OEXLoginSplashViewController(environment: splashEnvironment)
+            splashController = OEXLoginSplashViewController(environment: environment)
+        }
+        
+        /*
         if !environment.config.isRegistrationEnabled {
             splashController = loginViewController()
         }
@@ -396,6 +408,7 @@ extension OEXRouter {
         } else {
             splashController = OEXLoginSplashViewController(environment: environment)
         }
+        */
         
         makeContentControllerCurrent(splashController)
     }

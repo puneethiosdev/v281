@@ -9,12 +9,17 @@
 import Foundation
 import UIKit
 
+///Controls the space between the ModeChange icon and the View on Web Icon for CourseOutlineViewController and CourseContentPageViewController. Changing this constant changes the spacing in both places.
+public let barButtonFixedSpaceWidth : CGFloat = 20
+
 public class CourseOutlineViewController :
     OfflineSupportViewController,
     CourseBlockViewController,
     CourseOutlineTableControllerDelegate,
+    CourseOutlineModeControllerDelegate,
     CourseContentPageViewControllerDelegate,
     CourseLastAccessedControllerDelegate,
+    OpenOnWebControllerDelegate,
     PullRefreshControllerDelegate
 {
     public typealias Environment = protocol<OEXAnalyticsProvider, DataManagerProvider, OEXInterfaceProvider, NetworkManagerProvider, ReachabilityProvider, OEXRouterProvider>
@@ -32,6 +37,7 @@ public class CourseOutlineViewController :
     
     private let loadController : LoadStateViewController
     private let insetsController : ContentInsetsController
+    private let modeController : CourseOutlineModeController
     private var lastAccessedController : CourseLastAccessedController
     
     
@@ -46,6 +52,8 @@ public class CourseOutlineViewController :
         return courseQuerier.courseID
     }
     
+    private lazy var webController : OpenOnWebController = OpenOnWebController(delegate: self)
+    
     public init(environment: Environment, courseID : String, rootID : CourseBlockID?) {
         self.rootID = rootID
         self.environment = environment
@@ -54,6 +62,7 @@ public class CourseOutlineViewController :
         loadController = LoadStateViewController()
         insetsController = ContentInsetsController()
         
+        modeController = environment.dataManager.courseDataManager.freshOutlineModeController()
         tableController = CourseOutlineTableController(environment : self.environment, courseID: courseID)
         
         lastAccessedController = CourseLastAccessedController(blockID: rootID , dataManager: environment.dataManager, networkManager: environment.networkManager, courseQuerier: courseQuerier)
@@ -61,11 +70,15 @@ public class CourseOutlineViewController :
         super.init(env: environment)
         
         lastAccessedController.delegate = self
+        modeController.delegate = self
         
         addChildViewController(tableController)
         tableController.didMoveToParentViewController(self)
         tableController.delegate = self
         
+        let fixedSpace = UIBarButtonItem(barButtonSystemItem: .FixedSpace, target: nil, action: nil)
+        fixedSpace.width = barButtonFixedSpaceWidth
+        navigationItem.rightBarButtonItems = [webController.barButtonItem,fixedSpace,modeController.barItem]
         navigationItem.backBarButtonItem = UIBarButtonItem(title: " ", style: .Plain, target: nil, action: nil)
     }
     
@@ -93,7 +106,7 @@ public class CourseOutlineViewController :
     
     public override func viewWillAppear(animated: Bool) {
         super.viewWillAppear(animated)
-        lastAccessedController.loadLastAccessed()
+        lastAccessedController.loadLastAccessed(forMode: modeController.currentMode)
         lastAccessedController.saveLastAccessed()
         let stream = joinStreams(courseQuerier.rootID, courseQuerier.blockWithID(blockID))
         stream.extendLifetimeUntilFirstResult (success :
@@ -139,6 +152,16 @@ public class CourseOutlineViewController :
     
     private func setupNavigationItem(block : CourseBlock) {
         self.navigationItem.title = block.displayName
+        self.webController.info = OpenOnWebController.Info(courseID : courseID, blockID : block.blockID, supported : block.displayType.isUnknown, URL: block.webURL)
+    }
+    
+    public func viewControllerForCourseOutlineModeChange() -> UIViewController {
+        return self
+    }
+    
+    public func courseOutlineModeChanged(courseMode: CourseOutlineMode) {
+        lastAccessedController.loadLastAccessed(forMode: courseMode)
+        reload()
     }
     
     private func reload() {
@@ -146,7 +169,17 @@ public class CourseOutlineViewController :
     }
     
     private func emptyState() -> LoadState {
-        return LoadState.empty(icon: .UnknownError, message : Strings.coursewareUnavailable)
+        switch modeController.currentMode {
+        case .Full:
+            return LoadState.empty(icon: .UnknownError, message : Strings.coursewareUnavailable)
+        case .Video:
+            let style = loadController.messageStyle
+            let message = style.apply(Strings.noVideosTryModeSwitcher)
+            let iconText = self.modeController.currentIcon.attributedTextWithStyle(style, inline: true)
+            let formattedMessage = message(iconText)
+            let accessibilityMessage = Strings.noVideosTryModeSwitcher(modeSwitcher: Strings.courseModePickerDescription)
+            return LoadState.empty(icon: Icon.CourseModeFull, attributedMessage : formattedMessage, accessibilityMessage : accessibilityMessage)
+        }
     }
     
     private func showErrorIfNecessary(error : NSError) {
@@ -158,7 +191,7 @@ public class CourseOutlineViewController :
     private func addListeners() {
         headersLoader.backWithStream(blockIDStream.transform {[weak self] blockID in
             if let owner = self {
-                return owner.courseQuerier.childrenOfBlockWithID(blockID)
+                return owner.courseQuerier.childrenOfBlockWithID(blockID, forMode: owner.modeController.currentMode)
             }
             else {
                 return Stream<CourseOutlineQuerier.BlockGroup>(error: NSError.oex_courseContentLoadError())
@@ -167,7 +200,7 @@ public class CourseOutlineViewController :
         rowsLoader.backWithStream(headersLoader.transform {[weak self] headers in
             if let owner = self {
                 let children = headers.children.map {header in
-                    return owner.courseQuerier.childrenOfBlockWithID(header.blockID)
+                    return owner.courseQuerier.childrenOfBlockWithID(header.blockID, forMode: owner.modeController.currentMode)
                 }
                 return joinStreams(children)
             }
@@ -284,6 +317,10 @@ public class CourseOutlineViewController :
             self.tableController.hideLastAccessed()
         }
         
+    }
+    
+    public func presentationControllerForOpenOnWebController(controller: OpenOnWebController) -> UIViewController {
+        return self
     }
 }
 

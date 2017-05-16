@@ -10,6 +10,7 @@ NS_ASSUME_NONNULL_BEGIN
 
 extern NSString* const OEXAnalyticsKeyBlockID;
 extern NSString* const OEXAnalyticsKeyCourseID;
+extern NSString* const OEXAnalyticsKeyNavigationMode;
 extern NSString* const OEXAnalyticsKeyOrientation;
 extern NSString* const OEXAnalyticsKeyProvider;
 extern NSString* const OEXAnalyticsKeySupported;
@@ -64,6 +65,8 @@ extern NSString* const OEXAnalyticsEventAnnouncementNotificationTapped;
 extern NSString* const OEXAnalyticsEventComponentViewed;
 extern NSString* const OEXAnalyticsEventPictureSet;
 extern NSString* const OEXAnalyticsEventProfileViewed;
+extern NSString* const OEXAnalyticsEventOpenInBrowser;
+extern NSString* const OEXAnalyticsEventOutlineModeChanged;
 extern NSString* const OEXAnalyticsEventScreen;
 extern NSString* const OEXAnalyticsEventCertificateShared;
 extern NSString* const OEXAnalyticsEventCourseShared;

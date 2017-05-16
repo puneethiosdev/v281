@@ -19,6 +19,7 @@
 
 #import "OEXAnalytics.h"
 #import "OEXAppDelegate.h"
+#import "OEXConfig.h"
 #import "OEXCustomButton.h"
 #import "OEXCustomLabel.h"
 #import "OEXAuthentication.h"
@@ -33,6 +34,7 @@
 #import "OEXInterface.h"
 #import "OEXNetworkConstants.h"
 #import "OEXNetworkUtility.h"
+#import "OEXRouter.h"
 #import "OEXSession.h"
 #import "OEXUserDetails.h"
 #import "OEXUserLicenseAgreementViewController.h"
@@ -212,7 +214,8 @@
     self.img_Logo.isAccessibilityElement = YES;
     self.img_Logo.accessibilityLabel = [[OEXConfig sharedConfig] platformName];
 
-    NSString* environmentName = self.environment.config.environmentName;
+//    NSString* environmentName = self.environment.config.environmentName;
+    NSString* environmentName = [OEXConfig sharedConfig].environmentName;
     if(environmentName.length > 0) {
         NSString* appVersion = [NSBundle mainBundle].oex_buildVersionString;
         self.versionLabel.text = [Strings versionDisplayWithNumber:appVersion environment:environmentName];
@@ -329,7 +332,7 @@
     _buttonsTitleStyle.size = OEXTextSizeXXSmall;
 
     NSString *termsText = [Strings registrationAgreementButtonTitleWithPlatformName:self.environment.config.platformName];
-    [self.btn_OpenEULA setAttributedTitle:[_buttonsTitleStyle attributedStringWithText:termsText] forState:UIControlStateNormal];
+    [self.btn_OpenEULA setAttributedTitle:[_buttonsTitleStyle attributedStringWithText:[Strings registrationAgreementButtonTitleWithPlatformName:[[OEXConfig sharedConfig] platformName]]] forState:UIControlStateNormal];
     self.btn_OpenEULA.titleLabel.adjustsFontSizeToFitWidth = YES;
 
     self.btn_OpenEULA.accessibilityTraits = UIAccessibilityTraitLink;
@@ -536,8 +539,10 @@
 }
 
 - (void)loginFailedWithServiceName:(NSString*)serviceName {
-    NSString* platform = self.environment.config.platformName;
-    NSString* destination = self.environment.config.platformDestinationName;
+    NSString* platform = [[OEXConfig sharedConfig] platformName];
+    NSString* destination = [[OEXConfig sharedConfig] platformDestinationName];
+//    NSString* platform = self.environment.config.platformName;
+//    NSString* destination = self.environment.config.platformDestinationName;
     NSString* title = [Strings serviceAccountNotAssociatedTitleWithService:serviceName platformName:platform];
     NSString* message = [Strings serviceAccountNotAssociatedMessageWithService:serviceName platformName:platform destinationName:destination];
     [self loginFailedWithErrorMessage:message title:title];

@@ -11,10 +11,20 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @class RouterEnvironment;
+@class OEXRouter;
+
+@interface OEXLoginSplashViewControllerEnvironment : NSObject
+
+- (id)initWithRouter:(OEXRouter*)router;
+
+@property (weak, nonatomic, nullable) OEXRouter* router;
+
+@end
 
 @interface OEXLoginSplashViewController : UIViewController
 
 - (id)initWithEnvironment:(RouterEnvironment*)environment;
+//- (id)initWithEnvironment:(OEXLoginSplashViewControllerEnvironment*)environment;
 -(void) stopRotatingActivityIndicator;
 -(void) rotateActivityIndicator;
 

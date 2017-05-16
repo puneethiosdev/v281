@@ -1,4 +1,4 @@
-    //
+//
 //  D3WKViewController.m
 //  D3iOS
 //
@@ -9,20 +9,26 @@
 #import "D3WKViewController.h"
 #import "WebKitController.h"
 #import "edX-Swift.h"
+#import "OEXRouter.h"
 
 @interface D3WKViewController () {
-//    UIActivityIndicatorView *activity;
     SpinnerView *spinnerD3;
+    QRCViewController *qrScanCamera;
 }
 
 @property (nonatomic, strong) WKWebView *webView;
 @property (nonatomic, strong) NSOperationQueue *scriptQueue;
+//@property (strong, nonatomic) UIStoryboard* mainStoryboard;
 @end
 
 @implementation D3WKViewController
 
-- (IBAction)cameraAction:(id)sender {
+- (IBAction)qrScanAction:(id)sender {
     
+    //    self.mainStoryboard = [UIStoryboard storyboardWithName:@"Main" bundle:nil];
+    //    QRCViewController *qrCodeController = [self.mainStoryboard instantiateViewControllerWithIdentifier:@"QRCodeVC"];
+    
+    [[OEXRouter sharedRouter] scanMyQRCode:qrScanCamera];
 }
 
 
@@ -38,7 +44,7 @@
     [super viewWillAppear:animated];
     [self setupWebView];
     [self.view addSubview:_webView];
-    //bring camera button for QR code scanner 
+    //bring camera button for QR code scanner
     [self.view bringSubviewToFront:_cameraBtn];
     
     _scriptQueue = [[NSOperationQueue alloc] init];
@@ -50,14 +56,14 @@
                                                   usingBlock:^(NSNotification *note) {
                                                       
                                                       //From here add these as part of the arguments for the script we are sending this to.
-//                                                      NSString *name = note.name;
-//                                                      NSDictionary *jsObject = note.userInfo;
-//                                                      NSLog(@"Name: %@\njsObject: %@", name, jsObject);
+                                                      //                                                      NSString *name = note.name;
+                                                      //                                                      NSDictionary *jsObject = note.userInfo;
+                                                      //                                                      NSLog(@"Name: %@\njsObject: %@", name, jsObject);
                                                       
                                                       [_webView evaluateJavaScript:@"NEED SOMETHING HERE"
                                                                  completionHandler:^(id object, NSError *error) {
-                                                          
-                                                      }];
+                                                                     
+                                                                 }];
                                                   }];
     
     
@@ -79,15 +85,21 @@
 }
 
 -(void)webView:(WKWebView *)webView didFinishNavigation:(WKNavigation *)navigation {
-//    pass username to datagenerator.js
-//    NSString * param  = @"rahulshenoy";
-//    NSString * jsCallBack = [NSString stringWithFormat:@"updateGraph(%@)",param];  
-//    [_webView evaluateJavaScript:jsCallBack completionHandler:nil];
+    //pass badges api URL
+    NSMutableString *badgesURLUser = [[NSMutableString alloc] initWithString:POINTS_BADGES_URL];
+    
     _webView.hidden = false;
-    [_webView evaluateJavaScript:@"loadPieChart()" completionHandler:nil];
-
+    [_webView evaluateJavaScript:[NSString stringWithFormat:@"loadPieChart('%@','%@')",badgesURLUser,self.currentUsername] completionHandler:nil];
     [[OEXRouter sharedRouter] hideMyActivityIndicator:spinnerD3];
     
+    //    [_webView evaluateJavaScript:@"loadPieChart()" completionHandler:nil];
+    //    [badgesURLUser appendFormat:@"%@", self.currentUsername];
+    //    [_webView evaluateJavaScript:[NSString stringWithFormat:@"DATAG_MOD.newDataSet('%@')", badgesURLUser] completionHandler:nil];
+    
+    //    pass username to datagenerator.js
+    //    NSString * param  = @"rahulshenoy";
+    //    NSString * jsCallBack = [NSString stringWithFormat:@"updateGraph(%@)",param];
+    //    [_webView evaluateJavaScript:jsCallBack completionHandler:nil];
 }
 
 
@@ -95,7 +107,7 @@
 {
     [super viewDidDisappear:animated];
     //Remove Observers added!
-//    [[NSNotificationCenter defaultCenter] removeObserver:<#(id)#> name:<#(NSString *)#> object:<#(id)#>];
+    //    [[NSNotificationCenter defaultCenter] removeObserver:<#(id)#> name:<#(NSString *)#> object:<#(id)#>];
 }
 
 #pragma mark - Setup
@@ -109,7 +121,7 @@
     _webView.allowsBackForwardNavigationGestures = NO; //This disables the ability to go back and go forward (we will be updating manually).
     
     _webView.hidden =true;
-
+    
     spinnerD3 = [[OEXRouter sharedRouter] showMyActivityIndicator:self];
     
     //Passing html url of the path to be opened on D3ViewController.
@@ -117,15 +129,22 @@
     NSURL *indexURL = [NSURL fileURLWithPath:indexPath];
     NSString *indexFile = [NSString stringWithContentsOfURL:indexURL encoding:NSUTF8StringEncoding error:nil];
     
+    
+    //    [_webView loadHTMLString:indexFile baseURL:indexURL];
+    
     //Passing current username value to html for Points & badges value from API.
     NSString *usernameURL = [NSString stringWithFormat:@"%@?username=%@",indexPath,self.currentUsername];
-//    NSLog(@"indexURL: %@", usernameURL);
-//    NSLog(@"indexfile: %@", indexFile);
-//    NSLog(@"index:%@", indexURL);
+    //    NSLog(@"indexURL: %@", usernameURL);
+    //    NSLog(@"indexfile: %@", indexFile);
+    //    NSLog(@"index:%@", indexURL);
     
     //converting url path with username to NSURL path
     NSURL *usernameURLIndex = [NSURL fileURLWithPath:usernameURL];
     [_webView loadHTMLString:indexFile baseURL:usernameURLIndex];
+    
+    
+    //    [_webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"DARAG_MOD('%@')", badgesURLUser]];
+    //    NSString *jsBadgesString = [NSString stringWithFormat:@"newDataSet('%@')", badgesURLUser];
     
     
 }
@@ -156,13 +175,13 @@
             break;
     }
     
-/*//Sample implementation for future...
+    /*//Sample implementation for future...
      NSURL *url = navigationAction.request.URL;
      if (![url.host.lowercaseString hasPrefix:@"https://"]) {
      decisionHandler(WKNavigationActionPolicyCancel);
      return;
      }
- */
+     */
 }
 
 -(void)webView:(WKWebView *)webView decidePolicyForNavigationResponse:(WKNavigationResponse *)navigationResponse decisionHandler:(void (^)(WKNavigationResponsePolicy))decisionHandler
@@ -179,12 +198,12 @@
 
 #pragma mark - IBAction
 - (IBAction)refreshWebView:(id)sender {
-//    NSLog(@"Reloaded");
-//    [_webView evaluateJavaScript:@"window.webkit.messageHandlers.{NAME}.postMessage({body: "" })"
-//               completionHandler:^(id object, NSError * error) {
-//        [_webView reload];
-//    }];
-//    [_webView evaluateJavaScript:@"fireOffCustomEvent();" completionHandler:nil];
+    //    NSLog(@"Reloaded");
+    //    [_webView evaluateJavaScript:@"window.webkit.messageHandlers.{NAME}.postMessage({body: "" })"
+    //               completionHandler:^(id object, NSError * error) {
+    //        [_webView reload];
+    //    }];
+    //    [_webView evaluateJavaScript:@"fireOffCustomEvent();" completionHandler:nil];
     [_webView evaluateJavaScript:@"updateGraph()" completionHandler:nil];
 }
 

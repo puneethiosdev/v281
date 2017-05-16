@@ -13,9 +13,23 @@ NS_ASSUME_NONNULL_BEGIN
 @class OEXRouter;
 @class RouterEnvironment;
 
+
+@interface OEXMyVideosViewControllerEnvironment : NSObject
+
+- (id)initWithInterface:(OEXInterface*)interface networkManager:(NetworkManager*)networkManager router:(OEXRouter*)router;
+
+@property (strong, nonatomic) OEXInterface* interface;
+@property (strong, nonatomic) NetworkManager* networkManager;
+@property (weak, nonatomic, nullable) OEXRouter* router;
+
+@end
+
+
 @interface OEXMyVideosViewController : UIViewController
 
 @property (strong, nonatomic) RouterEnvironment* environment;
+
+//@property (strong, nonatomic) OEXMyVideosViewControllerEnvironment* environment;
 
 @end
 

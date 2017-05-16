@@ -17,7 +17,7 @@ class CourseUnknownBlockViewController: UIViewController, CourseBlockViewControl
     let blockID : CourseBlockID?
     let courseID : String
     var block: CourseBlock?
-    var messageView : IconMessageView?
+    let messageView : IconMessageView
     
     var loader : Stream<NSURL?>?
     init(blockID : CourseBlockID?, courseID : String, environment : Environment) {
@@ -25,9 +25,35 @@ class CourseUnknownBlockViewController: UIViewController, CourseBlockViewControl
         self.courseID = courseID
         self.environment = environment
         
-        super.init(nibName: nil, bundle: nil)
+        messageView = IconMessageView(icon: Icon.CourseUnknownContent, message: Strings.courseContentUnknown)
         
-        let courseQuerier = environment.dataManager.courseDataManager.querierForCourseWithID(self.courseID)
+        super.init(nibName: nil, bundle: nil)
+    
+        messageView.buttonInfo = MessageButtonInfo(title : Strings.openInBrowser)
+        {
+            [weak self] in
+            self?.loader?.listen(self!, success : {URL -> Void in
+                if let URL = URL {
+                    UIApplication.sharedApplication().openURL(URL)
+                }
+                }, failure : {_ in
+            })
+        }
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        self.view.backgroundColor = OEXStyles.sharedStyles().standardBackgroundColor()
+        self.view.addSubview(messageView)
+        
+    }
+    
+/*        let courseQuerier = environment.dataManager.courseDataManager.querierForCourseWithID(self.courseID)
         courseQuerier.blockWithID(blockID).extendLifetimeUntilFirstResult (
             success:
             { [weak self] block in
@@ -84,7 +110,7 @@ class CourseUnknownBlockViewController: UIViewController, CourseBlockViewControl
         self.view.backgroundColor = OEXStyles.sharedStyles().standardBackgroundColor()
         
     }
-    
+ */
     override func updateViewConstraints() {
         
         if  self.isVerticallyCompact() {
@@ -98,13 +124,13 @@ class CourseUnknownBlockViewController: UIViewController, CourseBlockViewControl
     }
     
     private func applyPortraitConstraints() {
-        messageView?.snp_remakeConstraints { (make) -> Void in
+        messageView.snp_remakeConstraints { (make) -> Void in
             make.edges.equalTo(view)
         }
     }
     
     private func applyLandscapeConstraints() {
-        messageView?.snp_remakeConstraints { (make) -> Void in
+        messageView.snp_remakeConstraints { (make) -> Void in
             make.edges.equalTo(view)
             let barHeight = navigationController?.toolbar.frame.size.height ?? 0.0
             make.bottom.equalTo(view.snp_bottom).offset(-barHeight)

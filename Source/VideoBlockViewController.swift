@@ -10,6 +10,8 @@ import Foundation
 import MediaPlayer
 import UIKit
 
+private let StandardVideoAspectRatio : CGFloat = 0.6
+
 class VideoBlockViewController : UIViewController, CourseBlockViewController, OEXVideoPlayerInterfaceDelegate, StatusBarOverriding, InterfaceOrientationOverriding, VideoTranscriptDelegate {
 
 //    typealias Environment = protocol<DataManagerProvider, OEXInterfaceProvider, ReachabilityProvider>
@@ -59,44 +61,15 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         
         loader.listen (self,
                        success : { [weak self] block in
-                        if let video = block.type.asVideo where video.isYoutubeVideo,
-                            let url = block.blockURL
-                        {
-                            self?.showYoutubeMessage(url)
-                        }
-                        else if
-                            let video = self?.environment.interface?.stateForVideoWithID(self?.blockID, courseID : self?.courseID)
-                            where block.type.asVideo?.preferredEncoding != nil
-                        {
-                            self?.showLoadedBlock(block, forVideo: video)
-                        }
-                        else {
-                            self?.showError(nil)
-                        }
-            }, failure : {[weak self] error in
-                self?.showError(error)
-            }
-        )
-
-        
-        
-/*        loader.listen (self,
-                       success : { [weak self] block in
-
-/*                        if let video = block.type.asVideo,
+                        if let video = block.type.asVideo,
                             let encoding = video.preferredEncoding where encoding.isYoutube,
                             let URL = encoding.URL
                         {
                             //kAMAT_CHANGES
                             self!.videoURL = URL
-                            self?.showYoutubeMessage(URL)
-*/
-                    
-                        if let video = block.type.asVideo where video.isYoutubeVideo,
-                            let url = block.blockURL
-                        {
-                            self?.showYoutubeMessage(url)
-
+                            
+                            let URL = NSURL(string: URL)
+                            self?.showYoutubeMessage(URL!)
                         }
                         else if
                             let video = self?.environment.interface?.stateForVideoWithID(self?.blockID, courseID : self?.courseID)
@@ -113,7 +86,6 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
                 self?.showError(error)
             }
         )
- */
     }
     
     override func viewDidLoad() {
@@ -141,6 +113,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         view.backgroundColor = OEXStyles.sharedStyles().standardBackgroundColor()
         view.setNeedsUpdateConstraints()
         
+        videoController.hidesNextPrev = true
     }
     
     override func viewWillAppear(animated: Bool) {
@@ -160,18 +133,14 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
         
         validateSubtitleTimer()
         
-        if !canDownloadVideo() {
+        guard canDownloadVideo() else {
             guard let video = self.environment.interface?.stateForVideoWithID(self.blockID, courseID : self.courseID) where video.downloadState == .Complete else {
                 self.showOverlayMessage(Strings.noWifiMessage)
                 return
             }
+            
+            return
         }
-        
-        guard let videoPlayer = videoController.moviePlayerController else { return }
-        if currentOrientation() == .LandscapeLeft || currentOrientation() == .LandscapeRight {
-            videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
-        }
-        
     }
     
     override func viewDidDisappear(animated: Bool) {
@@ -209,7 +178,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
             make.edges.equalTo(view)
         }
         
-        videoController.height = view.bounds.size.width * CGFloat(STANDARD_VIDEO_ASPECT_RATIO)
+        videoController.height = view.bounds.size.width * StandardVideoAspectRatio
         videoController.width = view.bounds.size.width
         
         videoController.view.snp_remakeConstraints {make in
@@ -222,7 +191,7 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
                 make.top.equalTo(self.snp_topLayoutGuideBottom)
             }
             
-            make.height.equalTo(view.bounds.size.width * CGFloat(STANDARD_VIDEO_ASPECT_RATIO))
+            make.height.equalTo(view.bounds.size.width * StandardVideoAspectRatio)
         }
         
         rotateDeviceMessageView?.snp_remakeConstraints {make in

@@ -48,4 +48,8 @@ NSString* const OEXVideoEncodingFallback = @"fallback";
     return self;
 }
 
+- (BOOL)isYoutube {
+    return [self.name isEqualToString:OEXVideoEncodingYoutube];
+}
+
 @end

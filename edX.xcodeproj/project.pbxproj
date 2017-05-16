@@ -13,6 +13,7 @@
 		08C7CDE51D8AB59700F3D5EC /* ic_captions.png in Resources */ = {isa = PBXBuildFile; fileRef = 08C7CDE21D8AB59700F3D5EC /* ic_captions.png */; };
 		08C7CDE61D8AB59700F3D5EC /* UIWindow+TopController.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C7CDE41D8AB59700F3D5EC /* UIWindow+TopController.m */; };
 		0B1212221B4F089A002EE96C /* OEXCoursewareAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1212211B4F089A002EE96C /* OEXCoursewareAccess.m */; };
+		17096F941EC0B62C00667EAC /* OEXCustomNavigationView.h in Headers */ = {isa = PBXBuildFile; fileRef = 17096F931EC0B62C00667EAC /* OEXCustomNavigationView.h */; };
 		1728B53D1E84152C002614DB /* QRCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1728B53C1E84152C002614DB /* QRCViewController.swift */; };
 		1728B53F1E84174C002614DB /* QuizViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1728B53E1E84174C002614DB /* QuizViewController.swift */; };
 		172CC06C1EBF5D9F00451626 /* OEXStatusMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 174279B51EBF57E9002054E9 /* OEXStatusMessageViewController.m */; };
@@ -34,7 +35,6 @@
 		1756A1C91E766EF100F0D1B9 /* D3WKViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1785934E1E6C4B7A00F5EEDD /* D3WKViewController.m */; };
 		175C14D21EBF666B0037763F /* OEXColorsDataFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14D11EBF666B0037763F /* OEXColorsDataFactory.swift */; };
 		175C14D41EBF671D0037763F /* VideoTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14D31EBF671D0037763F /* VideoTranscript.swift */; };
-		175C14D61EBF67C00037763F /* NSObject+SafeKVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14D51EBF67C00037763F /* NSObject+SafeKVO.swift */; };
 		175C14DB1EBF68160037763F /* RatingContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14D81EBF68160037763F /* RatingContainerView.swift */; };
 		175C14DC1EBF68160037763F /* RatingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14D91EBF68160037763F /* RatingView.swift */; };
 		175C14DD1EBF68160037763F /* RatingViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14DA1EBF68160037763F /* RatingViewController.swift */; };
@@ -72,7 +72,9 @@
 		178593D01E6C618200F5EEDD /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 178593CF1E6C618200F5EEDD /* Constants.m */; };
 		17AAADE81E9F259600BFABA1 /* Plus-50.png in Resources */ = {isa = PBXBuildFile; fileRef = 17AAADE71E9F259600BFABA1 /* Plus-50.png */; };
 		17AAADEC1E9F379400BFABA1 /* Camera-Blue.png in Resources */ = {isa = PBXBuildFile; fileRef = 17AAADEB1E9F379400BFABA1 /* Camera-Blue.png */; };
+		17C1738A1EC43D9B001A0F2C /* NSObject+SafeKVO.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17C173891EC43D9B001A0F2C /* NSObject+SafeKVO.swift */; };
 		17CB52B61E8CD6C400169F66 /* FloatingBtnViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CB52B51E8CD6C400169F66 /* FloatingBtnViewController.swift */; };
+		17CD09521EC2D5E800BA3683 /* OpenOnWebController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17CD09511EC2D5E800BA3683 /* OpenOnWebController.swift */; };
 		17EBF42A1E508B2C003222D1 /* CourseFilterViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EBF4281E508B2C003222D1 /* CourseFilterViewController.swift */; };
 		17EBF42E1E50A2BF003222D1 /* CourseFilterCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 17EBF42C1E50A2BF003222D1 /* CourseFilterCell.swift */; };
 		17EBF42F1E50A2BF003222D1 /* CourseFilterCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 17EBF42D1E50A2BF003222D1 /* CourseFilterCell.xib */; };
@@ -792,6 +794,7 @@
 		0B1212211B4F089A002EE96C /* OEXCoursewareAccess.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEXCoursewareAccess.m; sourceTree = "<group>"; };
 		0B1212231B4F08B6002EE96C /* OEXCoursewareAccess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEXCoursewareAccess.h; sourceTree = "<group>"; };
 		0CDA0A05ED3F40A3D948E4F4 /* libPods-edX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-edX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		17096F931EC0B62C00667EAC /* OEXCustomNavigationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXCustomNavigationView.h; sourceTree = "<group>"; };
 		1728B53C1E84152C002614DB /* QRCViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCViewController.swift; sourceTree = "<group>"; };
 		1728B53E1E84174C002614DB /* QuizViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizViewController.swift; sourceTree = "<group>"; };
 		174154F51E6FD6FD000A3BF0 /* d3.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = d3.min.js; path = GamificationChart/d3.min.js; sourceTree = "<group>"; };
@@ -813,7 +816,6 @@
 		174775101E6D7345003E491D /* WebViewJavascriptBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebViewJavascriptBridge.m; path = Source/D3iOS/WebViewJavascriptBridge.m; sourceTree = SOURCE_ROOT; };
 		175C14D11EBF666B0037763F /* OEXColorsDataFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OEXColorsDataFactory.swift; sourceTree = "<group>"; };
 		175C14D31EBF671D0037763F /* VideoTranscript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoTranscript.swift; sourceTree = "<group>"; };
-		175C14D51EBF67C00037763F /* NSObject+SafeKVO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSObject+SafeKVO.swift"; sourceTree = "<group>"; };
 		175C14D81EBF68160037763F /* RatingContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingContainerView.swift; sourceTree = "<group>"; };
 		175C14D91EBF68160037763F /* RatingView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingView.swift; sourceTree = "<group>"; };
 		175C14DA1EBF68160037763F /* RatingViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingViewController.swift; sourceTree = "<group>"; };
@@ -854,7 +856,9 @@
 		178593CF1E6C618200F5EEDD /* Constants.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Constants.m; sourceTree = "<group>"; };
 		17AAADE71E9F259600BFABA1 /* Plus-50.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Plus-50.png"; sourceTree = "<group>"; };
 		17AAADEB1E9F379400BFABA1 /* Camera-Blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Camera-Blue.png"; sourceTree = "<group>"; };
+		17C173891EC43D9B001A0F2C /* NSObject+SafeKVO.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "NSObject+SafeKVO.swift"; sourceTree = "<group>"; };
 		17CB52B51E8CD6C400169F66 /* FloatingBtnViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FloatingBtnViewController.swift; sourceTree = "<group>"; };
+		17CD09511EC2D5E800BA3683 /* OpenOnWebController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OpenOnWebController.swift; sourceTree = "<group>"; };
 		17EBF4281E508B2C003222D1 /* CourseFilterViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CourseFilterViewController.swift; sourceTree = "<group>"; };
 		17EBF42C1E50A2BF003222D1 /* CourseFilterCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CourseFilterCell.swift; sourceTree = "<group>"; };
 		17EBF42D1E50A2BF003222D1 /* CourseFilterCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CourseFilterCell.xib; sourceTree = "<group>"; };
@@ -871,7 +875,6 @@
 		1905BFF01A31B037001917FA /* COURSE_NOT_LISTED.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = COURSE_NOT_LISTED.htm; sourceTree = "<group>"; };
 		1905BFF21A31B097001917FA /* NEW_USER.htm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.html; path = NEW_USER.htm; sourceTree = "<group>"; };
 		190AF7941A4061950029E23E /* Main.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; path = Main.storyboard; sourceTree = "<group>"; };
-		1913DD37194B0B7F00573977 /* OEXCustomNavigationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXCustomNavigationView.h; sourceTree = "<group>"; };
 		1913DD3B194B267000573977 /* OEXDownloadViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXDownloadViewController.h; sourceTree = "<group>"; };
 		1913DD3C194B267000573977 /* OEXDownloadViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEXDownloadViewController.m; sourceTree = "<group>"; };
 		1913DD4219502E5D00573977 /* OEXVideoSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXVideoSummary.h; sourceTree = "<group>"; };
@@ -2233,13 +2236,13 @@
 		770848BD1B20BB5B002FEEEE /* Deprecated */ = {
 			isa = PBXGroup;
 			children = (
+				17096F931EC0B62C00667EAC /* OEXCustomNavigationView.h */,
 				193B504319459C2F0038E11C /* OEXCustomButton.h */,
 				193B504419459C2F0038E11C /* OEXCustomButton.m */,
 				193B50461945A0520038E11C /* OEXCustomLabel.h */,
 				193B50471945A0520038E11C /* OEXCustomLabel.m */,
 				199627811945AB5A0022C489 /* OEXCustomTextField.h */,
 				199627821945AB5A0022C489 /* OEXCustomTextField.m */,
-				1913DD37194B0B7F00573977 /* OEXCustomNavigationView.h */,
 				19EA0F5B1965CB3700B684B0 /* OEXCustomEditingView.h */,
 				19EA0F5C1965CB3700B684B0 /* OEXCustomEditingView.m */,
 			);
@@ -2413,7 +2416,6 @@
 		776459831A0968F0008404CC /* Library Additions */ = {
 			isa = PBXGroup;
 			children = (
-				175C14D51EBF67C00037763F /* NSObject+SafeKVO.swift */,
 				77DCD23C1C2B434200CAEBB5 /* UIViewController+Overlay.swift */,
 				7706AAC01BCFEEBF00728432 /* NSAttributedString+Formatting.swift */,
 				7727EC341BBC73F300C9987F /* RevealViewController.swift */,
@@ -2477,6 +2479,7 @@
 				E0C6EF961BFF4B9900B315E3 /* UIButton+TintColor.swift */,
 				E03E6A181D38EC7500944AAA /* UIView+UIViewController.swift */,
 				E01591F11D533F3B00201B15 /* UIViewController+CommonAdditions.swift */,
+				17C173891EC43D9B001A0F2C /* NSObject+SafeKVO.swift */,
 			);
 			name = "Library Additions";
 			sourceTree = "<group>";
@@ -2501,6 +2504,7 @@
 		7772BE781AF40A730081CA7A /* Controller Helpers */ = {
 			isa = PBXGroup;
 			children = (
+				17CD09511EC2D5E800BA3683 /* OpenOnWebController.swift */,
 				174279AD1EBF5508002054E9 /* FullScreenMessageViewController.swift */,
 				174279A91EBF54C2002054E9 /* CourseOutlineModeController.swift */,
 				7765025E1C7CEBC5007384E7 /* SingleChildContainingViewController.swift */,
@@ -3532,6 +3536,7 @@
 				775391441C9760BD00FA959C /* NSString+OEXCrypto.h in Headers */,
 				77E648261C90DE0200B6740D /* NSBundle+OEXConveniences.h in Headers */,
 				772856E81CADCEB600460E7C /* OEXDateFormatting.h in Headers */,
+				17096F941EC0B62C00667EAC /* OEXCustomNavigationView.h in Headers */,
 				771D65C61C922E6700112B7E /* OEXRemovable.h in Headers */,
 				77E648941C91407B00B6740D /* NSObject+OEXDeallocAction.h in Headers */,
 				77E648221C90DD6B00B6740D /* edXCore.h in Headers */,
@@ -3661,9 +3666,12 @@
 					};
 					77E647961C90C10300B6740D = {
 						CreatedOnToolsVersion = 7.2.1;
+						DevelopmentTeam = LCDC66DJM2;
+						ProvisioningStyle = Automatic;
 					};
 					77E6482F1C91016300B6740D = {
 						CreatedOnToolsVersion = 7.2.1;
+						ProvisioningStyle = Automatic;
 						TestTargetID = BECB7B0A1924C0C3009C77F1;
 					};
 					BECB7B0A1924C0C3009C77F1 = {
@@ -3685,6 +3693,7 @@
 						};
 					};
 					BECB7B2B1924C0C3009C77F1 = {
+						DevelopmentTeam = LCDC66DJM2;
 						ProvisioningStyle = Automatic;
 						TestTargetID = BECB7B0A1924C0C3009C77F1;
 					};
@@ -4413,6 +4422,7 @@
 				77FDF4191B02910D00E8C639 /* IconMessageView.swift in Sources */,
 				19321F6219615E3300B7D75C /* OEXMyVideosSubSectionViewController.m in Sources */,
 				77DCD23B1C2B14BA00CAEBB5 /* UITableView+Layout.swift in Sources */,
+				17CD09521EC2D5E800BA3683 /* OpenOnWebController.swift in Sources */,
 				77509D941BE1710200B10CD3 /* TZStackView.swift in Sources */,
 				9E17EFD31BC65B7600C903CC /* UIAppearance+Swift.m in Sources */,
 				174775121E6D7345003E491D /* WebViewJavascriptBridge.m in Sources */,
@@ -4440,7 +4450,6 @@
 				E076A5C21C7DB624008A99C6 /* DiscussionResponsesDataController.swift in Sources */,
 				1A5AC5801B94ED0D00885187 /* CourseCardViewModel.swift in Sources */,
 				77FFA2CC1AC35CE800B4D69B /* OEXRegistrationStyles.m in Sources */,
-				175C14D61EBF67C00037763F /* NSObject+SafeKVO.swift in Sources */,
 				77567B771AC9FC1400877A7B /* NSNotificationCenter+OEXSafeAccess.m in Sources */,
 				9E4E6C3F1B4BBB5C0034F7EB /* LastAccessedProvider.swift in Sources */,
 				B4B6D5E91A9490FC000F44E8 /* OEXRegistrationViewController.m in Sources */,
@@ -4467,6 +4476,7 @@
 				E0ED96E71D6EED1C00B48B64 /* OEXCourseInfoViewController+Swift.swift in Sources */,
 				773B1D421B1F48F100B861DF /* CourseOutlineHeaderView.swift in Sources */,
 				778B61061B06BD2100489532 /* NSNotificationCenter+SafeSwift.swift in Sources */,
+				17C1738A1EC43D9B001A0F2C /* NSObject+SafeKVO.swift in Sources */,
 				B4B6D6011A949EFC000F44E8 /* OEXRegistrationError.m in Sources */,
 				1904A14D1A1386C2006A5524 /* edXDB.xcdatamodel in Sources */,
 				E03E6A191D38EC7500944AAA /* UIView+UIViewController.swift in Sources */,
@@ -4782,9 +4792,9 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = LCDC66DJM2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -4942,9 +4952,10 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = LCDC66DJM2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = Source/Core/Test/SupportingFiles/Info.plist;
@@ -4953,7 +4964,8 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 2.3;
@@ -4965,10 +4977,11 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LCDC66DJM2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = Source/Core/Test/SupportingFiles/Info.plist;
@@ -4977,7 +4990,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 				SWIFT_VERSION = 2.3;
 			};
@@ -4988,10 +5002,11 @@
 			buildSettings = {
 				CLANG_ENABLE_MODULES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Distribution: Applied Materials Inc";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution: Applied Materials Inc";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = LCDC66DJM2;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = Source/Core/Test/SupportingFiles/Info.plist;
@@ -5000,7 +5015,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.edXCoreTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "947f582d-023c-4995-994b-49ff09b585c6";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OBJC_BRIDGING_HEADER = "Source/Core/Test/SupportingFiles/edXCoreTests-Bridging-Header.h";
 				SWIFT_VERSION = 2.3;
 			};
@@ -5011,9 +5027,10 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = Test/EndToEnd/SupportingFiles/Info.plist;
@@ -5022,7 +5039,8 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "157100bd-58f3-4811-b52e-999adc46663d";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 2.3;
 				TEST_TARGET_NAME = edX;
@@ -5035,10 +5053,11 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = Test/EndToEnd/SupportingFiles/Info.plist;
@@ -5047,7 +5066,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "157100bd-58f3-4811-b52e-999adc46663d";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 2.3;
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
@@ -5059,10 +5079,11 @@
 			buildSettings = {
 				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				COPY_PHASE_STRIP = NO;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = "";
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = Test/EndToEnd/SupportingFiles/Info.plist;
@@ -5071,7 +5092,8 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_BUNDLE_IDENTIFIER = org.edx.EndToEndTests;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE = "157100bd-58f3-4811-b52e-999adc46663d";
+				PROVISIONING_PROFILE = "";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 2.3;
 				TEST_TARGET_NAME = edX;
 				USES_XCTRUNNER = YES;
@@ -5257,9 +5279,9 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = LCDC66DJM2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
@@ -5317,9 +5339,9 @@
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				CLANG_ENABLE_MODULES = YES;
-				CODE_SIGN_IDENTITY = "iPhone Developer: puneet kumat (8E9HNB7VE2)";
+				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				DEVELOPMENT_TEAM = "";
+				DEVELOPMENT_TEAM = LCDC66DJM2;
 				FRAMEWORK_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",

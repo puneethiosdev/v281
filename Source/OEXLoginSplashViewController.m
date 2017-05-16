@@ -13,20 +13,36 @@
 #import "OEXRouter.h"
 #import "OEXLoginViewController.h"
 #import "OEXSession.h"
+#import "OEXAppDelegate.h"
+
+@implementation OEXLoginSplashViewControllerEnvironment
+    
+- (id)initWithRouter:(OEXRouter *)router {
+    self = [super init];
+    if(self != nil) {
+        _router = router;
+    }
+    return self;
+}
+    
+    @end
+
 
 @interface OEXLoginSplashViewController ()
 
 @property (strong, nonatomic) IBOutlet UIButton* signInButton;
 @property (strong, nonatomic) IBOutlet UIButton* signUpButton;
 
-@property (strong, nonatomic) RouterEnvironment* environment;
+@property (strong, nonatomic) OEXLoginSplashViewControllerEnvironment* environment;
+//@property (strong, nonatomic) RouterEnvironment* environment;
 @property (strong, nonatomic) UIActivityIndicatorView* activityIndicator;
 
 @end
 
 @implementation OEXLoginSplashViewController
 
-- (id)initWithEnvironment:(RouterEnvironment*)environment {
+//- (id)initWithEnvironment:(RouterEnvironment*)environment {
+- (id)initWithEnvironment:(OEXLoginSplashViewControllerEnvironment*)environment {
     self = [super initWithNibName:nil bundle:nil];
     if(self != nil) {
         self.environment = environment;
@@ -38,7 +54,15 @@
     [super viewDidLoad];
     
     [self.signInButton setTitle:[Strings loginSplashSignIn] forState:UIControlStateNormal];
-    [self.signUpButton applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[Strings loginSplashSignUp]];
+//    [self.signUpButton applyButtonStyle:[self.environment.styles filledPrimaryButtonStyle] withTitle:[Strings loginSplashSignUp]];
+    [self.signUpButton setTitle:[Strings loginSplashSignUp] forState:UIControlStateNormal];
+    
+    //kAMAT_CHANGES
+    [self.signUpButton setHidden:YES];
+    [self activateActivityIndictaor];
+    
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(stopRotatingActivityIndicator) name:@"RemoveActivityIndicator" object:nil];
+
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -47,7 +71,11 @@
 }
 
 - (IBAction)showLogin:(id)sender {
-    [self.environment.router showLoginScreenFromController:self completion:nil];
+//    [self.environment.router showLoginScreenFromController:self completion:nil];
+    [(OEXAppDelegate *)[[UIApplication sharedApplication] delegate] performVPNAvailability];
+    
+    //First we dispaly the activity indicator
+    [self rotateActivityIndicator];
 }
 
 - (IBAction)showRegistration:(id)sender {

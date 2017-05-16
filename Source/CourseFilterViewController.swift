@@ -166,7 +166,7 @@ class CourseFilterViewController: UIViewController, UITableViewDataSource,UITabl
     }
     
     func filterCoursesAPI() {
-        let urlPath = kFILTER_COURSES
+        let urlPath = kFILTER_COURSES+"?page_size=400"+"&mobile=true" //kFILTER_COURSES
         
         guard let url = NSURL(string: urlPath) else {
             print("Error creating endpoint")

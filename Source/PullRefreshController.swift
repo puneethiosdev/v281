@@ -66,10 +66,9 @@ public class PullRefreshController: NSObject, ContentInsetsSource {
             make.width.equalTo(scrollView)
         }
     //Uncomment later
-/*        scrollView.oex_addObserver(self, forKeyPath: "bounds") { (observer, scrollView, _) -> Void in
+        scrollView.oex_addObserver(self, forKeyPath: "bounds") { (observer, scrollView, _) -> Void in
             observer.scrollViewDidScroll(scrollView)
         }
- */
     }
     
     private func triggered() {

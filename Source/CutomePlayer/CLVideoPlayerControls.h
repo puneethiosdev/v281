@@ -44,7 +44,8 @@ extern NSString* const CLVideoPlayerkEnd;
 extern NSString* const CLVideoPlayerkText;
 
 @protocol CLVideoPlayerControlsDelegate <NSObject>
-- (void) videoPlayerTapped:(id) sender;
+- (void) videoPlayerTapped:(UIGestureRecognizer *) sender;
+//- (void) videoPlayerTapped:(id) sender;
 - (void) transcriptLoaded:(NSArray *)transcript;
 - (void) didFinishVideoPlaying;
 @end
@@ -140,6 +141,7 @@ extern NSString* const CLVideoPlayerkText;
 
 - (void)readClosedCaptioningString:(NSString*)srtString completion:(void (^)(BOOL finished))success failure:(void (^)(NSError* error))failure;
 
+- (void)fullscreenPressed:(UIButton*)button;
 @end
 
 NS_ASSUME_NONNULL_END

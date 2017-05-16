@@ -1,8 +1,9 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="15G1004" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="11201" systemVersion="16D32" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="11161"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -15,7 +16,7 @@
                         <viewControllerLayoutGuide type="bottom" id="2zw-QW-AUq"/>
                     </layoutGuides>
                     <view key="view" contentMode="scaleToFill" id="PMR-ii-iVV">
-                        <rect key="frame" x="0.0" y="64" width="375" height="603"/>
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                         <subviews>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="iFC-95-ZX8" userLabel="RecentVideoView">
@@ -89,8 +90,6 @@
                                                             </state>
                                                         </button>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="502" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="3:45" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="sSZ-cu-2C4" customClass="OEXCustomLabel">
-                                                            <rect key="frame" x="53" y="39" width="78" height="10"/>
-
                                                             <accessibility key="accessibilityConfiguration" label="lbVideoLength"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="height" constant="10" id="42k-zQ-8dk"/>
@@ -101,9 +100,6 @@
                                                             <nil key="highlightedColor"/>
                                                         </label>
                                                         <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" tag="503" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="200MB" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4PX-dG-qM3" customClass="OEXCustomLabel">
-
-                                                            <rect key="frame" x="132" y="39" width="47" height="10"/>
-
                                                             <accessibility key="accessibilityConfiguration" label="lbVideoSize"/>
                                                             <constraints>
                                                                 <constraint firstAttribute="width" constant="47" id="i5N-jd-OQ1"/>
@@ -179,6 +175,9 @@
                                     <constraint firstAttribute="trailing" secondItem="h57-PP-XUC" secondAttribute="trailing" id="z6E-Ci-vgB"/>
                                 </constraints>
                             </view>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="pYo-Nb-vrw">
+                                <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                            </view>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="aIT-EB-vrS" userLabel="TabView">
                                 <subviews>
                                     <collectionView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" showsHorizontalScrollIndicator="NO" showsVerticalScrollIndicator="NO" minimumZoomScale="0.0" maximumZoomScale="0.0" dataMode="prototypes" translatesAutoresizingMaskIntoConstraints="NO" id="WFv-LH-THx">
@@ -191,7 +190,7 @@
                                         </collectionViewFlowLayout>
                                         <cells>
                                             <collectionViewCell opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" reuseIdentifier="tabCell" id="a0q-S3-Lpw" customClass="OEXTabBarItemsCell">
-                                                <rect key="frame" x="0.0" y="0.5" width="165" height="44"/>
+                                                <rect key="frame" x="0.0" y="1" width="165" height="44"/>
                                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMinY="YES"/>
                                                 <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center">
                                                     <rect key="frame" x="0.0" y="0.0" width="165" height="44"/>
@@ -299,6 +298,61 @@
                                     <outlet property="delegate" destination="0fg-49-r6S" id="RDa-HR-T8h"/>
                                 </connections>
                             </tableView>
+                            <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="My Videos" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="KPs-bm-5ba">
+                                <accessibility key="accessibilityConfiguration" label="myVideosHeader"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="YEO-lS-uqh"/>
+                                    <constraint firstAttribute="width" constant="120" id="oDD-QN-Pd7"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <color key="textColor" red="0.27058823529999998" green="0.28627450980000002" blue="0.31764705879999999" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="QZ2-mJ-Hgt">
+                                <accessibility key="accessibilityConfiguration" label="btnNavigation"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="80" id="RbX-OR-YBu"/>
+                                    <constraint firstAttribute="height" constant="38" id="g15-SV-XJu"/>
+                                </constraints>
+                                <inset key="contentEdgeInsets" minX="8" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal">
+                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                            </button>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tiu-x9-6gY" customClass="DACircularProgressView">
+                                <color key="backgroundColor" red="0.66666666666666663" green="0.66666666666666663" blue="0.66666666666666663" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="30" id="Zrl-IR-fAZ"/>
+                                    <constraint firstAttribute="height" constant="30" id="cvg-Ff-mOO"/>
+                                </constraints>
+                            </view>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="qkd-gT-5H9">
+                                <accessibility key="accessibilityConfiguration" label="btnDownloadScreen"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="41" id="wdK-7X-oII"/>
+                                    <constraint firstAttribute="width" constant="41" id="ydO-68-cBE"/>
+                                </constraints>
+                                <inset key="contentEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
+                                <state key="normal" image="ic_download_arrow.png">
+                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="downloadsButtonPressed:" destination="0fg-49-r6S" eventType="touchUpInside" id="V1h-RQ-hxC"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="O7e-Gg-Spv" userLabel="Select All Button" customClass="OEXCheckBox" customModule="edX" customModuleProvider="target">
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="40" id="ANs-cc-mDF"/>
+                                    <constraint firstAttribute="height" constant="40" id="YMu-Lx-M1b"/>
+                                </constraints>
+                                <inset key="contentEdgeInsets" minX="5" minY="5" maxX="5" maxY="5"/>
+                                <state key="normal">
+                                    <color key="titleShadowColor" red="0.5" green="0.5" blue="0.5" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                </state>
+                                <connections>
+                                    <action selector="selectAllChanged:" destination="0fg-49-r6S" eventType="valueChanged" id="Vlj-Tj-pTJ"/>
+                                </connections>
+                            </button>
                             <label opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="There are currently no videos downloaded" textAlignment="center" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" preferredMaxLayoutWidth="280" translatesAutoresizingMaskIntoConstraints="NO" id="K8K-cn-EfC">
                                 <accessibility key="accessibilityConfiguration" label=""/>
                                 <constraints>
@@ -312,37 +366,61 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
+                            <constraint firstItem="pYo-Nb-vrw" firstAttribute="trailing" secondItem="aIT-EB-vrS" secondAttribute="trailing" id="4ns-PK-nLA"/>
                             <constraint firstItem="K8K-cn-EfC" firstAttribute="leading" secondItem="PMR-ii-iVV" secondAttribute="leading" constant="20" id="4uZ-rf-Jpz"/>
                             <constraint firstAttribute="centerX" secondItem="tEo-nb-KXu" secondAttribute="centerX" id="7oZ-zL-9hy"/>
+                            <constraint firstItem="KPs-bm-5ba" firstAttribute="top" secondItem="Oii-9F-lJE" secondAttribute="bottom" constant="10" id="8Qk-QN-rzf"/>
                             <constraint firstItem="iFC-95-ZX8" firstAttribute="top" secondItem="aIT-EB-vrS" secondAttribute="bottom" id="9ZA-1z-Zcf"/>
                             <constraint firstItem="2zw-QW-AUq" firstAttribute="top" secondItem="iFC-95-ZX8" secondAttribute="bottom" id="BG7-Nc-rjZ"/>
+                            <constraint firstItem="pYo-Nb-vrw" firstAttribute="leading" secondItem="aIT-EB-vrS" secondAttribute="leading" id="BUP-RJ-013"/>
+                            <constraint firstItem="qkd-gT-5H9" firstAttribute="top" secondItem="Oii-9F-lJE" secondAttribute="bottom" id="Fcc-lK-zEh"/>
+                            <constraint firstItem="aIT-EB-vrS" firstAttribute="top" secondItem="O7e-Gg-Spv" secondAttribute="bottom" constant="3" id="FeT-fT-cDR"/>
                             <constraint firstItem="2zw-QW-AUq" firstAttribute="top" secondItem="tEo-nb-KXu" secondAttribute="bottom" id="GLf-QX-3cn"/>
                             <constraint firstAttribute="trailing" secondItem="iFC-95-ZX8" secondAttribute="trailing" id="HRW-06-c4H"/>
+                            <constraint firstAttribute="right" secondItem="tiu-x9-6gY" secondAttribute="right" constant="8" id="JHj-wK-BBZ"/>
                             <constraint firstItem="iFC-95-ZX8" firstAttribute="leading" secondItem="PMR-ii-iVV" secondAttribute="leading" id="Spk-fZ-Snf"/>
-                            <constraint firstItem="iFC-95-ZX8" firstAttribute="top" secondItem="Oii-9F-lJE" secondAttribute="bottom" constant="45" id="VMb-Vd-Ocm"/>
+                            <constraint firstItem="tiu-x9-6gY" firstAttribute="left" secondItem="qkd-gT-5H9" secondAttribute="left" constant="5" id="Sr0-c5-l2i"/>
+                            <constraint firstItem="iFC-95-ZX8" firstAttribute="top" secondItem="Oii-9F-lJE" secondAttribute="bottom" constant="89" id="VMb-Vd-Ocm"/>
                             <constraint firstItem="aIT-EB-vrS" firstAttribute="leading" secondItem="iFC-95-ZX8" secondAttribute="leading" id="VcD-gU-aSz"/>
                             <constraint firstAttribute="centerX" secondItem="K8K-cn-EfC" secondAttribute="centerX" id="WeO-rZ-DMV"/>
+                            <constraint firstAttribute="right" secondItem="O7e-Gg-Spv" secondAttribute="right" constant="10" id="YzO-xI-GnH"/>
+                            <constraint firstItem="aIT-EB-vrS" firstAttribute="top" secondItem="QZ2-mJ-Hgt" secondAttribute="bottom" constant="4" id="Zs6-8Q-h40"/>
+                            <constraint firstItem="KPs-bm-5ba" firstAttribute="centerX" secondItem="aIT-EB-vrS" secondAttribute="centerX" id="czk-HX-DuF"/>
                             <constraint firstAttribute="centerY" secondItem="K8K-cn-EfC" secondAttribute="centerY" id="fRX-1c-qSo"/>
                             <constraint firstItem="tEo-nb-KXu" firstAttribute="top" secondItem="aIT-EB-vrS" secondAttribute="bottom" id="kQM-HE-uGE"/>
+                            <constraint firstItem="QZ2-mJ-Hgt" firstAttribute="top" secondItem="Oii-9F-lJE" secondAttribute="bottom" constant="2" id="nS0-WP-Cr2"/>
+                            <constraint firstItem="KPs-bm-5ba" firstAttribute="left" secondItem="QZ2-mJ-Hgt" secondAttribute="right" constant="20" id="oMd-py-XJc"/>
+                            <constraint firstItem="O7e-Gg-Spv" firstAttribute="leading" secondItem="KPs-bm-5ba" secondAttribute="trailing" constant="57" id="pCO-bv-OSL"/>
+                            <constraint firstItem="aIT-EB-vrS" firstAttribute="top" secondItem="pYo-Nb-vrw" secondAttribute="bottom" id="sGg-qt-7y4"/>
                             <constraint firstItem="K8K-cn-EfC" firstAttribute="centerX" secondItem="PMR-ii-iVV" secondAttribute="centerX" id="uzP-jR-fNl"/>
+                            <constraint firstItem="tiu-x9-6gY" firstAttribute="top" secondItem="Oii-9F-lJE" secondAttribute="bottom" constant="6" id="ve2-9e-2B2"/>
+                            <constraint firstItem="QZ2-mJ-Hgt" firstAttribute="leading" secondItem="PMR-ii-iVV" secondAttribute="leadingMargin" constant="-10" id="veQ-gJ-s8p"/>
+                            <constraint firstItem="pYo-Nb-vrw" firstAttribute="top" secondItem="PMR-ii-iVV" secondAttribute="top" id="vnQ-1B-426"/>
                             <constraint firstAttribute="centerX" secondItem="aIT-EB-vrS" secondAttribute="centerX" id="wXg-WM-BJp"/>
                             <constraint firstItem="tEo-nb-KXu" firstAttribute="leading" secondItem="iFC-95-ZX8" secondAttribute="leading" id="yhh-6T-sTK"/>
                             <constraint firstAttribute="trailing" secondItem="K8K-cn-EfC" secondAttribute="trailing" constant="20" id="ywS-Fd-JBs"/>
                         </constraints>
                         <variation key="default">
                             <mask key="constraints">
+                                <exclude reference="oMd-py-XJc"/>
                                 <exclude reference="4uZ-rf-Jpz"/>
                                 <exclude reference="WeO-rZ-DMV"/>
                                 <exclude reference="ywS-Fd-JBs"/>
+                                <exclude reference="pCO-bv-OSL"/>
                             </mask>
                         </variation>
                     </view>
                     <navigationItem key="navigationItem" title="My Videos" id="pdG-Pb-PFK"/>
-                    <simulatedNavigationBarMetrics key="simulatedTopBarMetrics" translucent="NO" prompted="NO"/>
                     <connections>
                         <outlet property="ConstraintRecentTop" destination="VMb-Vd-Ocm" id="u9H-Oh-UnC"/>
+                        <outlet property="TrailingSpaceCustomProgress" destination="JHj-wK-BBZ" id="L0Q-XR-sfj"/>
+                        <outlet property="btn_Downloads" destination="qkd-gT-5H9" id="QuH-yR-v1C"/>
+                        <outlet property="btn_LeftNavigation" destination="QZ2-mJ-Hgt" id="JXr-Dq-fCx"/>
+                        <outlet property="btn_SelectAllEditing" destination="O7e-Gg-Spv" id="q8Z-rk-lgB"/>
                         <outlet property="collectionView" destination="WFv-LH-THx" id="Wzj-eG-S4X"/>
                         <outlet property="customEditing" destination="yZm-m7-fVH" id="i77-KH-FeW"/>
+                        <outlet property="customProgressView" destination="tiu-x9-6gY" id="jLI-hS-iqJ"/>
+                        <outlet property="lbl_NavTitle" destination="KPs-bm-5ba" id="j6S-jJ-fS9"/>
                         <outlet property="lbl_NoVideo" destination="K8K-cn-EfC" id="Mw6-f3-g6J"/>
                         <outlet property="lbl_videoHeader" destination="vAF-sO-Tjz" id="FUk-fz-52x"/>
                         <outlet property="recentEditViewHeight" destination="y59-fs-o6j" id="N7H-bz-46v"/>
@@ -353,6 +431,7 @@
                         <outlet property="videoVideo" destination="rNo-KV-qy8" id="7Ne-ky-sKm"/>
                         <outlet property="videoViewHeight" destination="E5T-iI-bXL" id="3Kb-Lg-pNA"/>
                         <outlet property="video_containerView" destination="h57-PP-XUC" id="AAe-yZ-A5h"/>
+                        <outlet property="view_NavBG" destination="pYo-Nb-vrw" id="9df-8N-zUx"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ewI-Ns-cyJ" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -362,6 +441,7 @@
     </scenes>
     <resources>
         <image name="bt_scrollbar_tap.png" width="229" height="80"/>
+        <image name="ic_download_arrow.png" width="44" height="44"/>
         <image name="ic_partiallywatched.png" width="12" height="12"/>
     </resources>
 </document>

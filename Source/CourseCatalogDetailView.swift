@@ -101,14 +101,13 @@ class CourseCatalogDetailView : UIView, UIWebViewDelegate {
         courseCard.addCenteredOverlay(playButton)
    
 //uncomment later 
-/*        descriptionView.scrollView.oex_addObserver(self, forKeyPath: "bounds") { (observer, scrollView, _) -> Void in
+        descriptionView.scrollView.oex_addObserver(self, forKeyPath: "bounds") { (observer, scrollView, _) -> Void in
             let offset = scrollView.contentOffset.y + scrollView.contentInset.top
             // Even though it's in the webview's scrollview,
             // the container view doesn't offset when the content scrolls.
             // As such, we manually offset it here
             observer.container.transform = CGAffineTransformMakeTranslation(0, -offset)
         }
- */
     }
     
     func setupInController(controller: UIViewController) {

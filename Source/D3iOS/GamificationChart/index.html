@@ -49,24 +49,28 @@
                         .startAngle(function(d) { return d.startAngle/2 -Math.PI/2 })
                         .endAngle(function(d) { return d.endAngle/2 -Math.PI/2 });
                         
-                        function loadPieChart() {
+                        function loadPieChart(badgeURL,username) {
                             // $(".viji").html(location.search.split("username=")[1]);
-                           //$(".viji").html(location.pathname);
-                           var file_path= location.pathname;
-                           var username_start = file_path.search("username=");
-                           var username= file_path.slice(username_start+9) ;
-                           //$(".username").html(username)
-                           
+                            //$(".viji").html(location.pathname);
+                            
+                            //var file_path= location.pathname;
+                            //var username_start = file_path.search("username=");
+                            //var username= file_path.slice(username_start+9) ;
+                            
+                            //$(".username").html(username)
+                            var badgeURL = badgeURL;
+                            var username = username;
+                            
                             nv.addGraph(function(){
                                         d3.select("#chart svg")
                                         .attr("width", width)
                                         .attr("height", height)
-                                        .datum(mod.newDataSet(username))
+                                        .datum(mod.newDataSet(badgeURL,username))
                                         .transition().duration(350)
                                         .call(chart);
                                         
                                         return chart;
-                            });
+                                        });
                         }
                     
                     //Update the Graph

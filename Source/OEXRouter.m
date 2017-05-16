@@ -111,16 +111,16 @@ OEXRegistrationViewControllerDelegate
     self.currentContentController = controller;
 }
 
-/*
+
 - (void)showSplash {
     self.revealController = nil;
     [self removeCurrentContentController];
     
-    OEXLoginSplashViewControllerEnvironment* splashEnvironment = [[OEXLoginSplashViewControllerEnvironment alloc] initWithRouter:self];
-    OEXLoginSplashViewController* splashController = [[OEXLoginSplashViewController alloc] initWithEnvironment:splashEnvironment];
+//    OEXLoginSplashViewControllerEnvironment* splashEnvironment = [[OEXLoginSplashViewControllerEnvironment alloc] initWithRouter:self];
+//    OEXLoginSplashViewController* splashController = [[OEXLoginSplashViewController alloc] initWithEnvironment:splashEnvironment];
+    OEXLoginSplashViewController* splashController = [[OEXLoginSplashViewController alloc]initWithEnvironment: _environment];
     [self makeContentControllerCurrent:splashController];
 }
-*/
 
 - (void)showLoggedInContent {
     //kAMAT_CHANGES
@@ -243,6 +243,7 @@ OEXRegistrationViewControllerDelegate
 - (void)showMyVideos {
     OEXMyVideosViewController* videoController = [[UIStoryboard storyboardWithName:@"OEXMyVideosViewController" bundle:nil]instantiateViewControllerWithIdentifier:@"MyVideos"];
     NSAssert( self.revealController != nil, @"oops! must have a revealViewController" );
+//    videoController.environment = [[OEXMyVideosViewControllerEnvironment alloc] initWithInterface:self.environment.interface networkManager:self.environment.networkManager router:self];
     videoController.environment = self.environment;
     [self showContentStackWithRootController:videoController animated:YES];
 }

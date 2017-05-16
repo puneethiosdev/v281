@@ -12,7 +12,7 @@ private let PageSize = 20
 private let footerHeight = 30
 
 
-class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate, UISearchBarDelegate,CourseFilterDelegate, NSURLSessionDelegate {
+class CourseCatalogViewController: UIViewController, CoursesTableViewControllerDelegate, NSURLSessionTaskDelegate,UISearchBarDelegate,NSURLSessionDelegate,CourseFilterDelegate {
     typealias Environment = protocol<NetworkManagerProvider, OEXRouterProvider, OEXSessionProvider, OEXConfigProvider, OEXAnalyticsProvider>
     
     private let environment : Environment
@@ -23,6 +23,7 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
     private var loadmoreView = UIView();
     var filterCoursesCount : Int16 = 0
     var pageNumber : Int = 1
+    var pageIndex : Int = 1
     
     init(environment : Environment) {
         self.environment = environment
@@ -137,7 +138,9 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
         
         tableController.delegate = self
         
-        data_request(kFILTER_COURSES,hasLoadMore: false)
+//        data_request(kFILTER_COURSES,hasLoadMore: false)
+        data_request(kFILTER_COURSES+"?page_size=400"+"&page_index=1"+"&mobile=true", hasLoadMore: false)
+
         /*
          paginationController.stream.listen(self, success:
          {[weak self] courses in
@@ -384,16 +387,19 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
             //print("Last row \(indexPath.row)")
             if filterCoursesCount-1 > indexPath.row {
                 pageNumber += 1
+                pageIndex += 1
                 
                 if (searchBar.text != nil && searchBar.text?.characters.count != 0) {
                     searchBar.resignFirstResponder()
                     //self.loadController.state = .Initial
-                    data_request(kFILTER_COURSES+"?search_string="+searchBar.text!+"&page_size=\(pageNumber*PageSize)"+"&page_index=1"+"&mobile=True",hasLoadMore: true)
+                    data_request(kFILTER_COURSES+"?search_string="+searchBar.text!+"&page_size=\(pageNumber*PageSize)"+"&page_index=\(pageIndex)"+"&mobile=true",hasLoadMore: true)
+//                    data_request(kFILTER_COURSES+"?search_string="+searchBar.text!+"&page_size=\(pageNumber*PageSize)"+"&page_index=1"+"&mobile=True",hasLoadMore: true)
                     
                 }else{
                     searchBar.resignFirstResponder()
                     //self.loadController.state = .Initial
-                    data_request(kFILTER_COURSES+"?page_size=\(pageNumber*PageSize)"+"&page_index=1"+"&mobile=True",hasLoadMore: true)
+                    data_request(kFILTER_COURSES+"?page_size=\(pageNumber*PageSize)"+"&page_index=\(pageIndex)"+"&mobile=true",hasLoadMore: true)
+//                    data_request(kFILTER_COURSES+"?page_size=\(pageNumber*PageSize)"+"&page_index=1"+"&mobile=True",hasLoadMore: true)
                 }
             }
         }
