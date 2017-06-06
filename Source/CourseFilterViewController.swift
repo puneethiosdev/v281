@@ -17,6 +17,7 @@ class CourseFilterViewController: UIViewController, UITableViewDataSource,UITabl
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var viewingCoursesLbl: UILabel!
     @IBOutlet weak var verifiedCourses: UISwitch!
+    @IBOutlet weak var mobileEnabledCourses: UISwitch!
     
     var delegate:CourseFilterDelegate?
     var items = [[String : AnyObject]]()
@@ -75,6 +76,12 @@ class CourseFilterViewController: UIViewController, UITableViewDataSource,UITabl
             filterDict.updateValue("true", forKey: "verified")
         } else {
             filterDict.updateValue("false", forKey: "verified")
+        }
+        
+        if mobileEnabledCourses.on {
+            filterDict.updateValue("true", forKey: "mobile_available")
+        } else {
+            filterDict.updateValue("false", forKey: "mobile_available")
         }
         
         self.delegate?.selectedCourseFilter(filterDict)

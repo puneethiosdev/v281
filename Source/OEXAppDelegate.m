@@ -173,7 +173,7 @@
             [schemaDictionary setObject:value forKey:key];
         }
         
-        NSLog(@"The Schema dictionary is:%@", schemaDictionary);
+        //NSLog(@"The Schema dictionary is:%@", schemaDictionary);
         
         NSDictionary *customAccessToken = [[NSDictionary alloc] initWithObjectsAndKeys:schemaDictionary[@"oauth"],@"access_token",
                                            @"", @"expires_in",
@@ -233,7 +233,7 @@
         
         [self stopRotatingActivityIndicator];
     } else {
-        NSLog(@"%s - YES INTERNET ",__FUNCTION__);
+        //NSLog(@"%s - YES INTERNET ",__FUNCTION__);
         if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count] &&  [NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"OEXLoginSplashViewController"]) {
             
             //NSLog(@"%@",[[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]);

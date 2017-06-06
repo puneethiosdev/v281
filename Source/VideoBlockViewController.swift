@@ -138,8 +138,12 @@ class VideoBlockViewController : UIViewController, CourseBlockViewController, OE
                 self.showOverlayMessage(Strings.noWifiMessage)
                 return
             }
-            
             return
+        }
+        
+        guard let videoPlayer = videoController.moviePlayerController else { return }
+        if currentOrientation() == .LandscapeLeft || currentOrientation() == .LandscapeRight {
+            videoPlayer.setFullscreen(true, withOrientation: self.currentOrientation())
         }
     }
     

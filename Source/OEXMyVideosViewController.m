@@ -920,22 +920,22 @@ typedef  enum OEXAlertType
                 [self showAlert:OEXAlertTypePlayBackErrorAlert];
             }
         }
-        
-        self.video_containerView.hidden = NO;
-        [_videoPlayerInterface setShouldRotate:YES];
-        [self.videoPlayerInterface.moviePlayerController stop];
-        self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
-        [self handleComponentsFrame];
-        
-        self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
-        self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
-        self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
-        
-        
-        [_videoPlayerInterface playVideoFor:self.currentTappedVideo];
-        // Send Analytics
-        [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
     }
+    
+    self.video_containerView.hidden = NO;
+    [_videoPlayerInterface setShouldRotate:YES];
+    [self.videoPlayerInterface.moviePlayerController stop];
+    self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
+    [self handleComponentsFrame];
+    
+    self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
+    self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
+    self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
+    
+    
+    [_videoPlayerInterface playVideoFor:self.currentTappedVideo];
+    // Send Analytics
+    [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
 }
 
 - (void)handleComponentsFrame {

@@ -7,3 +7,4 @@ COURSE_ENROLLMENT:
         COURSE_SEARCH_URL: 'https://appliedx.amat.com/courses'
 ENVIRONMENT_DISPLAY_NAME: 'AMAT'
 FEEDBACK_EMAIL_ADDRESS: 'appliedx_ops@amat.com'
+VIDEO_TRANSCRIPT_ENABLED: true

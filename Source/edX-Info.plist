@@ -47,7 +47,7 @@
 			<key>CFBundleURLIconFile</key>
 			<string></string>
 			<key>CFBundleURLName</key>
-			<string>com.amat.appliedx</string>
+			<string>org.edx.mobile</string>
 			<key>CFBundleURLSchemes</key>
 			<array>
 				<string>appliedxproduction</string>
@@ -80,10 +80,10 @@
 		<key>NSAllowsArbitraryLoads</key>
 		<true/>
 	</dict>
-	<key>NSCameraUsageDescription</key>
-	<string>Used to scan QR codes</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>for bluetooth</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Used to scan QR codes</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>so you can select a profile image</string>
 	<key>UIAppFonts</key>

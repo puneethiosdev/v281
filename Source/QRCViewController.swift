@@ -157,9 +157,6 @@ class QRCViewController: UIViewController, AVCaptureMetadataOutputObjectsDelegat
                 //with viewcontroller argument
                 environment.router?.controllerForBlockIDString(BlockID!, courseID: courseID!, fromController: self, type: type!)
                 
-                
-                
-                
                 //within the UIViewcontroller with no contain
 //                environment.router?.showContainerForBlockWithID(BlockID, type:type!, parentID: BlockID, courseID: courseID!, fromController:self)
                 
