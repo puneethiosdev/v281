@@ -90,6 +90,7 @@ static NSString* const OEXUserDetailsUrlKey = @"url";
     NSAssert(error == nil, @"Error extracting user details: %@", error);
     
     return [self initWithUserDictionary:userDetailsDictionary];
+//    return [self userDetailsData:userDetailsDictionary];
 }
 
 @end

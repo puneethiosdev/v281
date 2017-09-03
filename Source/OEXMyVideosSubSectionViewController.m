@@ -80,9 +80,9 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
 @property (weak, nonatomic) IBOutlet UIButton* btn_Downloads;
 @property (weak, nonatomic) IBOutlet NSLayoutConstraint* contraintEditingView;
 @property (weak, nonatomic) IBOutlet OEXCustomEditingView* customEditing;
-//@property (weak, nonatomic) IBOutlet OEXCheckBox* selectAllButton;
+@property (weak, nonatomic) IBOutlet OEXCheckBox* selectAllButton;
 
-@property (strong, nonatomic) OEXCheckBox* selectAllButton;
+//@property (strong, nonatomic) OEXCheckBox* selectAllButton;
 @property (strong, nonatomic) ProgressController *progressController;
 
 @property(nonatomic) GVRVideoView *vrPlayerVideoView;
@@ -112,7 +112,7 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
     //Add oserver
     [self addObservers];
     
-   if(_isTableEditing) {
+    if(_isTableEditing) {
         self.TrailingSpaceCustomProgress.constant = ORIGINAL_RIGHT_SPACE_PROGRESSBAR + SHIFT_LEFT;
     }
     
@@ -228,59 +228,59 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
     
     [self.btn_Downloads tintColor:[[OEXStyles sharedStyles] navigationItemTintColor]];
     [self enableFullscreenAutorotation];
-/*
-    isVRVideo = NO;
-    
-    //set exclusive touch for all btns
-    self.customNavigation.btn_Back.exclusiveTouch = YES;
-    self.btn_Downloads.exclusiveTouch = YES;
-    self.view.exclusiveTouch = YES;
-    self.videoVideo.exclusiveTouch = YES;
-    
-    [self setTitle:self.course.name];
-    self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@" " style:UIBarButtonItemStylePlain target:self action:@selector(navigateBack)];
-    
-    self.dataInterface = self.environment.interface;
-    
-    //Init video view and video player
-    self.videoPlayerInterface = [[OEXVideoPlayerInterface alloc] init];
-    [self.videoPlayerInterface enableFullscreenAutorotation];
-    [self addChildViewController:self.videoPlayerInterface];
-    [self.videoPlayerInterface didMoveToParentViewController:self];
-    _videoPlayerInterface.videoPlayerVideoView = self.videoVideo;
-    self.videoPlayerInterface.moviePlayerController.controls.isShownOnMyVideos = YES;
-    self.videoViewHeight.constant = 0;
-    self.videoVideo.exclusiveTouch = YES;
-    
-    //Set Navigation Buttons
-    self.selectAllButton = [[OEXCheckBox alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
-    [self.selectAllButton addTarget:self action:@selector(selectAllChanged:) forControlEvents:UIControlEventTouchUpInside];
-    self.progressController = [[ProgressController alloc] initWithOwner:self router:self.environment.router dataInterface:self.environment.interface];
-    self.navigationItem.rightBarButtonItem = [self.progressController navigationItem];
-    [self.progressController hideProgessView];
-    
-    //Fix for 20px issue for the table view
-    self.automaticallyAdjustsScrollViewInsets = NO;
-    
-    // Call to populate data
-    [self getSubsectionVideoDataFromArray];
-    
-    // Used for autorotation
-    [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
-    
-    // Show Custom editing View
-    [self.customEditing.btn_Edit addTarget:self action:@selector(editTableClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.customEditing.btn_Delete addTarget:self action:@selector(deleteTableClicked:) forControlEvents:UIControlEventTouchUpInside];
-    [self.customEditing.btn_Cancel addTarget:self action:@selector(cancelTableClicked:) forControlEvents:UIControlEventTouchUpInside];
-    self.selectAllButton.hidden = YES;
-    self.selectAllButton.accessibilityLabel = [Strings accessibilitySelectAll];
-    
-    // set select all button color to white so it look prominent on blue navigation bar
-    self.selectAllButton.tintColor = [[OEXStyles sharedStyles] navigationItemTintColor];
-    
-    self.isTableEditing = NO;           // Check Edit button is clicked
-    self.selectAll = NO;        // Check if all are selected
-*/
+    /*
+     isVRVideo = NO;
+     
+     //set exclusive touch for all btns
+     self.customNavigation.btn_Back.exclusiveTouch = YES;
+     self.btn_Downloads.exclusiveTouch = YES;
+     self.view.exclusiveTouch = YES;
+     self.videoVideo.exclusiveTouch = YES;
+     
+     [self setTitle:self.course.name];
+     self.navigationItem.backBarButtonItem = [[UIBarButtonItem alloc] initWithTitle:@" " style:UIBarButtonItemStylePlain target:self action:@selector(navigateBack)];
+     
+     self.dataInterface = self.environment.interface;
+     
+     //Init video view and video player
+     self.videoPlayerInterface = [[OEXVideoPlayerInterface alloc] init];
+     [self.videoPlayerInterface enableFullscreenAutorotation];
+     [self addChildViewController:self.videoPlayerInterface];
+     [self.videoPlayerInterface didMoveToParentViewController:self];
+     _videoPlayerInterface.videoPlayerVideoView = self.videoVideo;
+     self.videoPlayerInterface.moviePlayerController.controls.isShownOnMyVideos = YES;
+     self.videoViewHeight.constant = 0;
+     self.videoVideo.exclusiveTouch = YES;
+     
+     //Set Navigation Buttons
+     self.selectAllButton = [[OEXCheckBox alloc] initWithFrame:CGRectMake(0, 0, 40, 40)];
+     [self.selectAllButton addTarget:self action:@selector(selectAllChanged:) forControlEvents:UIControlEventTouchUpInside];
+     self.progressController = [[ProgressController alloc] initWithOwner:self router:self.environment.router dataInterface:self.environment.interface];
+     self.navigationItem.rightBarButtonItem = [self.progressController navigationItem];
+     [self.progressController hideProgessView];
+     
+     //Fix for 20px issue for the table view
+     self.automaticallyAdjustsScrollViewInsets = NO;
+     
+     // Call to populate data
+     [self getSubsectionVideoDataFromArray];
+     
+     // Used for autorotation
+     [[UIDevice currentDevice] beginGeneratingDeviceOrientationNotifications];
+     
+     // Show Custom editing View
+     [self.customEditing.btn_Edit addTarget:self action:@selector(editTableClicked:) forControlEvents:UIControlEventTouchUpInside];
+     [self.customEditing.btn_Delete addTarget:self action:@selector(deleteTableClicked:) forControlEvents:UIControlEventTouchUpInside];
+     [self.customEditing.btn_Cancel addTarget:self action:@selector(cancelTableClicked:) forControlEvents:UIControlEventTouchUpInside];
+     self.selectAllButton.hidden = YES;
+     self.selectAllButton.accessibilityLabel = [Strings accessibilitySelectAll];
+     
+     // set select all button color to white so it look prominent on blue navigation bar
+     self.selectAllButton.tintColor = [[OEXStyles sharedStyles] navigationItemTintColor];
+     
+     self.isTableEditing = NO;           // Check Edit button is clicked
+     self.selectAll = NO;        // Check if all are selected
+     */
 }
 
 - (void)addObservers {
@@ -445,7 +445,7 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
         sectionTitle = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, mainViewWidth - 20, 30)];
         sectionTitle.text = headerTitle;
         sectionTitle.font = [UIFont fontWithName:@"OpenSans-Semibold" size:14.0f];
-//        sectionTitle.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:14.0f];
+        //        sectionTitle.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:14.0f];
         sectionTitle.textColor = [UIColor blackColor];
         [viewMain addSubview:sectionTitle];
     }
@@ -468,14 +468,14 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
         chapTitle = [[UILabel alloc] initWithFrame:CGRectMake(20, 0, mainViewWidth - 20, 50)];
         chapTitle.text = chapterName;
         chapTitle.font = [UIFont fontWithName:@"OpenSans-Semibold" size:14.0f];
-//        chapTitle.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:14.0f];
+        //        chapTitle.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:14.0f];
         chapTitle.textColor = [UIColor whiteColor];
         [viewMain addSubview:chapTitle];
         
         sectionTitle = [[UILabel alloc] initWithFrame:CGRectMake(20, 50, mainViewWidth - 20, 30)];
         sectionTitle.text = headerTitle;
         sectionTitle.font = [UIFont fontWithName:@"OpenSans-Semibold" size:14.0f];
-//        sectionTitle.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:14.0f];
+        //        sectionTitle.font = [[OEXStyles sharedStyles] semiBoldSansSerifOfSize:14.0f];
         sectionTitle.textColor = [UIColor blackColor];
         [viewMain addSubview:sectionTitle];
     }
@@ -507,17 +507,17 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
         cell.lbl_Title.text = @"(Untitled)";
     }
     
-/*    double size = [obj_video.summary.size doubleValue];
-    float result = ((size / 1024) / 1024);
-    cell.lbl_Size.text = [NSString stringWithFormat:@"%.2fMB", result];
-    
-    if(!obj_video.summary.duration) {
-        cell.lbl_Time.text = @"NA";
-    }
-    else {
-        cell.lbl_Time.text = [OEXDateFormatting formatSecondsAsVideoLength: obj_video.summary.duration];
-    }
-*/
+    /*    double size = [obj_video.summary.size doubleValue];
+     float result = ((size / 1024) / 1024);
+     cell.lbl_Size.text = [NSString stringWithFormat:@"%.2fMB", result];
+     
+     if(!obj_video.summary.duration) {
+     cell.lbl_Time.text = @"NA";
+     }
+     else {
+     cell.lbl_Time.text = [OEXDateFormatting formatSecondsAsVideoLength: obj_video.summary.duration];
+     }
+     */
     
     NSFileManager* filemgr = [NSFileManager defaultManager];
     NSString* path = [obj_video.filePath stringByAppendingPathExtension:@"mp4"];
@@ -703,27 +703,27 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
         [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
     }
     
-/*    self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
-    self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
-    self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", obj.summary.name];
-    self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
-    [self.table_SubSectionVideos deselectRowAtIndexPath:indexPath animated:NO];
-    self.contraintEditingView.constant = 0;
-    [self handleComponentsFrame];
-    [_videoPlayerInterface playVideoFor:obj];
-    
-    // Send Analytics
-    [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
- */
+    /*    self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
+     self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
+     self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", obj.summary.name];
+     self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
+     [self.table_SubSectionVideos deselectRowAtIndexPath:indexPath animated:NO];
+     self.contraintEditingView.constant = 0;
+     [self handleComponentsFrame];
+     [_videoPlayerInterface playVideoFor:obj];
+     
+     // Send Analytics
+     [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
+     */
 }
 
 - (void)handleComponentsFrame {
     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
         self.videoViewHeight.constant = VIDEO_VIEW_HEIGHT;
         
-        //self.videoViewHeight.constant = self.view.bounds.size.width * STANDARD_VIDEO_ASPECT_RATIO;
-        //self.videoPlayerInterface.height = self.view.bounds.size.width * STANDARD_VIDEO_ASPECT_RATIO;
-        //self.videoPlayerInterface.width = self.view.bounds.size.width;
+        self.videoViewHeight.constant = self.view.bounds.size.width * STANDARD_VIDEO_ASPECT_RATIO;
+        self.videoPlayerInterface.height = self.view.bounds.size.width * STANDARD_VIDEO_ASPECT_RATIO;
+        self.videoPlayerInterface.width = self.view.bounds.size.width;
         
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
@@ -1140,7 +1140,7 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
         [barButtons addObject:[[UIBarButtonItem alloc] initWithCustomView:self.selectAllButton]];
     }
     if(![self.progressController progressView].hidden){
-        [barButtons addObject:[self.progressController navigationItem]];
+        //        [barButtons addObject:[self.progressController navigationItem]]; //commented for download crash error
     }
     if(barButtons.count != self.navigationItem.rightBarButtonItems.count) {
         self.navigationItem.rightBarButtonItems = barButtons;
@@ -1151,7 +1151,7 @@ typedef NS_ENUM (NSUInteger, OEXAlertType) {
 
 - (void)movieTimedOut {
     if(!_videoPlayerInterface.moviePlayerController.isFullscreen) {
-//        [self showOverlayMessage:[Strings timeoutCheckInternetConnection]];
+        //        [self showOverlayMessage:[Strings timeoutCheckInternetConnection]];
         [[OEXStatusMessageViewController sharedInstance]
          showMessage:[Strings timeoutCheckInternetConnection] onViewController:self];
         [_videoPlayerInterface.moviePlayerController stop];

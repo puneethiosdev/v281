@@ -93,11 +93,12 @@ class OEXRearTableViewController : UITableViewController {
         super.viewWillAppear(animated)
         
         if let profileCell = tableView.cellForRowAtIndexPath(NSIndexPath(forRow: OEXRearViewOptions.UserProfile.rawValue, inSection: 0)) {
+//            profileCell.accessibilityLabel = Strings.Accessibility.LeftDrawer.profileLabel(userName: environment.session.currentUser?.name ?? "", userEmail: environment.session.currentUser?.email ?? "")
             profileCell.accessibilityLabel = Strings.Accessibility.LeftDrawer.profileLabel(userName: environment.session.currentUser?.name ?? "", userEmail: environment.session.currentUser?.email ?? "")
             profileCell.accessibilityHint = Strings.Accessibility.LeftDrawer.profileHint
         }
     }
-    
+
     private func setupProfileLoader() {
         guard environment.config.profilesEnabled else { return }
         profileFeed = self.environment.userProfileManager.feedForCurrentUser()
@@ -111,7 +112,7 @@ class OEXRearTableViewController : UITableViewController {
     private func updateUIWithUserInfo() {
         if let currentUser = environment.session.currentUser {
             userNameLabel.text = currentUser.name
-            userEmailLabel.text = currentUser.email
+//            userEmailLabel.text = currentUser.email
             profileFeed?.refresh()
         }
     }
@@ -242,31 +243,109 @@ extension OEXRearTableViewController : MFMailComposeViewControllerDelegate {
         return body
     }
     
+////<---Mobile Iron email -->
+//    func launchEmailComposer() {
+//        if !MFMailComposeViewController.canSendMail() {
+//            let alert = UIAlertView(title: Strings.emailAccountNotSetUpTitle,
+//                                    message: Strings.emailAccountNotSetUpMessage,
+//                                    delegate: nil,
+//                                    cancelButtonTitle: Strings.ok)
+//            alert.show()
+//        } else {
+//            let mail = MFMailComposeViewController()
+//            mail.mailComposeDelegate = self
+//            mail.navigationBar.tintColor = OEXStyles.sharedStyles().navigationItemTintColor()
+//            mail.setSubject(Strings.SubmitFeedback.messageSubject)
+//            
+//            mail.setMessageBody(OEXRearTableViewController.supportEmailMessageTemplate(), isHTML: false)
+//
+////            mail.setMessageBody(EmailTemplates.supportEmailMessageTemplate(), isHTML: false)
+//  
+//            if let fbAddress = environment.config.feedbackEmailAddress() {
+//                mail.setToRecipients([fbAddress])
+//            }
+//            presentViewController(mail, animated: true, completion: nil)
+//        }
+//    }
+    
+    
+//<--- Intune email -->
+    
     func launchEmailComposer() {
-        if !MFMailComposeViewController.canSendMail() {
-            let alert = UIAlertView(title: Strings.emailAccountNotSetUpTitle,
-                                    message: Strings.emailAccountNotSetUpMessage,
-                                    delegate: nil,
-                                    cancelButtonTitle: Strings.ok)
-            alert.show()
-        } else {
+        
+        var mailString : String = ""
+//        mailString = String.init(format: "ms-outlook://compose?to=%@", arguments: nil)
+        mailString = String.init(format: "ms-outlook://compose?to=%@", environment.config.feedbackEmailAddress()!)
+        
+        if MFMailComposeViewController.canSendMail() {
             let mail = MFMailComposeViewController()
             mail.mailComposeDelegate = self
             mail.navigationBar.tintColor = OEXStyles.sharedStyles().navigationItemTintColor()
             mail.setSubject(Strings.SubmitFeedback.messageSubject)
-            
+
             mail.setMessageBody(OEXRearTableViewController.supportEmailMessageTemplate(), isHTML: false)
 
 //            mail.setMessageBody(EmailTemplates.supportEmailMessageTemplate(), isHTML: false)
-  
+
             if let fbAddress = environment.config.feedbackEmailAddress() {
                 mail.setToRecipients([fbAddress])
             }
             presentViewController(mail, animated: true, completion: nil)
+    
+        } else if let mailURL = NSURL(string: mailString) {
+            
+            if (UIApplication.sharedApplication().openURL(mailURL)) {
+                if #available(iOS 10, *) {
+                    UIApplication.sharedApplication().openURL(mailURL, options: [:], completionHandler: {
+                        (success) in
+                    })
+                } else if (UIApplication.sharedApplication().openURL(mailURL)){
+                    
+                }
+            } else {
+                let alert = UIAlertView(title: Strings.emailAccountNotSetUpTitle,
+                                        message: Strings.emailAccountNotSetUpMessage,
+                                        delegate: nil,
+                                        cancelButtonTitle: Strings.ok)
+                alert.show()
+            }
+        }else{
+            let alert = UIAlertView(title: Strings.emailAccountNotSetUpTitle,
+                                          message: Strings.emailAccountNotSetUpMessage,
+                                          delegate: nil,
+                                          cancelButtonTitle: Strings.ok)
+            alert.show()
         }
     }
     
     func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
+        
+        var message : String = ""
+        switch (result) {
+        case .Cancelled:
+            message = "Mail cancelled"
+            break
+        case .Saved:
+            message = "Mail saved"
+            break
+        case .Sent:
+            message = "Mail sent successfully"
+            break
+        case .Failed:
+            message = "Mail sent failure"
+            break
+        }
+        
         dismissViewControllerAnimated(true, completion: nil)
+        
+        let customAlertController = UIAlertController(title: "Mail Compose", message: message, preferredStyle: UIAlertControllerStyle.Alert);
+        //Create and add the cancel action
+        
+        let cancelAction: UIAlertAction = UIAlertAction(title: "OK", style: .Default) { action -> Void in
+            customAlertController.dismissViewControllerAnimated(true, completion: {
+            })
+        }
+        customAlertController.addAction(cancelAction)
+        self.presentViewController(customAlertController, animated: true, completion: nil)
     }
 }

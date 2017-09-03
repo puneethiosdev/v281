@@ -973,7 +973,7 @@ static OEXInterface* _sharedInterface = nil;
                 [videosArray addObject:video];
             }
             else if(video.downloadState == OEXDownloadStateNew && OEXDownloadStateNew) {
-//                [videosArray addObjectr:video];
+                [videosArray addObject:video];
             }
         }
         

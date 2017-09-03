@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (id)initWithUserDictionary:(NSDictionary*)userDetails;
 
 - (id)initWithUserDetailsData:(NSData*)data;
-- (NSData* _Nullable)userDetailsData;
+- (NSData*)userDetailsData;
 
 @property (nonatomic, copy, nullable) NSNumber* userId;
 @property (nonatomic, copy, nullable) NSString* username;

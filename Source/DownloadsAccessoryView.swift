@@ -35,6 +35,7 @@ class DownloadsAccessoryView : UIView {
         downloadSpinner.setContentCompressionResistancePriority(UILayoutPriorityRequired, forAxis: .Horizontal)
         
         self.addSubview(downloadButton)
+//        self.backgroundColor = UIColor.redColor()
         self.addSubview(downloadSpinner)
         self.addSubview(countLabel)
         

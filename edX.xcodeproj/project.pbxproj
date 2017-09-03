@@ -14,6 +14,7 @@
 		08C7CDE61D8AB59700F3D5EC /* UIWindow+TopController.m in Sources */ = {isa = PBXBuildFile; fileRef = 08C7CDE41D8AB59700F3D5EC /* UIWindow+TopController.m */; };
 		0B1212221B4F089A002EE96C /* OEXCoursewareAccess.m in Sources */ = {isa = PBXBuildFile; fileRef = 0B1212211B4F089A002EE96C /* OEXCoursewareAccess.m */; };
 		17096F941EC0B62C00667EAC /* OEXCustomNavigationView.h in Headers */ = {isa = PBXBuildFile; fileRef = 17096F931EC0B62C00667EAC /* OEXCustomNavigationView.h */; };
+		1721E5E31EED83B300B72FCD /* AVKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1721E5E21EED83B300B72FCD /* AVKit.framework */; };
 		1728B53D1E84152C002614DB /* QRCViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1728B53C1E84152C002614DB /* QRCViewController.swift */; };
 		1728B53F1E84174C002614DB /* QuizViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1728B53E1E84174C002614DB /* QuizViewController.swift */; };
 		172CC06C1EBF5D9F00451626 /* OEXStatusMessageViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 174279B51EBF57E9002054E9 /* OEXStatusMessageViewController.m */; };
@@ -32,6 +33,7 @@
 		174775081E6D7253003E491D /* nv.d3.js in Resources */ = {isa = PBXBuildFile; fileRef = 174775031E6D7253003E491D /* nv.d3.js */; };
 		174775111E6D7345003E491D /* WebViewJavascriptBridge.js.txt in Resources */ = {isa = PBXBuildFile; fileRef = 1747750F1E6D7345003E491D /* WebViewJavascriptBridge.js.txt */; };
 		174775121E6D7345003E491D /* WebViewJavascriptBridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 174775101E6D7345003E491D /* WebViewJavascriptBridge.m */; };
+		1756905A1EF7CF4C00ABB9DC /* OEXCustomNavigationView.m in Sources */ = {isa = PBXBuildFile; fileRef = 175690591EF7CF4C00ABB9DC /* OEXCustomNavigationView.m */; };
 		1756A1C91E766EF100F0D1B9 /* D3WKViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1785934E1E6C4B7A00F5EEDD /* D3WKViewController.m */; };
 		175C14D21EBF666B0037763F /* OEXColorsDataFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14D11EBF666B0037763F /* OEXColorsDataFactory.swift */; };
 		175C14D41EBF671D0037763F /* VideoTranscript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C14D31EBF671D0037763F /* VideoTranscript.swift */; };
@@ -67,6 +69,7 @@
 		175C15171EBFAA160037763F /* QR_Scan_Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 175C15161EBFAA160037763F /* QR_Scan_Icon.png */; };
 		175C15191EBFAA9C0037763F /* qr-code-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 175C15181EBFAA9C0037763F /* qr-code-icon.png */; };
 		175C151C1EBFB0BB0037763F /* OEXRearTableViewControllerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 175C151A1EBFAE280037763F /* OEXRearTableViewControllerTests.swift */; };
+		1770AB491F1F2E8500E52ADD /* QR-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 1770AB481F1F2E8500E52ADD /* QR-icon.png */; };
 		1785939A1E6C4B7A00F5EEDD /* D3WKViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1785934E1E6C4B7A00F5EEDD /* D3WKViewController.m */; };
 		178593A41E6C4B7A00F5EEDD /* WebKitController.m in Sources */ = {isa = PBXBuildFile; fileRef = 1785935A1E6C4B7A00F5EEDD /* WebKitController.m */; };
 		178593D01E6C618200F5EEDD /* Constants.m in Sources */ = {isa = PBXBuildFile; fileRef = 178593CF1E6C618200F5EEDD /* Constants.m */; };
@@ -795,6 +798,7 @@
 		0B1212231B4F08B6002EE96C /* OEXCoursewareAccess.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = OEXCoursewareAccess.h; sourceTree = "<group>"; };
 		0CDA0A05ED3F40A3D948E4F4 /* libPods-edX.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-edX.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		17096F931EC0B62C00667EAC /* OEXCustomNavigationView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OEXCustomNavigationView.h; sourceTree = "<group>"; };
+		1721E5E21EED83B300B72FCD /* AVKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVKit.framework; path = System/Library/Frameworks/AVKit.framework; sourceTree = SDKROOT; };
 		1728B53C1E84152C002614DB /* QRCViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QRCViewController.swift; sourceTree = "<group>"; };
 		1728B53E1E84174C002614DB /* QuizViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = QuizViewController.swift; sourceTree = "<group>"; };
 		174154F51E6FD6FD000A3BF0 /* d3.min.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = d3.min.js; path = GamificationChart/d3.min.js; sourceTree = "<group>"; };
@@ -814,6 +818,7 @@
 		1747750E1E6D7345003E491D /* WebViewJavascriptBridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebViewJavascriptBridge.h; path = Source/D3iOS/WebViewJavascriptBridge.h; sourceTree = SOURCE_ROOT; };
 		1747750F1E6D7345003E491D /* WebViewJavascriptBridge.js.txt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = WebViewJavascriptBridge.js.txt; path = Source/D3iOS/WebViewJavascriptBridge.js.txt; sourceTree = SOURCE_ROOT; };
 		174775101E6D7345003E491D /* WebViewJavascriptBridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = WebViewJavascriptBridge.m; path = Source/D3iOS/WebViewJavascriptBridge.m; sourceTree = SOURCE_ROOT; };
+		175690591EF7CF4C00ABB9DC /* OEXCustomNavigationView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OEXCustomNavigationView.m; sourceTree = "<group>"; };
 		175C14D11EBF666B0037763F /* OEXColorsDataFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OEXColorsDataFactory.swift; sourceTree = "<group>"; };
 		175C14D31EBF671D0037763F /* VideoTranscript.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = VideoTranscript.swift; sourceTree = "<group>"; };
 		175C14D81EBF68160037763F /* RatingContainerView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RatingContainerView.swift; sourceTree = "<group>"; };
@@ -848,6 +853,7 @@
 		175C15161EBFAA160037763F /* QR_Scan_Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = QR_Scan_Icon.png; sourceTree = "<group>"; };
 		175C15181EBFAA9C0037763F /* qr-code-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "qr-code-icon.png"; sourceTree = "<group>"; };
 		175C151A1EBFAE280037763F /* OEXRearTableViewControllerTests.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OEXRearTableViewControllerTests.swift; sourceTree = "<group>"; };
+		1770AB481F1F2E8500E52ADD /* QR-icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "QR-icon.png"; sourceTree = "<group>"; };
 		1785934D1E6C4B7A00F5EEDD /* D3WKViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = D3WKViewController.h; path = D3iOS/D3WKViewController.h; sourceTree = "<group>"; };
 		1785934E1E6C4B7A00F5EEDD /* D3WKViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = D3WKViewController.m; path = D3iOS/D3WKViewController.m; sourceTree = "<group>"; };
 		178593591E6C4B7A00F5EEDD /* WebKitController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = WebKitController.h; path = D3iOS/WebKitController.h; sourceTree = "<group>"; };
@@ -1704,6 +1710,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1721E5E31EED83B300B72FCD /* AVKit.framework in Frameworks */,
 				776F39291B4EF4CD00ED11E3 /* WebKit.framework in Frameworks */,
 				805329121B0EA2DC0093B177 /* QuartzCore.framework in Frameworks */,
 				8F562F901A1F451600320DB3 /* CoreMotion.framework in Frameworks */,
@@ -1914,6 +1921,7 @@
 		1972E3B619BF474900085F08 /* Analytics */ = {
 			isa = PBXGroup;
 			children = (
+				772619B41ADC5CE8005BD7E4 /* Application */,
 				175C14EC1EBF84800037763F /* FirebaseAnalyticsTracker.swift */,
 				7712732F1BA8FAD2008BA397 /* OEXAnalytics+Swift.swift */,
 				7712732D1BA8F5C7008BA397 /* SegmentAnalyticsTracker.swift */,
@@ -2122,6 +2130,7 @@
 		69ECC5AE1D50D1170030CF87 /* Icons */ = {
 			isa = PBXGroup;
 			children = (
+				1770AB481F1F2E8500E52ADD /* QR-icon.png */,
 				175C15181EBFAA9C0037763F /* qr-code-icon.png */,
 				175C15161EBFAA160037763F /* QR_Scan_Icon.png */,
 				17AAADEB1E9F379400BFABA1 /* Camera-Blue.png */,
@@ -2237,6 +2246,7 @@
 			isa = PBXGroup;
 			children = (
 				17096F931EC0B62C00667EAC /* OEXCustomNavigationView.h */,
+				175690591EF7CF4C00ABB9DC /* OEXCustomNavigationView.m */,
 				193B504319459C2F0038E11C /* OEXCustomButton.h */,
 				193B504419459C2F0038E11C /* OEXCustomButton.m */,
 				193B50461945A0520038E11C /* OEXCustomLabel.h */,
@@ -3213,6 +3223,7 @@
 		BECB7B0D1924C0C3009C77F1 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1721E5E21EED83B300B72FCD /* AVKit.framework */,
 				776F39281B4EF4CD00ED11E3 /* WebKit.framework */,
 				805329111B0EA2DC0093B177 /* QuartzCore.framework */,
 				77ACA1C81A323C2500039AD1 /* Crashlytics.framework */,
@@ -3239,7 +3250,6 @@
 			children = (
 				1972E3B619BF474900085F08 /* Analytics */,
 				175C14D71EBF68040037763F /* App Review */,
-				772619B41ADC5CE8005BD7E4 /* Application */,
 				B4B6D5E21A94901A000F44E8 /* Authentication */,
 				77864DDA1B10057600182FC2 /* Base Structures */,
 				1AB539E51BFA24E20065501F /* Certificates and Badges */,
@@ -3662,7 +3672,7 @@
 					77E6478D1C90C10300B6740D = {
 						CreatedOnToolsVersion = 7.2.1;
 						DevelopmentTeam = LCDC66DJM2;
-						ProvisioningStyle = Automatic;
+						ProvisioningStyle = Manual;
 					};
 					77E647961C90C10300B6740D = {
 						CreatedOnToolsVersion = 7.2.1;
@@ -3843,6 +3853,7 @@
 				69ECC6041D50D1170030CF87 /* OpenSans-LightItalic.ttf in Resources */,
 				69ECC64F1D50D1170030CF87 /* Default-Landscape@3x.png in Resources */,
 				69ECC6331D50D1170030CF87 /* ic_lms_blue.png in Resources */,
+				1770AB491F1F2E8500E52ADD /* QR-icon.png in Resources */,
 				69ECC6511D50D1170030CF87 /* handouts-announcements.css in Resources */,
 				69ECC6431D50D1170030CF87 /* logo@3x.png in Resources */,
 				175C15171EBFAA160037763F /* QR_Scan_Icon.png in Resources */,
@@ -4158,6 +4169,7 @@
 				1904A1511A1386C2006A5524 /* OEXStorageFactory.m in Sources */,
 				778F17851C10A1B50099BF93 /* CourseCatalogDetailViewController.swift in Sources */,
 				770A3D451AF0167A008F09D9 /* UIControl+OEXBlockActions.m in Sources */,
+				1756905A1EF7CF4C00ABB9DC /* OEXCustomNavigationView.m in Sources */,
 				770848C41B21334F002FEEEE /* OEXMathUtilities.m in Sources */,
 				F22A0ABB1CE60D5E00D50DFF /* NetworkManager+Authenticators.swift in Sources */,
 				9EC6E1001BDE40E100729704 /* OEXCourse+Swift.swift in Sources */,

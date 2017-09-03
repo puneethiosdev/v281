@@ -13,7 +13,7 @@ NS_ASSUME_NONNULL_BEGIN
 - (OEXAccessToken*)initWithTokenDetails:(NSDictionary*)dict;
 
 /// data should have been previously created by the -accessTokenData method
-+ (OEXAccessToken* _Nullable)accessTokenWithData:(NSData*)accessTokenData;
++ (OEXAccessToken*)accessTokenWithData:(NSData*)accessTokenData;
 
 @property(nonatomic, strong, nullable) NSDate* expiryDate;
 @property(nonatomic, copy, nullable) NSString* accessToken;

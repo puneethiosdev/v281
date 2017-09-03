@@ -127,6 +127,51 @@
     return YES;
 }
 
+-(void)setup {
+#if DEBUG
+    // Skip all this initialization if we're running the unit tests
+    // So they can start from a clean state.
+    // dispatch_async so that the XCTest bundle (where TestEnvironmentBuilder lives) has already loaded
+    if([[NSProcessInfo processInfo].arguments containsObject:@"-UNIT_TEST"]) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            Class builder = NSClassFromString(@"TestEnvironmentBuilder");
+            NSAssert(builder != nil, @"Can't find test environment builder");
+            (void)[[builder alloc] init];
+        });
+//        return YES;
+    }
+    if([[NSProcessInfo processInfo].arguments containsObject:@"-END_TO_END_TEST"]) {
+        [[[OEXSession alloc] init] closeAndClearSession];
+        [OEXFileUtility nukeUserData];
+    }
+#endif
+    
+    // logout user automatically if server changed
+    [[[ServerChangedChecker alloc] init] logoutIfServerChanged];
+    
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    self.window.backgroundColor = [UIColor whiteColor];
+    [self.window makeKeyAndVisible];
+    
+    isFirstVersionCheck = YES;
+    NSDate *backgroundDate = [NSDate date];
+    [[NSUserDefaults standardUserDefaults] setObject:backgroundDate forKey:@"BackgroundDate"];
+    
+    
+    if ([self.reachability isReachableViaWWAN])
+    {
+        UIAlertView *cellularInternetAlert = [[UIAlertView alloc] initWithTitle:nil message:OEXLocalizedString(@"CONNECT_TO_WIFI_MESSAGE", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [cellularInternetAlert show];
+    }
+    
+    [self setupGlobalEnvironment];
+    [self.environment.session performMigrations];
+    [self.environment.router openInWindow:self.window];
+    [self activateActivityIndictaor];
+    
+}
+
+
 - (UIInterfaceOrientationMask)application:(UIApplication *)application supportedInterfaceOrientationsForWindow:(UIWindow *)window{
     
     UIViewController *topController = self.window.rootViewController;
@@ -152,6 +197,16 @@
     
     //SFSafari
     [self.window.rootViewController.presentedViewController dismissViewControllerAnimated:true completion:nil];
+    
+    
+//    if ([url.absoluteString containsString:@"appliedxproduction://"]){
+    if ([url.absoluteString isEqualToString:APP_URL]){
+        
+        [self setup];
+        [self appLauchSetUp];
+        
+        return handled;
+    }
     
     if ([url.absoluteString containsString:UNDEFINED_USER]) {
         
@@ -252,6 +307,38 @@
     }
 }
 
+-(void) appLauchSetUp {
+    /*! If VR Videos are playing then should not call version web service & display alerts */
+    if (self.isVRVideosPlaying) {
+        return;
+    }
+    
+    if(!self.reachability) {
+        
+        UIAlertView *noInternetAlert = [[UIAlertView alloc] initWithTitle:OEXLocalizedString(@"NETWORK_NOT_AVAILABLE_TITLE", nil) message:OEXLocalizedString(@"NETWORK_NOT_AVAILABLE_MESSAGE", nil) delegate:nil cancelButtonTitle:@"OK" otherButtonTitles:nil];
+        [noInternetAlert show];
+        
+        [self stopRotatingActivityIndicator];
+    } else {
+        //NSLog(@"%s - YES INTERNET ",__FUNCTION__);
+        if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count] &&  [NSStringFromClass([[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]) isEqualToString:@"OEXLoginSplashViewController"]) {
+            
+            //NSLog(@"%@",[[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] class]);
+            //NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
+            
+            if ([[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] count]) {
+                [(OEXLoginSplashViewController*)[[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers] objectAtIndex:0] rotateActivityIndicator];
+                [self performVPNAvailability];
+                //NSLog(@"No Need of SSO because we are in signup,signin, eula");
+            }
+            
+        }else{
+            //NSLog(@"%@",[[UIWindow getVisibleViewControllerFrom:[self.window rootViewController]] childViewControllers]);
+            [self performVPNAvailability];
+        }
+    }
+}
+
 //kAMAT_CHANGES
 #pragma - VPN Check
 - (void) performVPNAvailability
@@ -259,10 +346,12 @@
     [self rotateActivityIndicator];
     [self performSelector:@selector(checkDoWeNeedToCallSSO) withObject:nil afterDelay:1.0f];
 
+    /*
     //VPN Check & start
     NSURL *ceoURL = [NSURL URLWithString:[VPN_CHECK_URL stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
     vpnConnection = [[NSURLConnection alloc ]initWithRequest:[NSURLRequest requestWithURL:ceoURL] delegate:self startImmediately:YES];
     [vpnConnection start];
+     */
 }
 
 #pragma mark -  SSO

@@ -234,7 +234,7 @@
     
     //Validate empty URL
     if (video.summary.videoURL.length == 0) {
-        [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval videoURL: video.summary.videoURL];
+        [self playVideoFromURL:url withTitle:video.summary.name timeInterval:timeinterval videoURL:video.summary.videoURL];
     }else{
         
         //        OEXSession* session = [OEXSession sharedSession];
@@ -545,6 +545,7 @@
     _shouldRotate = YES;
 }
 
+
 - (void)orientationChanged:(NSNotification*)notification {
     //To enable landscape orientation in MyVideos section, we are commenting this code.
     //AMAT
@@ -567,19 +568,18 @@
     
 }
 
-/*
-- (void)orientationChanged:(NSNotification*)notification {
-    if(_shouldRotate) {
-        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(manageOrientation) object:nil];
-        
-        if(![self isVerticallyCompact]) {
-            [self manageOrientation];
-        }
-        else {
-            [self performSelector:@selector(manageOrientation) withObject:nil afterDelay:0.8];
-        }
-    }
-} */
+//- (void)orientationChanged:(NSNotification*)notification {
+//    if(_shouldRotate) {
+//        [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(manageOrientation) object:nil];
+//        
+//        if(![self isVerticallyCompact]) {
+//            [self manageOrientation];
+//        }
+//        else {
+//            [self performSelector:@selector(manageOrientation) withObject:nil afterDelay:0.8];
+//        }
+//    }
+//} 
 
 - (void) stopVRPlayer{
     if (_videoView != nil) {

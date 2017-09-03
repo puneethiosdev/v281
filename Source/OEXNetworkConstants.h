@@ -72,9 +72,10 @@
  #define SERVER_URL @"https://appliedx.amat.com/"
  #define PING_SSO_URL @"https://appliedx.amat.com/auth/login/tpa-saml/?auth_entry=login&next=/mobileappredirect&idp=pingsso"
  #define APP_SCHEMA_URL @"appliedxproduction://?"
+ #define APP_URL @"appliedxproduction://"
  #define VERSION_CHECK_URL @"https://appliedx.amat.com/latest_app_version"
-// #define kDownloadURLForProduction @"https://mivsp01.amat.com/mifs/asfV3x/appstore?clientid=1073760408&vspver=7.5.0.0" //MI
- #define kDownloadURLForProduction @"https://portal.fei.msua01.manage.microsoft.com/Apps#All" //Intune download
+ #define kDownloadURLForProduction @"https://mivsp01.amat.com/mifs/asfV3x/appstore?clientid=1073760408&vspver=7.5.0.0" //MI version update download url
+//, #define kDownloadURLForProduction @"https://portal.fei.msua01.manage.microsoft.com/Apps#All" //Intune version update download url
  #define kFILTER_COURSES @"https://appliedx.amat.com/search_courses"
  #define POINTS_BADGES_URL @"https://badges.appliedx.amat.com/api/v0/"
 
@@ -88,7 +89,6 @@
 // #define kDownloadURLForProduction @"https://portal.fei.msua01.manage.microsoft.com/Apps#All" //Intune download
 //// #define kDownloadURLForProduction @"https://mivsp01.amat.com/mifs/asfV3x/appstore?clientid=1073760408&vspver=7.5.0.0"
 // #define kFILTER_COURSES @"https://appliedx.amat.com/search_courses?search_string=360"
-
 
 
 //CEO- Check -  To check the VPN Availability.

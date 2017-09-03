@@ -52,7 +52,6 @@
 #define ORIGINAL_RIGHT_SPACE_OFFLINE 15
 #define StandardVideoAspectRatio 0.6
 
-/*
 @implementation OEXMyVideosViewControllerEnvironment
 
 - (id)initWithInterface:(OEXInterface *)interface networkManager:(NetworkManager *)networkManager router:(OEXRouter *)router {
@@ -65,7 +64,7 @@
 }
 
 @end
- */
+ 
 
 typedef  enum OEXAlertType
 {
@@ -156,7 +155,7 @@ typedef  enum OEXAlertType
     [super viewWillAppear:animated];
     //Analytics Screen record
     [[OEXAnalytics sharedAnalytics] trackScreenWithName: @"My Videos - All Videos"];
-//    [[OEXAnalytics sharedAnalytics] trackScreenWithName: OEXAnalyticsScreenMyVideosAllVideos];
+    [[OEXAnalytics sharedAnalytics] trackScreenWithName: OEXAnalyticsScreenMyVideosAllVideos];
     
     [self.navigationController setNavigationBarHidden:true animated:animated];
     
@@ -317,10 +316,10 @@ typedef  enum OEXAlertType
         //Initiate player object
         self.videoPlayerInterface = [[OEXVideoPlayerInterface alloc] init];
         [self.videoPlayerInterface enableFullscreenAutorotation];
-        self.videoPlayerInterface.delegate = self;
         
         [self addChildViewController:self.videoPlayerInterface];
         [self.videoPlayerInterface didMoveToParentViewController:self];
+        self.videoPlayerInterface.delegate = self;
         
         _videoPlayerInterface.view.translatesAutoresizingMaskIntoConstraints = false;
         _videoPlayerInterface.fadeInOnLoad = false;
@@ -383,7 +382,7 @@ typedef  enum OEXAlertType
 
 - (void)updateTotalDownloadProgress:(NSNotification* )notification {
     [self.customProgressView setProgress:_dataInterface.totalProgress animated:YES];
-    //[self updateNavigationItemButtons];
+    [self updateNavigationItemButtons];
 }
 
 - (void)getMyVideosTableData {
@@ -920,31 +919,31 @@ typedef  enum OEXAlertType
                 [self showAlert:OEXAlertTypePlayBackErrorAlert];
             }
         }
+        
+        self.video_containerView.hidden = NO;
+        [_videoPlayerInterface setShouldRotate:YES];
+        [self.videoPlayerInterface.moviePlayerController stop];
+        self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
+        [self handleComponentsFrame];
+        
+        self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
+        self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
+        self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
+        
+        
+        [_videoPlayerInterface playVideoFor:self.currentTappedVideo];
+        // Send Analytics
+        [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
     }
-    
-    self.video_containerView.hidden = NO;
-    [_videoPlayerInterface setShouldRotate:YES];
-    [self.videoPlayerInterface.moviePlayerController stop];
-    self.currentVideoURL = [NSURL fileURLWithPath:self.currentTappedVideo.filePath];
-    [self handleComponentsFrame];
-    
-    self.lbl_videoHeader.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
-    self.lbl_videobottom.text = [NSString stringWithFormat:@"%@ ", self.currentTappedVideo.summary.name];
-    self.lbl_section.text = [NSString stringWithFormat:@"%@\n%@", self.currentTappedVideo.summary.sectionPathEntry.name, self.currentTappedVideo.summary.chapterPathEntry.name];
-    
-    
-    [_videoPlayerInterface playVideoFor:self.currentTappedVideo];
-    // Send Analytics
-    [_dataInterface sendAnalyticsEvents:OEXVideoStatePlay withCurrentTime:self.videoPlayerInterface.moviePlayerController.currentPlaybackTime forVideo:self.currentTappedVideo];
 }
 
 - (void)handleComponentsFrame {
     [UIView animateWithDuration:ANIMATION_DURATION animations:^{
         self.videoViewHeight.constant = 225;
-/*        self.videoViewHeight.constant = self.view.bounds.size.width * STANDARD_VIDEO_ASPECT_RATIO;
+        self.videoViewHeight.constant = self.view.bounds.size.width * STANDARD_VIDEO_ASPECT_RATIO;
         self.videoPlayerInterface.height = self.view.bounds.size.width * STANDARD_VIDEO_ASPECT_RATIO;
         self.videoPlayerInterface.width = self.view.bounds.size.width;
-*/
+
         [self.recentEditViewHeight setConstant:0.0f];
         [self.view layoutIfNeeded];
     } completion:^(BOOL finished) {
@@ -1353,7 +1352,7 @@ typedef  enum OEXAlertType
         [[OEXStatusMessageViewController sharedInstance] showMessage:[Strings timeoutCheckInternetConnection]
                                                     onViewController:self
          ];
-//        [self showOverlayMessage:[Strings timeoutCheckInternetConnection]];
+        [self showOverlayMessage:[Strings timeoutCheckInternetConnection]];
         [_videoPlayerInterface.moviePlayerController stop];
     }
     else {

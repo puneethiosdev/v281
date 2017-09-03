@@ -246,7 +246,11 @@ class CourseCatalogViewController: UIViewController, CoursesTableViewControllerD
                         self.tableController.courses = courses
                         self.tableController.tableView.reloadData()
                         
-                        self.showOverlayMessage("We couldn't find any results for " + self.searchBar.text!+".")
+                        if (self.searchBar.text == ""){
+                            self.showOverlayMessage("We couldn't find any results for selected options.")
+                        } else {
+                            self.showOverlayMessage("We couldn't find any results for " + self.searchBar.text!+".")
+                        }
                         self.searchBar.text = nil;
                         self.data_request(kFILTER_COURSES,hasLoadMore: false)
                     }else{

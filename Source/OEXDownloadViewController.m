@@ -144,6 +144,7 @@
     
     [self configureCell:cell forIndexPath:indexPath];
 #ifdef __IPHONE_8_0
+//#ifdef __IPHONE_10_2
     if(IS_IOS8) {
         [cell setLayoutMargins:UIEdgeInsetsZero];
     }

@@ -43,7 +43,7 @@ class CourseSectionTableViewCell: UITableViewCell, CourseBlockContainerCell {
                 self?.downloadView.itemCount = downloads.count
             }
             else {
-                self?.content.trailingView = nil
+                self?.content.trailingView = nil //self!.downloadView 
             }
         }
         

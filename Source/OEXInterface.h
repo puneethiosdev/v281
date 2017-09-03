@@ -77,7 +77,7 @@ extern NSString* const OEXDownloadEndedNotification;
 + (float) getOEXVideoSpeed:(OEXVideoSpeed) speed;
 
 #pragma mark Last Accessed
-- (OEXHelperVideoDownload* _Nullable)lastAccessedSubsectionForCourseID:(NSString*)courseID;
+- (OEXHelperVideoDownload*)lastAccessedSubsectionForCourseID:(NSString*)courseID;
 
 #pragma mark Video Management
 /// videos is an array of OEXVideoSummary
@@ -85,7 +85,7 @@ extern NSString* const OEXDownloadEndedNotification;
 /// videos is an array of OEXHelperVideoDownload
 /// This should really take a courseID not the outline URL, but that will require more serious refactoring
 - (void)setVideos:(NSArray*)videos forURL:(NSString*)URLString;
-- (NSString* _Nullable)URLStringForType:(NSString*)type;
+- (NSString*)URLStringForType:(NSString*)type;
 - (NSMutableArray*)videosForChapterID:(NSString*)chapter
                             sectionID:(nullable NSString*)section
                                   URL:(NSString*)URLString;
@@ -131,7 +131,7 @@ extern NSString* const OEXDownloadEndedNotification;
 - (void)deleteUnregisteredItems;
 
 #pragma mark Video Management
-- (OEXHelperVideoDownload* _Nullable)stateForVideoWithID:(nullable NSString*)videoID courseID:(nullable NSString*)courseID;
+- (OEXHelperVideoDownload*)stateForVideoWithID:(nullable NSString*)videoID courseID:(nullable NSString*)courseID;
 - (OEXDownloadState)downloadStateForVideoWithID:(nullable NSString*)videoID;
 - (OEXPlayedState)watchedStateForVideoWithID:(nullable NSString*)videoID;
 - (float)lastPlayedIntervalForVideo:(OEXHelperVideoDownload*)video;
